@@ -245,6 +245,9 @@
           <property name="sortingEnabled" >
            <bool>true</bool>
           </property>
+          <property name="allColumnsShowFocus" >
+           <bool>true</bool>
+          </property>
           <column>
            <property name="text" >
             <string>ID</string>
@@ -380,6 +383,9 @@
             </item>
             <item row="0" column="0" colspan="5" >
              <widget class="QTreeWidget" name="treeWidget_5" >
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
               <column>
                <property name="text" >
                 <string>ID</string>
@@ -521,7 +527,7 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <widget class="QWidget" name="" >
+          <widget class="QWidget" name="layoutWidget" >
            <layout class="QVBoxLayout" >
             <property name="margin" >
              <number>0</number>
