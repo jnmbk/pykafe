@@ -20,6 +20,11 @@ class ClientSession:
     startTime = None
     orders = []
 
+    def isReachable(self):
+        if state == 0:
+            return False
+        else:
+            return True
     def isWorking(self):
         if state == 1:
             return True
@@ -30,8 +35,11 @@ class ClientSession:
             return True
         else:
             return False
-    def isReachable(self):
-        if state == 0:
-            return False
+    def getCurrentState(self):
+        """returns current state as a string"""
+        if self.state == 0:
+            return "N/A"
+        elif self.state == 1:
+            return "Ready"
         else:
-            return True
+            return "Logged In"
