@@ -21,9 +21,10 @@ from gettext import translation
 _ = translation('pyKafe', fallback=True).ugettext
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor):
+    def __init__(self, parent, socketDescriptor, clients):
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
+        self.clients = clients
         self.blockSize = 0
 
     def run(self):
@@ -39,7 +40,12 @@ class ListenerThread(QtCore.QThread):
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation):
         QtGui.QTreeWidgetItem.__init__(self, parent)
-        self.setText(0,"asfasf")
+        self.fillList(clientInformation)
+
+    def fillList(self, clientInformation):
+        self.ip = clientInformation["ip"]
+        self.setText(0, clientInformation["name"])
+        self.setText(1, clientInformation["session"].getCurrentState())
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
@@ -52,9 +58,10 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.clients = []
         for clientInformation in self.config.clientList:
             self.clients.append(Client(ui.main_treeWidget, clientInformation))
+        ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
 
     def incomingConnection(self, socketDescriptor):
-        thread = ListenerThread(self.parent(), socketDescriptor)
+        thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
         thread.start()
 
     def startClient(self):
