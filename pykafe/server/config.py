@@ -11,7 +11,9 @@
 #
 
 #TODO: Read config from database api
+from session import ClientSession
+
 class PykafeConfiguration:
     class network:
         port = 23105
-        clientport = 23106
+    computerList = ({"ip":"192.168.2.3", "name":"computer1", "session":ClientSession()})
