@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2007, pyKafe Development Team
 #
@@ -101,6 +100,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_shutDownButton,0,7,1,1)
 
         self.main_treeWidget = QtGui.QTreeWidget(self.tab)
+        self.main_treeWidget.setRootIsDecorated(False)
         self.main_treeWidget.setSortingEnabled(True)
         self.main_treeWidget.setAllColumnsShowFocus(True)
         self.main_treeWidget.setObjectName("main_treeWidget")
@@ -472,7 +472,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        self.server = server.PykafeServer(MainWindow)
+        self.server = server.PykafeServer(MainWindow, self)
         QtCore.QObject.connect(self.main_startButton,QtCore.SIGNAL("clicked()"),self.server.startClient)
         QtCore.QObject.connect(self.main_stopButton,QtCore.SIGNAL("clicked()"),self.server.stopClient)
         QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("activated()"),MainWindow.close)
