@@ -15,6 +15,7 @@
 from PyQt4 import QtNetwork, QtCore, QtGui
 from config import PykafeConfiguration
 from sys import exit
+from base64 import encodestring, decodestring
 
 from gettext import translation
 _ = translation('pyKafe', fallback=True).ugettext
@@ -23,20 +24,23 @@ class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor):
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
+        self.blockSize = 0
 
     def run(self):
-        socket = QtNetwork.QTcpSocket()
-        socket.setSocketDescriptor(self.socketDescriptor)
-        socket.write("jghvyv")
-        print "yazdım"
-        socket.disconnectFromHost()
-        socket.waitForDisconnected()
+        self.tcpSocket = QtNetwork.QTcpSocket()
+        self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
+        QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readSocket)
+        self.tcpSocket.waitForDisconnected()
+
+    def readSocket(self):
+        print decodestring(self.tcpSocket.readAll())
+        self.tcpSocket.disconnectFromHost()
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
-        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), self.config.network.port):
+        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port):
             #TODO: retry button
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
             exit()
