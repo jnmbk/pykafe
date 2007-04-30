@@ -16,4 +16,4 @@ from session import ClientSession
 class PykafeConfiguration:
     class network:
         port = 23105
-    computerList = ({"ip":"192.168.2.3", "name":"computer1", "session":ClientSession()})
+    clientList = [{"ip":"192.168.2.3", "name":"computer1", "session":ClientSession()}]

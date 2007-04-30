@@ -36,15 +36,22 @@ class ListenerThread(QtCore.QThread):
         print decodestring(self.tcpSocket.readAll())
         self.tcpSocket.disconnectFromHost()
 
+class Client(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, clientInformation):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.setText(0,"asfasf")
+
 class PykafeServer(QtNetwork.QTcpServer):
-    def __init__(self, parent):
+    def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port):
             #TODO: retry button
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
             exit()
-        #QtCore.QObject.connect(self.server, QtCore.SIGNAL("incomingConnection()"), self.handleConnection)
+        self.clients = []
+        for clientInformation in self.config.clientList:
+            self.clients.append(Client(ui.main_treeWidget, clientInformation))
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor)

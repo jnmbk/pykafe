@@ -141,7 +141,7 @@
          </spacer>
         </item>
         <item row="0" column="6" >
-         <widget class="QToolButton" name="toolButton_5" >
+         <widget class="QToolButton" name="main_settingsButton" >
           <property name="statusTip" >
            <string>Opens settings for this computer</string>
           </property>
@@ -166,7 +166,7 @@
          </widget>
         </item>
         <item row="0" column="5" >
-         <widget class="QToolButton" name="toolButton_4" >
+         <widget class="QToolButton" name="main_remoteButton" >
           <property name="statusTip" >
            <string>Opens remote desktop connection</string>
           </property>
@@ -216,7 +216,7 @@
          </widget>
         </item>
         <item row="0" column="7" >
-         <widget class="QToolButton" name="toolButton_6" >
+         <widget class="QToolButton" name="main_shutDownButton" >
           <property name="statusTip" >
            <string>Shuts down selected computer</string>
           </property>
@@ -242,6 +242,9 @@
         </item>
         <item row="1" column="0" colspan="9" >
          <widget class="QTreeWidget" name="main_treeWidget" >
+          <property name="rootIsDecorated" >
+           <bool>false</bool>
+          </property>
           <property name="sortingEnabled" >
            <bool>true</bool>
           </property>
@@ -323,7 +326,7 @@
              </spacer>
             </item>
             <item row="2" column="1" >
-             <widget class="QPushButton" name="pushButton_12" >
+             <widget class="QPushButton" name="orders_addButton_1" >
               <property name="text" >
                <string>Add</string>
               </property>
@@ -333,7 +336,7 @@
              </widget>
             </item>
             <item row="2" column="2" >
-             <widget class="QPushButton" name="pushButton_13" >
+             <widget class="QPushButton" name="orders_updateButton_1" >
               <property name="text" >
                <string>Update</string>
               </property>
@@ -343,7 +346,7 @@
              </widget>
             </item>
             <item row="2" column="3" >
-             <widget class="QPushButton" name="pushButton_14" >
+             <widget class="QPushButton" name="orders_deleteButton_1" >
               <property name="text" >
                <string>Delete</string>
               </property>
@@ -353,7 +356,7 @@
              </widget>
             </item>
             <item row="2" column="4" >
-             <widget class="QPushButton" name="pushButton_15" >
+             <widget class="QPushButton" name="orders_cancelButton_1" >
               <property name="text" >
                <string>Cancel</string>
               </property>
@@ -371,18 +374,18 @@
                <number>6</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox" />
+               <widget class="QComboBox" name="orders_idComboBox" />
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_2" />
+               <widget class="QComboBox" name="orders_itemComboBox" />
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_3" />
+               <widget class="QSpinBox" name="orders_spinBox1" />
               </item>
              </layout>
             </item>
             <item row="0" column="0" colspan="5" >
-             <widget class="QTreeWidget" name="treeWidget_5" >
+             <widget class="QTreeWidget" name="oders_treeWidget_1" >
               <property name="sortingEnabled" >
                <bool>true</bool>
               </property>
@@ -435,7 +438,7 @@
              </spacer>
             </item>
             <item row="2" column="1" >
-             <widget class="QPushButton" name="pushButton_10" >
+             <widget class="QPushButton" name="orders_addButton_2" >
               <property name="text" >
                <string>Add</string>
               </property>
@@ -445,7 +448,7 @@
              </widget>
             </item>
             <item row="2" column="2" >
-             <widget class="QPushButton" name="pushButton_9" >
+             <widget class="QPushButton" name="orders_updateButton_2" >
               <property name="text" >
                <string>Update</string>
               </property>
@@ -455,7 +458,7 @@
              </widget>
             </item>
             <item row="2" column="3" >
-             <widget class="QPushButton" name="pushButton_11" >
+             <widget class="QPushButton" name="orders_deleteButton_2" >
               <property name="text" >
                <string>Delete</string>
               </property>
@@ -465,7 +468,7 @@
              </widget>
             </item>
             <item row="0" column="0" colspan="4" >
-             <widget class="QTreeWidget" name="treeWidget_4" >
+             <widget class="QTreeWidget" name="orders_treeWidget_2" >
               <property name="sortingEnabled" >
                <bool>true</bool>
               </property>
@@ -495,13 +498,13 @@
                <number>6</number>
               </property>
               <item>
-               <widget class="QLineEdit" name="lineEdit_3" />
+               <widget class="QLineEdit" name="orders_itemLineEdit" />
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_4" />
+               <widget class="QSpinBox" name="orders_spinBox_2" />
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_5" />
+               <widget class="QSpinBox" name="orders_spinBox_3" />
               </item>
              </layout>
             </item>
@@ -536,7 +539,7 @@
              <number>6</number>
             </property>
             <item>
-             <widget class="QTreeWidget" name="treeWidget_2" >
+             <widget class="QTreeWidget" name="members_treeWidget" >
               <property name="alternatingRowColors" >
                <bool>true</bool>
               </property>
@@ -634,7 +637,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="user_add" >
+               <widget class="QPushButton" name="user_addButton" >
                 <property name="text" >
                  <string>Add</string>
                 </property>
@@ -644,7 +647,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="user_update" >
+               <widget class="QPushButton" name="user_updateButton" >
                 <property name="text" >
                  <string>Update</string>
                 </property>
@@ -654,7 +657,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="user_delete" >
+               <widget class="QPushButton" name="user_deleteButton" >
                 <property name="text" >
                  <string>Delete</string>
                 </property>
@@ -753,7 +756,7 @@
                <number>6</number>
               </property>
               <item row="1" column="1" >
-               <widget class="QDateEdit" name="dateEdit_2" />
+               <widget class="QDateEdit" name="members_dateEdit_2" />
               </item>
               <item row="0" column="0" colspan="2" >
                <widget class="QLabel" name="textLabel7" >
@@ -766,7 +769,7 @@
                </widget>
               </item>
               <item row="1" column="0" >
-               <widget class="QDateEdit" name="dateEdit" />
+               <widget class="QDateEdit" name="members_dateEdit" />
               </item>
              </layout>
             </item>
@@ -822,10 +825,10 @@
            <number>6</number>
           </property>
           <item row="0" column="0" >
-           <widget class="QDateTimeEdit" name="dateTimeEdit" />
+           <widget class="QDateTimeEdit" name="logs_dateTimeEdit_1" />
           </item>
           <item rowspan="2" row="0" column="1" >
-           <widget class="QPushButton" name="pushButton_8" >
+           <widget class="QPushButton" name="logs_searchButton" >
             <property name="icon" >
              <iconset>../../data/icons/find.png</iconset>
             </property>
@@ -838,12 +841,12 @@
            </widget>
           </item>
           <item row="1" column="0" >
-           <widget class="QDateTimeEdit" name="dateTimeEdit_2" />
+           <widget class="QDateTimeEdit" name="logs_dateTimeEdit_2" />
           </item>
          </layout>
         </item>
         <item row="1" column="0" colspan="3" >
-         <widget class="QTreeWidget" name="treeWidget_3" >
+         <widget class="QTreeWidget" name="logs_treeWidget" >
           <column>
            <property name="text" >
             <string>Date</string>
