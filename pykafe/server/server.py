@@ -30,11 +30,22 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
+        clientIpList = []
+        for client in self.clients:
+            clientIpList.append(QtNetwork.QHostAddress(client.ip))
+        try:
+            self.clientNumber = clientIpList.index(self.tcpSocket.localAddress())
+        except ValueError:
+            self.tcpSocket.disconnectFromHost()
         QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readSocket)
         self.tcpSocket.waitForDisconnected()
 
     def readSocket(self):
-        print decodestring(self.tcpSocket.readAll())
+        client = self.clients[self.clientNumber]
+        data = decodestring(self.tcpSocket.readAll())
+        if data[:2] == "00":
+            client.session.setState(1)
+            client.settext(1, client.session.getCurrentState())
         self.tcpSocket.disconnectFromHost()
 
 class Client(QtGui.QTreeWidgetItem):
@@ -43,9 +54,10 @@ class Client(QtGui.QTreeWidgetItem):
         self.fillList(clientInformation)
 
     def fillList(self, clientInformation):
+        self.session = clientInformation["session"]
         self.ip = clientInformation["ip"]
         self.setText(0, clientInformation["name"])
-        self.setText(1, clientInformation["session"].getCurrentState())
+        self.setText(1, self.session.getCurrentState())
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):

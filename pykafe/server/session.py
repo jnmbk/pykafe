@@ -43,3 +43,5 @@ class ClientSession:
             return "Ready"
         else:
             return "Logged In"
+    def setState(self, stateNumber):
+        self.state = stateNumber
