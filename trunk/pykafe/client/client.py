@@ -30,13 +30,7 @@ class ListenerThread(QtCore.QThread):
         self.tcpSocket.waitForDisconnected()
 
     def readSocket(self):
-        stream = QtCore.QDataStream(self.tcpSocket)
-        stream.setVersion(QtCore.QDataStream.Qt_4_2)
-        if self.blockSize == 0 and self.tcpSocket.bytesAvailable() > 2:
-            self.blockSize = stream.readInt16()
-        if self.tcpSocket.bytesAvailable() < self.blockSize:
-            return
-        data = stream.readString()
+        data = self.tcpSocket.readAll()
         print data
 
 class PykafeClient(QtNetwork.QTcpServer):
@@ -44,19 +38,16 @@ class PykafeClient(QtNetwork.QTcpServer):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
         self.listen(QtNetwork.QHostAddress(self.config.network.serverIP), self.config.network.port)
-        if not self.informServer():
-            print "olmadı"
+        self.informServer()
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor)
         thread.start()
 
     def informServer(self):
+        #Say: I'm here to server
         tcpSocket = QtNetwork.QTcpSocket()
         print tcpSocket.connectToHost(QtNetwork.QHostAddress(self.config.network.serverIP), self.config.network.port)
         tcpSocket.waitForConnected()
-        data = "sşçüelam"
-        print "data:", data
-        print tcpSocket.write(encodestring(data))
+        tcpSocket.write(encodestring("00"))
         tcpSocket.waitForBytesWritten()
-        return True
