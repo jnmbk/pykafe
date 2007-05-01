@@ -16,6 +16,7 @@ from PyQt4 import QtNetwork, QtCore
 from config import PykafeConfiguration
 from sys import exit
 from base64 import encodestring
+from time import sleep
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor):
@@ -47,7 +48,8 @@ class PykafeClient(QtNetwork.QTcpServer):
     def informServer(self):
         #Say: I'm here to server
         tcpSocket = QtNetwork.QTcpSocket()
-        print tcpSocket.connectToHost(QtNetwork.QHostAddress(self.config.network.serverIP), self.config.network.port)
-        tcpSocket.waitForConnected()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(self.config.network.serverIP), self.config.network.port)
+        tcpSocket.waitForConnected(-1)
         tcpSocket.write(encodestring("00"))
         tcpSocket.waitForBytesWritten()
+        tcpSocket.disconnectFromHost()
