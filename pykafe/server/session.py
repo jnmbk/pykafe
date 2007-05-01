@@ -41,7 +41,8 @@ class ClientSession:
             return "N/A"
         elif self.state == 1:
             return "Ready"
-        else:
+        elif self.state == 2:
             return "Logged In"
+
     def setState(self, stateNumber):
         self.state = stateNumber
