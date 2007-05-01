@@ -48,7 +48,7 @@ class ListenerThread(QtCore.QThread):
             client.session.setState(1)
             client.settext(1, client.session.getCurrentState())
         elif data[:2] == "01":
-            #Says that user wants to connect
+            #User wants to open
             answer = QtGui.QMessageBox.information(client.parent().parent(), "Opening Request", "%s sent an opening request. Accept?" % client.name, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.No:
                 self.tcpSocket.write("000")
