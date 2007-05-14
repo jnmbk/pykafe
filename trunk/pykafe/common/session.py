@@ -10,15 +10,19 @@
 # Please read the COPYING file.
 #
 
+import locale, gettext
+locale.setlocale(locale.LC_ALL, "C")
+_ = gettext.translation("pyKafe_common", fallback=True).ugettext
+
 class ClientSession:
     """class for managing client sessions"""
-
-    #state can be: 0:N/A, 1:Working, 2:LoggedIn
-    state = 0
-    user = None
-    settings = None
-    startTime = None
-    orders = []
+    notAvailable, working, loggedIn, requestedOpening = 0, 1, 2, 3
+    def __init__(self):
+        self.state = 0
+        self.user = None
+        self.settings = None
+        self.startTime = None
+        self.orders = []
 
     def isReachable(self):
         if state == 0:
@@ -37,12 +41,14 @@ class ClientSession:
             return False
     def getCurrentState(self):
         """returns current state as a string"""
-        if self.state == 0:
-            return "N/A"
-        elif self.state == 1:
-            return "Ready"
-        elif self.state == 2:
-            return "Logged In"
+        if self.state == self.notAvailable:
+            return _("N/A")
+        elif self.state == self.working:
+            return _("Ready")
+        elif self.state == self.loggedIn:
+            return _("Logged In")
+        elif self.state == self.requestedOpening:
+            return _("Requested Opening")
 
     def setState(self, stateNumber):
         self.state = stateNumber
