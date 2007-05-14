@@ -10,14 +10,9 @@
 # Please read the COPYING file.
 #
 
-from sys import argv, exit
 from PyQt4 import QtCore, QtGui
-import client
+import client, sys
 
-"""if not server.listen(QtNetwork.QHostAddress(config.network.serverIP), config.network.port):
-    #TODO: don't exit, send information to gui and retry every 3 seconds
-    exit("Connection Error: %s" % server.errorString())
-"""
-app = QtGui.QApplication(argv)
+app = QtGui.QApplication(sys.argv)
 client = client.PykafeClient(QtCore.QObject())
-exit(app.exec_())
+sys.exit(app.exec_())
