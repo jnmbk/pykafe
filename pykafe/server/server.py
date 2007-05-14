@@ -14,18 +14,31 @@
 
 from PyQt4 import QtNetwork, QtCore, QtGui
 from config import PykafeConfiguration
-from sys import exit
-from base64 import encodestring, decodestring
+from session import ClientSession
+import base64
 
-from gettext import translation
-_ = translation('pyKafe', fallback=True).ugettext
+import locale, gettext
+locale.setlocale(locale.LC_ALL, "C")
+_ = gettext.translation("pyKafe_server", fallback=True).ugettext
+
+class MessageSender(QtCore.QThread):
+    def __init__(self, parent, ip, port, message):
+        QtCore.QThread.__init__(self, parent)
+        self.ip, self.port, self.message = ip, port, message
+    def run(self):
+        tcpSocket = QtNetwork.QTcpSocket()
+        tcpSocket.connectToHost(QtNetWork.QHostAddress(self.ip), self.port)
+        tcpSocket.waitForConnected()
+        tcpSocket.write(base64.encodestring(self.message))
+        tcpSocket.waitForBytesWritten()
+        tcpSocket.disconnectFromHost()
+        tcpSocket.waitForDisconnected()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, clients):
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
         self.clients = clients
-        self.blockSize = 0
 
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
@@ -42,31 +55,47 @@ class ListenerThread(QtCore.QThread):
 
     def readSocket(self):
         client = self.clients[self.clientNumber]
-        data = decodestring(self.tcpSocket.readAll())
-        if data[:2] == "00":
+        data = base64.decodestring(self.tcpSocket.readAll())
+        if data[:3] == "004":
             #Says I'm here
-            client.session.setState(1)
+            client.session.state = ClientSession.working
             client.settext(1, client.session.getCurrentState())
-        elif data[:2] == "01":
+        elif data[:3] == "000":
             #User wants to open
-            answer = QtGui.QMessageBox.information(client.parent().parent(), "Opening Request", "%s sent an opening request. Accept?" % client.name, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if answer == QtGui.QMessageBox.No:
-                self.tcpSocket.write("000")
-            else:
-                self.tcpSocket.write("001")
+            client.session.state = ClientSession.requestedOpening
+            client.changeColor("red")
+            self.tcpSocket.write(base64.encodestring("0010"))
+            self.tcpSocket.write(base64.encodestring("0011"))
         self.tcpSocket.disconnectFromHost()
 
 class Client(QtGui.QTreeWidgetItem):
-    def __init__(self, parent, clientInformation):
+    def __init__(self, parent, clientInformation, config):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.fillList(clientInformation)
+        self.config = config 
 
     def fillList(self, clientInformation):
-        self.session = clientInformation["session"]
-        self.ip = clientInformation["ip"]
-        self.name = clientInformation["name"]
+        self.session = clientInformation.session
+        self.ip = clientInformation.ip
+        self.name = clientInformation.name
         self.setText(0, self.name)
+        self.setState(ClientSession.notAvailable)
+    def changeColor(self, colorName):
+        for i in range(self.columnCount()):
+            self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
+    def sendMessage(self, message):
+        thread = MessageSender(self.ip, self.config.network.port, message)
+    def setState(self, state, user = None, endTime = None):
+        self.session.state = state
         self.setText(1, self.session.getCurrentState())
+        if state == ClientSession.loggedIn:
+            self.session.user = user
+            self.setText(2, user)
+            self.setText(3, self.config.currency.prefix + "0" + self.config.currency.suffix)
+            self.session.startTime = QtCore.QDateTime.currentDateTime()
+            self.setText(4, self.session.startTime.time().toString())
+            if endTime:
+                self.setText(5, self.session.endTime.time().toString())
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
@@ -78,16 +107,31 @@ class PykafeServer(QtNetwork.QTcpServer):
             exit()
         self.clients = []
         for clientInformation in self.config.clientList:
-            self.clients.append(Client(ui.main_treeWidget, clientInformation))
+            self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
+        self.ui = ui
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
         thread.start()
 
     def startClient(self):
-        print 1
-        pass
+        current = self.ui.main_treeWidget.currentColumn()
+        if current != -1:
+            client = self.clients[current]
+            state = client.session.state
+            if state == ClientSession.notAvailable:
+                QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+            if state == ClientSession.working:
+                #TODO
+                pass
+            if state == ClientSession.loggedIn:
+                QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
+            if state == ClientSession.requestedOpening:
+                client.sendMessage("0011")
+                client.setState(ClientSession.loggedIn)
+        else:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
     def startTimed(self):
         print 2
         pass
