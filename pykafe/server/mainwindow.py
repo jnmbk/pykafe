@@ -20,7 +20,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,668,505).size()).expandedTo(MainWindow.minimumSizeHint()))
-
+        icon = QtGui.QIcon("../../data/icons/pyKafe.png")
+        MainWindow.setWindowIcon(icon)
+        
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 

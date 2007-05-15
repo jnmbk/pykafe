@@ -24,7 +24,8 @@ class PykafeConfiguration:
         #TODO: read general settings from database, and provide a method to write them.
         pass
     clientList = [ClientInformation("192.168.2.3", "computer1"),
-                  ClientInformation("192.168.2.4", "computer2")]
+                  ClientInformation("192.168.2.4", "computer2"),
+                  ClientInformation("192.168.2.5", "computer3")]
     class network:
         port = 23105
     class currency:

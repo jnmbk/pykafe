@@ -15,6 +15,7 @@
 from PyQt4 import QtNetwork, QtCore, QtGui
 from config import PykafeConfiguration
 from session import ClientSession
+from database import Database
 import base64
 
 import locale, gettext
@@ -47,7 +48,7 @@ class ListenerThread(QtCore.QThread):
         for client in self.clients:
             clientIpList.append(QtNetwork.QHostAddress(client.ip))
         try:
-            self.clientNumber = clientIpList.index(self.tcpSocket.localAddress())
+            self.clientNumber = clientIpList.index(self.tcpSocket.peerAddress())
         except ValueError:
             self.tcpSocket.disconnectFromHost()
         QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readSocket)
@@ -58,15 +59,32 @@ class ListenerThread(QtCore.QThread):
         data = base64.decodestring(self.tcpSocket.readAll())
         if data[:3] == "004":
             #Says I'm here
-            client.session.state = ClientSession.working
-            client.settext(1, client.session.getCurrentState())
+            if client.session.state == ClientSession.notAvailable:
+                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.working)
+            else:
+                #TODO: illegal activity
+                pass
         elif data[:3] == "000":
             #User wants to open
-            client.session.state = ClientSession.requestedOpening
-            client.changeColor("red")
-            self.tcpSocket.write(base64.encodestring("0010"))
-            self.tcpSocket.write(base64.encodestring("0011"))
+            if client.session.state == ClientSession.working:
+                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.requestedOpening)
+            else:
+                #TODO: illegal activity
+                pass
+        elif data[:3] == "002":
+            if client.session.state == ClientSession.working:
+                username, password = data[3:].split("|")
+                db = Database()
+                db.cur.execute("select count() from members where username = ? and password = ?", username, password)
+                if db.cur.fetchall()[0][0]:
+                    self.secureSend("0031")
+                    client.setState(ClientSession.loggedIn)
+                else:
+                    #TODO: log: wrong password or username entered
+                    self.secureSend("0030")
         self.tcpSocket.disconnectFromHost()
+    def secureSend(self, data):
+        self.tcpSocket.write(base64.encodestring("data"))
 
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation, config):
@@ -113,7 +131,11 @@ class PykafeServer(QtNetwork.QTcpServer):
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("stateChange"), self.setClientState)
         thread.start()
+
+    def setClientState(self, client, state):
+        self.clients[client].setState(state)
 
     def startClient(self):
         current = self.ui.main_treeWidget.currentColumn()
