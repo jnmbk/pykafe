@@ -21,13 +21,20 @@ import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
-def sendData(ip, port, data):
+def sendDataToServer(data):
     tcpSocket = QtNetwork.QTcpSocket()
-    tcpSocket.connectToHost(QtNetwork.QHostAddress(ip), port)
+    tcpSocket.connectToHost(QtNetwork.QHostAddress(PykafeConfiguration().network.serverIP), PykafeConfiguration().network.port)
     tcpSocket.waitForConnected(-1)
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
-    tcpSocket.disconnectFromHost()
+    print "sent to server:", data
+def sendDataToUi(data):
+    tcpSocket = QtNetwork.QTcpSocket()
+    tcpSocket.connectToHost(QtNetwork.QHostAddress(PykafeConfiguration().network.serverIP), PykafeConfiguration().network.localPort)
+    tcpSocket.waitForConnected(-1)
+    tcpSocket.write(base64.encodestring(data))
+    tcpSocket.waitForBytesWritten()
+    print "sent to server:", data
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, client):
@@ -38,6 +45,8 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
+        self.emit(QtCore.SIGNAL("connection"), self.tcpSocket.peerAddress())
+        print "connection request from:", self.tcpSocket.peerAddress()
         if self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readUi)
         elif self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(self.client.config.network.serverIP):
@@ -46,29 +55,43 @@ class ListenerThread(QtCore.QThread):
             sys.stderr.write(_("Unauthorized server tried to connect, aborting: %s") % self.tcpSocket.peerAddress())
             self.tcpSocket.disconnectFromHost()
         self.tcpSocket.waitForDisconnected()
+        print "disconnected"
 
     def readServer(self):
         data = base64.decodestring(self.tcpSocket.readAll())
+        print "received from server:", data
         if data[:3] == "001":
-            pass
+            if self.client.session.state == ClientSession.working:
+                sendDataToUi(data)
+            else:
+                sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
+
     def readUi(self):
         data = base64.decodestring(self.tcpSocket.readAll())
+        print "received from user:", data
         if data[:3] == "000":
-            if self.client.state == ClientSession.working:
-                sendData(self.client.config.network.serverIP, self.client.config.network.port, "000")
+            if self.client.session.state == ClientSession.working:
+                sendDataToServer("000")
             else:
                 sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.getCurrentState())
-
+        elif data[:3] == "004":
+            if self.client.session.state == ClientSession.notAvailable:
+                sendDataToServer("004")
+                self.session.state = ClientSession.working
+            else:
+                sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self, parent):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
         self.session = ClientSession()
-        self.listen(QtNetwork.QHostAddress(self.config.network.serverIP), self.config.network.port)
-        #Say: I'm here to server
-        sendData(self.config.network.serverIP, self.config.network.port, "004")
-        self.session.state = ClientSession.working
-
+        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port)
+        print "listening?", self.isListening()
+        print "listening to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any).toString() ,self.config.network.port
     def incomingConnection(self, socketDescriptor):
+        print "called incomingConnection"
         thread = ListenerThread(self.parent(), socketDescriptor, self)
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("connection"), self.connectionSignal)
         thread.start()
+    def connectionSignal(self, text):
+        print text
