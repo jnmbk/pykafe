@@ -15,3 +15,4 @@ class PykafeConfiguration:
     class network:
         serverIP = "192.168.2.2"
         port = 23105
+        localPort = 23106

@@ -10,12 +10,30 @@
 # Please read the COPYING file.
 #
 
-import base64, os, sys
+import base64, os, sys, time
 from PyQt4 import QtCore, QtGui, QtNetwork
+from config import PykafeConfiguration
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
+
+class SenderThread(QtCore.QThread):
+    def __init__(self, parent, data):
+        QtCore.QThread.__init__(self, parent)
+        self.data = data
+    def run(self):
+        tcpSocket = QtNetwork.QTcpSocket()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.port)
+        print "connecting to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost).toString(), PykafeConfiguration().network.port
+        if not tcpSocket.waitForConnected(-1):
+            print "error:", tcpSocket.errorString(), "sending exit signal"
+            self.emit(QtCore.SIGNAL("exit()"))
+        else:
+            tcpSocket.write(base64.encodestring(self.data))
+            tcpSocket.waitForBytesWritten()
+            print "sent:", self.data
+            tcpSocket.disconnectFromHost()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, ui):
@@ -25,30 +43,38 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        if self.tcpSocket.peerAddress() == QtNetwork.QHostAddress.LocalHost:
-            data = base64.decodestring(self.tcpSocket.readAll())
-            if data[:3] == "001":
-                if data[3] == "1":
-                    os.system("pyKafeclient&")
-                    self.ui.close()
-                elif data[3] == "0":
-                    self.ui.statusbar.showMessage(_("Server didn't give acknowledge"))
-            elif data[:3] == "003":
-                pass
+        data = base64.decodestring(self.tcpSocket.readAll())
+        print "received:", data
+        if data[:3] == "001":
+            if data[3] == "1":
+                os.system("pyKafeclient&")
+                self.emit(QtCore.SIGNAL("close"))
+            elif data[3] == "0":
+                self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
+        elif data[:3] == "003":
+            pass
         self.tcpSocket.disconnect()
         self.tcpSocket.waitForDisconnected()
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.ui = ui
-        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), 23106)
+        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
+        print "listening localhost on port:", PykafeConfiguration().network.localPort
+        thread = SenderThread(self.parent(), "004")
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("exit()"), parent.close)
+        thread.start()
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.ui)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.ui.close)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
         thread.start()
     def login(self):
-        pass
+        thread = SenderThread(self.parent(), "002" + self.ui.username.text + "|" + self.ui.password.text)
+        thread.start()
     def request(self):
-        pass
+        thread = SenderThread(self.parent(), "000")
+        thread.start()
 
 class Ui_LoginWindow(object):
     def setupUi(self, MainWindow):

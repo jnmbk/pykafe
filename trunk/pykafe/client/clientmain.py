@@ -21,23 +21,22 @@ class CurrencyConfig:
     prefix = ""
     suffix = " YTL"
     fixedPrice = 0.50
-    tenMinutePrice = 10
+    tenMinutePrice = 0.15
 
 class TimerThread(QtCore.QThread):
-    def __init__(self, parent, ui, startTime, endTime, currencyConfig):
+    def __init__(self, parent, startTime, endTime, currencyConfig):
         QtCore.QThread.__init__(self, parent)
         self.startTime = startTime
         self.endTime = endTime
         self.currencyConfig = currencyConfig
-        self.ui = ui
     def run(self):
         while True:
-            time.sleep(1)
             self.do()
+            time.sleep(60)
     def do(self):
         currentTime = QtCore.QDateTime.currentDateTime()
         usedTime = self.startTime.secsTo(currentTime)
-        price = usedTime/6*self.currencyConfig.tenMinutePrice
+        price = usedTime/600*self.currencyConfig.tenMinutePrice
         remainingTime = QtCore.QDateTime()
         if self.endTime.isValid():
             remainingTime.setTime_t(currentTime.secsTo(self.endTime))
@@ -46,17 +45,16 @@ class TimerThread(QtCore.QThread):
         temp = usedTime
         usedTime = QtCore.QDateTime()
         usedTime.setTime_t(temp)
-        print 1
-        self.ui.timeLabel.setText(currentTime.time().toString("hh.mm") + "\n" +\
-                               remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
-                               usedTime.toUTC().time().toString("hh.mm"))
-        print 2
-
-        if self.currencyConfig.fixedPrice < temp/6*self.currencyConfig.tenMinutePrice:
-            self.ui.moneyLabel.setText(self.currencyConfig.prefix + str(price) + self.currencyConfig.suffix)
+        text = self.startTime.time().toString("hh.mm") + "\n" +\
+               remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
+               usedTime.toUTC().time().toString("hh.mm")
+        self.emit(QtCore.SIGNAL("changeTimeLabel"), text)
+        if self.currencyConfig.fixedPrice < price:
+            text = self.currencyConfig.prefix + str(price) + self.currencyConfig.suffix
         else:
-            self.ui.moneyLabel.setText(self.currencyConfig.prefix + str(self.currencyConfig.fixedPrice) + self.currencyConfig.suffix)
-        print 3
+            text = self.currencyConfig.prefix + str(self.currencyConfig.fixedPrice) + self.currencyConfig.suffix
+        self.emit(QtCore.SIGNAL("changeMoneyLabel"), text)
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -126,7 +124,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QObject.connect(self.cafeteriaButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.logoutButton,QtCore.SIGNAL("clicked()"),sys.exit)
+        QtCore.QObject.connect(self.logoutButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         #tray things
         trayMenu = QtGui.QMenu("pyKafe", MainWindow)
@@ -137,9 +135,10 @@ class Ui_MainWindow(object):
         self.trayIcon.show()
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
-        #TODO:
-        #thread = TimerThread(MainWindow, self, QtCore.QDateTime.currentDateTime(), QtCore.QDateTime(), CurrencyConfig())
-        #thread.start()
+        thread = TimerThread(MainWindow, QtCore.QDateTime.currentDateTime(), QtCore.QDateTime(), CurrencyConfig())
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
+        thread.start()
     def iconActivated(self, reason):
         if reason == QtGui.QSystemTrayIcon.Trigger:
             if self.ui.isVisible():
@@ -153,7 +152,7 @@ class Ui_MainWindow(object):
         self.cafeteriaButton.setText(_("Cafeteria"))
         self.moneyLabel.setText("0")
         self.timeLabel.setText("00.00\n00.00\n00.00")
-        self.label.setText(_("Starting Time:\n") + _("Remaining Time:\n") + _("Used Time:"))
+        self.label.setText(_("Starting Time:") + "\n" + _("Remaining Time:") + "\n" + _("Used Time:"))
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
