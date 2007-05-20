@@ -10,9 +10,9 @@
 # Please read the COPYING file.
 #
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore
 import client, sys
 
-app = QtGui.QApplication(sys.argv)
+app = QtCore.QCoreApplication(sys.argv)
 client = client.PykafeClient(QtCore.QObject())
 sys.exit(app.exec_())
