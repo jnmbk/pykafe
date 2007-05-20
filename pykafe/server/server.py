@@ -52,7 +52,6 @@ class ListenerThread(QtCore.QThread):
         except ValueError:
             self.tcpSocket.disconnectFromHost()
         QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readSocket)
-        self.tcpSocket.waitForDisconnected()
 
     def readSocket(self):
         client = self.clients[self.clientNumber]
