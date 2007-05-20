@@ -28,7 +28,7 @@ class MessageSender(QtCore.QThread):
         self.ip, self.port, self.message = ip, port, message
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
-        tcpSocket.connectToHost(QtNetWork.QHostAddress(self.ip), self.port)
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(self.ip), self.port)
         tcpSocket.waitForConnected()
         tcpSocket.write(base64.encodestring(self.message))
         tcpSocket.waitForBytesWritten()
@@ -84,7 +84,7 @@ class ListenerThread(QtCore.QThread):
                     self.secureSend("0030")
         self.tcpSocket.disconnectFromHost()
     def secureSend(self, data):
-        self.tcpSocket.write(base64.encodestring("data"))
+        self.tcpSocket.write(base64.encodestring(data))
 
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation, config):
@@ -103,6 +103,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
     def sendMessage(self, message):
         thread = MessageSender(self.ip, self.config.network.port, message)
+        thread.run()
     def setState(self, state, user = None, endTime = None):
         self.session.state = state
         self.setText(1, self.session.getCurrentState())
