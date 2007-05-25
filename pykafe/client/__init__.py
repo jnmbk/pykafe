@@ -14,5 +14,5 @@ from PyQt4 import QtCore
 import client, sys
 
 app = QtCore.QCoreApplication(sys.argv)
-client = client.PykafeClient(QtCore.QObject())
+client = client.PykafeClient()
 sys.exit(app.exec_())

@@ -81,8 +81,8 @@ class ListenerThread(QtCore.QThread):
             else:
                 sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
 class PykafeClient(QtNetwork.QTcpServer):
-    def __init__(self, parent):
-        QtNetwork.QTcpServer.__init__(self, parent)
+    def __init__(self):
+        QtNetwork.QTcpServer.__init__(self, None)
         self.config = PykafeConfiguration()
         self.session = ClientSession()
         self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port)
