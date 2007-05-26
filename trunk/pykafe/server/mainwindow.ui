@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>668</width>
-    <height>505</height>
+    <width>650</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -418,7 +418,7 @@
           </widget>
           <widget class="QGroupBox" name="groupBox_3" >
            <property name="title" >
-            <string>Cafeteria</string>
+            <string>Cafeteria Products</string>
            </property>
            <layout class="QGridLayout" >
             <property name="margin" >
@@ -640,7 +640,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="user_addButton" >
+               <widget class="QPushButton" name="members_addButton" >
                 <property name="text" >
                  <string>Add</string>
                 </property>
@@ -650,7 +650,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="user_updateButton" >
+               <widget class="QPushButton" name="members_updateButton" >
                 <property name="text" >
                  <string>Update</string>
                 </property>
@@ -660,12 +660,22 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="user_deleteButton" >
+               <widget class="QPushButton" name="members_deleteButton" >
                 <property name="text" >
                  <string>Delete</string>
                 </property>
                 <property name="icon" >
                  <iconset>../../data/icons/edit_remove.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="members_reportsButton" >
+                <property name="text" >
+                 <string>Reports</string>
+                </property>
+                <property name="icon" >
+                 <iconset>../../data/icons/find.png</iconset>
                 </property>
                </widget>
               </item>
@@ -700,13 +710,10 @@
                </widget>
               </item>
               <item row="4" column="1" >
-               <widget class="QComboBox" name="user_payingType" />
-              </item>
-              <item row="3" column="1" >
-               <widget class="QLineEdit" name="user_debt" />
+               <widget class="QComboBox" name="members_payingType" />
               </item>
               <item row="2" column="1" >
-               <widget class="QLineEdit" name="user_realName" />
+               <widget class="QLineEdit" name="members_realName" />
               </item>
               <item row="0" column="0" >
                <widget class="QLabel" name="textLabel1_3" >
@@ -719,7 +726,7 @@
                </widget>
               </item>
               <item row="1" column="1" >
-               <widget class="QLineEdit" name="user_password" >
+               <widget class="QLineEdit" name="members_password" >
                 <property name="echoMode" >
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -746,7 +753,10 @@
                </widget>
               </item>
               <item row="0" column="1" >
-               <widget class="QLineEdit" name="user_username" />
+               <widget class="QLineEdit" name="members_username" />
+              </item>
+              <item row="3" column="1" >
+               <widget class="QSpinBox" name="members_debt" />
               </item>
              </layout>
             </item>
@@ -898,7 +908,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>668</width>
+     <width>650</width>
      <height>29</height>
     </rect>
    </property>
@@ -1035,6 +1045,246 @@
     </hint>
     <hint type="destinationlabel" >
      <x>318</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_addButton_1</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>109</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_updateButton_1</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>179</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_deleteButton_1</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>256</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_cancelButton_1</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>331</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_addButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>455</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_updateButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>525</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_deleteButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>602</x>
+     <y>438</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>333</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>members_addButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>354</x>
+     <y>432</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>members_updateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>424</x>
+     <y>432</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>members_deleteButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>501</x>
+     <y>432</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>members_reportsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>579</x>
+     <y>432</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>main_changeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>332</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>main_remoteButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>412</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>main_settingsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>492</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>main_shutDownButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>575</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
      <y>249</y>
     </hint>
    </hints>

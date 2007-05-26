@@ -9,7 +9,7 @@
 # Please read the COPYING file.
 #
 
-import sys, server
+import server
 from PyQt4 import QtCore, QtGui
 
 import locale, gettext
@@ -19,10 +19,10 @@ _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,668,505).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,650,500).size()).expandedTo(MainWindow.minimumSizeHint()))
         icon = QtGui.QIcon("../../data/icons/pyKafe.png")
         MainWindow.setWindowIcon(icon)
-        
+
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
@@ -291,20 +291,25 @@ class Ui_MainWindow(object):
         spacerItem5 = QtGui.QSpacerItem(80,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.hboxlayout3.addItem(spacerItem5)
 
-        self.user_addButton = QtGui.QPushButton(self.groupBox)
-        self.user_addButton.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
-        self.user_addButton.setObjectName("user_addButton")
-        self.hboxlayout3.addWidget(self.user_addButton)
+        self.members_addButton = QtGui.QPushButton(self.groupBox)
+        self.members_addButton.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
+        self.members_addButton.setObjectName("members_addButton")
+        self.hboxlayout3.addWidget(self.members_addButton)
 
-        self.user_updateButton = QtGui.QPushButton(self.groupBox)
-        self.user_updateButton.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
-        self.user_updateButton.setObjectName("user_updateButton")
-        self.hboxlayout3.addWidget(self.user_updateButton)
+        self.members_updateButton = QtGui.QPushButton(self.groupBox)
+        self.members_updateButton.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
+        self.members_updateButton.setObjectName("members_updateButton")
+        self.hboxlayout3.addWidget(self.members_updateButton)
 
-        self.user_deleteButton = QtGui.QPushButton(self.groupBox)
-        self.user_deleteButton.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
-        self.user_deleteButton.setObjectName("user_deleteButton")
-        self.hboxlayout3.addWidget(self.user_deleteButton)
+        self.members_deleteButton = QtGui.QPushButton(self.groupBox)
+        self.members_deleteButton.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
+        self.members_deleteButton.setObjectName("members_deleteButton")
+        self.hboxlayout3.addWidget(self.members_deleteButton)
+
+        self.members_reportsButton = QtGui.QPushButton(self.groupBox)
+        self.members_reportsButton.setIcon(QtGui.QIcon("../../data/icons/find.png"))
+        self.members_reportsButton.setObjectName("members_reportsButton")
+        self.hboxlayout3.addWidget(self.members_reportsButton)
         self.gridlayout6.addLayout(self.hboxlayout3,3,0,1,1)
 
         self.gridlayout7 = QtGui.QGridLayout()
@@ -322,27 +327,23 @@ class Ui_MainWindow(object):
         self.textLabel2_2.setObjectName("textLabel2_2")
         self.gridlayout7.addWidget(self.textLabel2_2,1,0,1,1)
 
-        self.user_payingType = QtGui.QComboBox(self.groupBox)
-        self.user_payingType.setObjectName("user_payingType")
-        self.gridlayout7.addWidget(self.user_payingType,4,1,1,1)
+        self.members_payingType = QtGui.QComboBox(self.groupBox)
+        self.members_payingType.setObjectName("members_payingType")
+        self.gridlayout7.addWidget(self.members_payingType,4,1,1,1)
 
-        self.user_debt = QtGui.QLineEdit(self.groupBox)
-        self.user_debt.setObjectName("user_debt")
-        self.gridlayout7.addWidget(self.user_debt,3,1,1,1)
-
-        self.user_realName = QtGui.QLineEdit(self.groupBox)
-        self.user_realName.setObjectName("user_realName")
-        self.gridlayout7.addWidget(self.user_realName,2,1,1,1)
+        self.members_realName = QtGui.QLineEdit(self.groupBox)
+        self.members_realName.setObjectName("members_realName")
+        self.gridlayout7.addWidget(self.members_realName,2,1,1,1)
 
         self.textLabel1_3 = QtGui.QLabel(self.groupBox)
         self.textLabel1_3.setWordWrap(False)
         self.textLabel1_3.setObjectName("textLabel1_3")
         self.gridlayout7.addWidget(self.textLabel1_3,0,0,1,1)
 
-        self.user_password = QtGui.QLineEdit(self.groupBox)
-        self.user_password.setEchoMode(QtGui.QLineEdit.Password)
-        self.user_password.setObjectName("user_password")
-        self.gridlayout7.addWidget(self.user_password,1,1,1,1)
+        self.members_password = QtGui.QLineEdit(self.groupBox)
+        self.members_password.setEchoMode(QtGui.QLineEdit.Password)
+        self.members_password.setObjectName("members_password")
+        self.gridlayout7.addWidget(self.members_password,1,1,1,1)
 
         self.textLabel4_2 = QtGui.QLabel(self.groupBox)
         self.textLabel4_2.setWordWrap(False)
@@ -354,9 +355,13 @@ class Ui_MainWindow(object):
         self.textLabel3_2.setObjectName("textLabel3_2")
         self.gridlayout7.addWidget(self.textLabel3_2,2,0,1,1)
 
-        self.user_username = QtGui.QLineEdit(self.groupBox)
-        self.user_username.setObjectName("user_username")
-        self.gridlayout7.addWidget(self.user_username,0,1,1,1)
+        self.members_username = QtGui.QLineEdit(self.groupBox)
+        self.members_username.setObjectName("members_username")
+        self.gridlayout7.addWidget(self.members_username,0,1,1,1)
+
+        self.members_debt = QtGui.QSpinBox(self.groupBox)
+        self.members_debt.setObjectName("members_debt")
+        self.gridlayout7.addWidget(self.members_debt,3,1,1,1)
         self.gridlayout6.addLayout(self.gridlayout7,0,0,1,1)
 
         self.gridlayout8 = QtGui.QGridLayout()
@@ -422,7 +427,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,668,29))
+        self.menubar.setGeometry(QtCore.QRect(0,0,650,29))
         self.menubar.setObjectName("menubar")
 
         self.menuHelp = QtGui.QMenu(self.menubar)
@@ -482,7 +487,22 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.main_startButton,QtCore.SIGNAL("clicked()"),self.server.startClient)
         QtCore.QObject.connect(self.main_stopButton,QtCore.SIGNAL("clicked()"),self.server.stopClient)
         QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_startTimeButton,QtCore.SIGNAL("clicked()"),self.server.startTimed)
+        QtCore.QObject.connect(self.main_startTimeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_addButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_updateButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_deleteButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_cancelButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_addButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_updateButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.orders_deleteButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.members_addButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.members_updateButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.members_deleteButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.members_reportsButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_changeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_remoteButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_settingsButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_shutDownButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -517,7 +537,7 @@ class Ui_MainWindow(object):
         self.oders_treeWidget_1.headerItem().setText(1,_("Item"))
         self.oders_treeWidget_1.headerItem().setText(2,_("Cost"))
         self.oders_treeWidget_1.headerItem().setText(3,_("Quantity"))
-        self.groupBox_3.setTitle(_("Cafeteria"))
+        self.groupBox_3.setTitle(_("Cafeteria Products"))
         self.orders_addButton_2.setText(_("Add"))
         self.orders_updateButton_2.setText(_("Update"))
         self.orders_deleteButton_2.setText(_("Delete"))
@@ -530,9 +550,10 @@ class Ui_MainWindow(object):
         self.pushButton_7.setStatusTip(_("Clears filter"))
         self.lineEdit.setStatusTip(_("Type some letters to filter"))
         self.groupBox.setTitle(_("Member Information"))
-        self.user_addButton.setText(_("Add"))
-        self.user_updateButton.setText(_("Update"))
-        self.user_deleteButton.setText(_("Delete"))
+        self.members_addButton.setText(_("Add"))
+        self.members_updateButton.setText(_("Update"))
+        self.members_deleteButton.setText(_("Delete"))
+        self.members_reportsButton.setText(_("Reports"))
         self.textLabel5.setText(_("Paying Type:"))
         self.textLabel2_2.setText(_("Password:"))
         self.textLabel1_3.setText(_("Username:"))
