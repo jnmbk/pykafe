@@ -359,7 +359,7 @@ class Ui_MainWindow(object):
         self.members_username.setObjectName("members_username")
         self.gridlayout7.addWidget(self.members_username,0,1,1,1)
 
-        self.members_debt = QtGui.QSpinBox(self.groupBox)
+        self.members_debt = QtGui.QDoubleSpinBox(self.groupBox)
         self.members_debt.setObjectName("members_debt")
         self.gridlayout7.addWidget(self.members_debt,3,1,1,1)
         self.gridlayout6.addLayout(self.gridlayout7,0,0,1,1)
