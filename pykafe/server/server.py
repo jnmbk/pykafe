@@ -164,6 +164,15 @@ class PykafeServer(QtNetwork.QTcpServer):
     def addMember(self):
         "Adds a new member"
         #add user to database
+        values = (self.ui.members_username.text(),
+                  self.ui.members_password.text(),
+                  self.ui.members_realName.text(),
+                  self.ui.members_dateEdit.date().toString("yyyy-mm-dd"),
+                  self.ui.members_dateEdit_2.date().toString("yyyy-mm-dd"),
+                  self.ui.members_debt.value(),
+                  self.ui.members_payingType.currentText(),
+                  False)
+        Database().run("insert into members values (?,?,?,?,?,?,?,?)", values)
         #update user list
         pass
     def deleteMember(self):

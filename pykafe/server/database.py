@@ -20,8 +20,8 @@ class Database:
         self.con = sqlite.connect(self.databaseFile)
         self.cur = self.con.cursor()
 
-    def run(self, query):
+    def run(self, query, tuple = ()):
         #TODO: check for sql injection
-        self.cur.execute(query)
+        self.cur.execute(query, tuple)
         if not 'select' in query: self.con.commit()
         return self.cur.fetchall()
