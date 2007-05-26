@@ -383,7 +383,7 @@
                <widget class="QComboBox" name="orders_itemComboBox" />
               </item>
               <item>
-               <widget class="QSpinBox" name="orders_spinBox1" />
+               <widget class="QDoubleSpinBox" name="orders_spinBox1" />
               </item>
              </layout>
             </item>
@@ -756,7 +756,7 @@
                <widget class="QLineEdit" name="members_username" />
               </item>
               <item row="3" column="1" >
-               <widget class="QSpinBox" name="members_debt" />
+               <widget class="QDoubleSpinBox" name="members_debt" />
               </item>
              </layout>
             </item>
