@@ -127,6 +127,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         for clientInformation in self.config.clientList:
             self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
+        #TODO: Initialize ui
         self.ui = ui
 
     def incomingConnection(self, socketDescriptor):
@@ -159,4 +160,18 @@ class PykafeServer(QtNetwork.QTcpServer):
         pass
     def stopClient(self):
         print 3
+        pass
+    def addMember(self):
+        "Adds a new member"
+        #add user to database
+        #update user list
+        pass
+    def deleteMember(self):
+        "Deletes selected member"
+        pass
+    def updateMember(self):
+        "Updates selected member information"
+        pass
+    def memberReports(self):
+        "Shows statistics about selected member"
         pass
