@@ -297,3 +297,9 @@ class PykafeServer(QtNetwork.QTcpServer):
     def localize(self):
         self.ui.members_debt.setPrefix(self.config.currency.prefix)
         self.ui.members_debt.setSuffix(self.config.currency.suffix)
+
+    def about(self):
+        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), _("Authors:") + u"\nUğur Çetin\nMustafa Sarı")
+
+    def aboutQt(self):
+        QtGui.QMessageBox.aboutQt(self.parent())
