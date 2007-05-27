@@ -10,13 +10,14 @@
 # Please read the COPYING file.
 #
 
-"""Listens connections"""
+"""Controls most of the server routines"""
 
 from PyQt4 import QtNetwork, QtCore, QtGui
+from pysqlite2 import dbapi2 as sqlite
 from config import PykafeConfiguration
 from session import ClientSession
 from database import Database
-import base64
+import base64, sha
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -97,12 +98,15 @@ class Client(QtGui.QTreeWidgetItem):
         self.name = clientInformation.name
         self.setText(0, self.name)
         self.setState(ClientSession.notAvailable)
+
     def changeColor(self, colorName):
         for i in range(self.columnCount()):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
+
     def sendMessage(self, message):
         thread = MessageSender(self.ip, self.config.network.port, message)
         thread.run()
+
     def setState(self, state, user = None, endTime = None):
         self.session.state = state
         self.setText(1, self.session.getCurrentState())
@@ -114,6 +118,19 @@ class Client(QtGui.QTreeWidgetItem):
             self.setText(4, self.session.startTime.time().toString())
             if endTime:
                 self.setText(5, self.session.endTime.time().toString())
+
+class Member(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, memberInformation):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.updateValues(memberInformation)
+
+    def updateValues(self, memberInformation):
+        self.userName, self.password, self.realName, self.startDate, self.endDate, self.debt, self.payingType = memberInformation
+        self.setText(0, self.userName)
+
+    def updateValuesWithoutPassword(self, memberInformation):
+        self.userName, self.realName, self.startDate, self.endDate, self.debt, self.payingType = memberInformation
+        self.setText(0, self.userName)        
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
@@ -129,6 +146,21 @@ class PykafeServer(QtNetwork.QTcpServer):
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
         #TODO: Initialize ui
         self.ui = ui
+        self.initMembers()
+        self.localize()
+
+    def initMembers(self):
+        self.members = []
+        memberList = Database().run("select * from members")
+        for memberInformation in memberList:
+            self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
+        self.ui.members_dateEdit.setDate(QtCore.QDate.currentDate())
+        self.ui.members_dateEdit_2.setDate(QtCore.QDate.currentDate().addMonths(1))
+        self.ui.members_username.clear()
+        self.ui.members_password.clear()
+        self.ui.members_realName.clear()
+        self.ui.members_debt.setValue(0.0)
+        self.ui.members_payingType.setCurrentIndex(0)
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
@@ -161,26 +193,109 @@ class PykafeServer(QtNetwork.QTcpServer):
     def stopClient(self):
         print 3
         pass
-    def addMember(self):
+    def addMember(self, toDatabase = True, memberInformation = None):
         "Adds a new member"
-        #add user to database
-        values = (self.ui.members_username.text(),
-                  self.ui.members_password.text(),
-                  self.ui.members_realName.text(),
-                  self.ui.members_dateEdit.date().toString("yyyy-mm-dd"),
-                  self.ui.members_dateEdit_2.date().toString("yyyy-mm-dd"),
-                  self.ui.members_debt.value(),
-                  self.ui.members_payingType.currentText(),
-                  False)
-        Database().run("insert into members values (?,?,?,?,?,?,?,?)", values)
-        #update user list
-        pass
-    def deleteMember(self):
-        "Deletes selected member"
-        pass
+        #check if startdate is smaller than enddate
+        if self.ui.members_dateEdit.date().__gt__(self.ui.members_dateEdit_2.date()):
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Start date must be smaller than end date"))
+            return
+        if not memberInformation:
+            memberInformation = [unicode(self.ui.members_username.text()),
+                                 unicode(self.ui.members_password.text()),
+                                 unicode(self.ui.members_realName.text()),
+                                 str(self.ui.members_dateEdit.date().toString("yyyy-MM-dd")),
+                                 str(self.ui.members_dateEdit_2.date().toString("yyyy-MM-dd")),
+                                 self.ui.members_debt.value(),
+                                 str(self.ui.members_payingType.currentText()),
+                                 False]
+        if "" in memberInformation:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("All member information must be filled"))
+        else:
+            memberInformation[1] = sha.new(unicode(self.ui.members_password.text())).hexdigest()
+            if toDatabase:
+                try:
+                    Database().runOnce("insert into members values (?,?,?,?,?,?,?,?)", memberInformation)
+                    self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
+                    self.filterMembers(self.ui.members_filter.text())
+                    self.ui.statusbar.showMessage(_("Added member"))
+                except sqlite.IntegrityError:
+                    QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Username must be unique"))
+
     def updateMember(self):
         "Updates selected member information"
-        pass
+        if self.ui.members_dateEdit.date().__gt__(self.ui.members_dateEdit_2.date()):
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Start date must be smaller than end date"))
+            return
+        member = self.ui.members_treeWidget.currentItem()
+        if not member:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a member first"))
+            return
+        memberInformation = [unicode(self.ui.members_username.text()),
+                             " ",
+                             unicode(self.ui.members_realName.text()),
+                             str(self.ui.members_dateEdit.date().toString("yyyy-MM-dd")),
+                             str(self.ui.members_dateEdit_2.date().toString("yyyy-MM-dd")),
+                             self.ui.members_debt.value(),
+                             str(self.ui.members_payingType.currentText()),
+                             member.userName]
+        if "" in memberInformation:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("All member information must be filled"))
+        memberInformation[1] = sha.new(unicode(self.ui.members_password.text())).hexdigest()
+        if self.ui.members_password.text():
+            try:
+                Database().runOnce("update members set username=?,password=?,name=?,starting_date=?,finish_date=?,debt=?,paying_type=? where username = ?", memberInformation)
+                member.updateValues(memberInformation[:7])
+                self.filterMembers(self.ui.members_filter.text())
+                self.ui.statusbar.showMessage(_("Updated member information"))
+            except sqlite.IntegrityError:
+                QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Username must be unique"))
+        else:
+            del(memberInformation[1])
+            try:
+                Database().runOnce("update members set username=?,name=?,starting_date=?,finish_date=?,debt=?,paying_type=? where username=?", memberInformation)
+                member.updateValuesWithoutPassword(memberInformation[:6])
+                self.filterMembers(self.ui.members_filter.text())
+                self.ui.statusbar.showMessage(_("Updated member information"))
+            except sqlite.IntegrityError:
+                QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Username must be unique"))
+
+    def deleteMember(self):
+        "Deletes selected member"
+        member = self.ui.members_treeWidget.currentItem()
+        if not member:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a member first"))
+            return
+        answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this member?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.Yes:
+            Database().runOnce("delete from members where username = ?", (member.userName,))
+            #TODO: There may be a better way of this
+            self.ui.members_treeWidget.clear()
+            self.initMembers()
+            self.filterMembers(self.ui.members_filter.text())
+            self.ui.statusbar.showMessage(_("Deleted member"))
+
     def memberReports(self):
         "Shows statistics about selected member"
         pass
+
+    def memberChanged(self, current, previous):
+        member = current
+        if not member:
+            member = previous
+        self.ui.members_username.setText(member.userName)
+        self.ui.members_password.clear()
+        self.ui.members_realName.setText(member.realName)
+        self.ui.members_dateEdit.setDate(QtCore.QDate.fromString(member.startDate, "yyyy-MM-dd"))
+        self.ui.members_dateEdit_2.setDate(QtCore.QDate.fromString(member.endDate, "yyyy-MM-dd"))
+        self.ui.members_debt.setValue(float(member.debt))
+        self.ui.members_payingType.setEditText(member.payingType)
+
+    def filterMembers(self, text):
+        for member in self.members:
+            member.setHidden(False)
+            if unicode(text) not in member.userName:
+                member.setHidden(True)
+
+    def localize(self):
+        self.ui.members_debt.setPrefix(self.config.currency.prefix)
+        self.ui.members_debt.setSuffix(self.config.currency.suffix)
