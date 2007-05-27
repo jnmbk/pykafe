@@ -37,15 +37,14 @@ def sendDataToUi(data):
     print "sent to server:", data
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor, client):
-        QtCore.QThread.__init__(self, parent)
+    def __init__(self, socketDescriptor, client):
+        QtCore.QThread.__init__(self)
         self.socketDescriptor = socketDescriptor
         self.client = client
 
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        self.emit(QtCore.SIGNAL("connection"), self.tcpSocket.peerAddress())
         print "connection request from:", self.tcpSocket.peerAddress()
         if self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readUi)
@@ -53,7 +52,8 @@ class ListenerThread(QtCore.QThread):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readServer)
         else:
             sys.stderr.write(_("Unauthorized server tried to connect, aborting: %s") % self.tcpSocket.peerAddress())
-            self.tcpSocket.disconnectFromHost()
+            self.exit()
+        self.exec_()
         self.tcpSocket.waitForDisconnected()
         print "disconnected"
 
@@ -65,6 +65,7 @@ class ListenerThread(QtCore.QThread):
                 sendDataToUi(data)
             else:
                 sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
+        self.exit()
 
     def readUi(self):
         data = base64.decodestring(self.tcpSocket.readAll())
@@ -77,21 +78,23 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "004":
             if self.client.session.state == ClientSession.notAvailable:
                 sendDataToServer("004")
-                self.session.state = ClientSession.working
+                self.client.session.state = ClientSession.working
             else:
                 sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
+        self.exit()
+
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self):
-        QtNetwork.QTcpServer.__init__(self, None)
+        QtNetwork.QTcpServer.__init__(self)
         self.config = PykafeConfiguration()
         self.session = ClientSession()
+        self.threads = []
         self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port)
         print "listening?", self.isListening()
         print "listening to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any).toString() ,self.config.network.port
     def incomingConnection(self, socketDescriptor):
         print "called incomingConnection"
-        thread = ListenerThread(self.parent(), socketDescriptor, self)
-        QtCore.QObject.connect(thread, QtCore.SIGNAL("connection"), self.connectionSignal)
+        thread = ListenerThread(socketDescriptor, self)
         thread.start()
-    def connectionSignal(self, text):
-        print text
+        self.threads.append(thread)
+        print "We have " + str(len(self.threads)) + " thread(s)"
