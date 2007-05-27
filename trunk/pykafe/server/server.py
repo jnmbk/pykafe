@@ -268,9 +268,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this member?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from members where username = ?", (member.userName,))
-            #TODO: There may be a better way of this
-            self.ui.members_treeWidget.clear()
-            self.initMembers()
+            self.ui.members_treeWidget.takeTopLevelItem(self.ui.members_treeWidget.indexOfTopLevelItem(member))
             self.filterMembers(self.ui.members_filter.text())
             self.ui.statusbar.showMessage(_("Deleted member"))
 
