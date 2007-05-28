@@ -43,6 +43,7 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
+        self.tcpSocket.waitForReadyRead()
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
         if data[:3] == "001":
