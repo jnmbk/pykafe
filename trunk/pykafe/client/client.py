@@ -30,7 +30,7 @@ def sendDataToServer(data):
     print "sent to server:", data
 def sendDataToUi(data):
     tcpSocket = QtNetwork.QTcpSocket()
-    tcpSocket.connectToHost(QtNetwork.QHostAddress(PykafeConfiguration().network.serverIP), PykafeConfiguration().network.localPort)
+    tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
     tcpSocket.waitForConnected(-1)
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
