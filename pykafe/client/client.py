@@ -67,7 +67,7 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "005":
             if self.client.session.state == ClientSession.working:
                 self.client.session.user = "guest"
-                sendDataToUi(data)
+                sendDataToUi("005")
         self.exit()
 
     def readUi(self):
