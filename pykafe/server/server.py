@@ -20,13 +20,16 @@ from database import Database
 import base64, sha
 
 import locale, gettext
-locale.setlocale(locale.LC_ALL, "C")
+locale.setlocale(locale.LC_MESSAGES, "C")
+#for printing money in listwidgets, maybe using monetary would be better
+locale.setlocale(locale.LC_NUMERIC, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class MessageSender(QtCore.QThread):
     def __init__(self, parent, ip, port, message):
         QtCore.QThread.__init__(self, parent)
         self.ip, self.port, self.message = ip, port, message
+        print "sending %s to %s:%d" % (message, ip, port)
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
         tcpSocket.connectToHost(QtNetwork.QHostAddress(self.ip), self.port)
@@ -50,13 +53,16 @@ class ListenerThread(QtCore.QThread):
             clientIpList.append(QtNetwork.QHostAddress(client.ip))
         try:
             self.clientNumber = clientIpList.index(self.tcpSocket.peerAddress())
+            print "came from a known client:", self.tcpSocket.peerAddress().toString()
         except ValueError:
             self.tcpSocket.disconnectFromHost()
         QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readSocket)
+        self.exec_()
 
     def readSocket(self):
         client = self.clients[self.clientNumber]
         data = base64.decodestring(self.tcpSocket.readAll())
+        print "data:", data
         if data[:3] == "004":
             #Says I'm here
             if client.session.state == ClientSession.notAvailable:
@@ -91,6 +97,7 @@ class Client(QtGui.QTreeWidgetItem):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.fillList(clientInformation)
         self.config = config 
+        self.threads = []
 
     def fillList(self, clientInformation):
         self.session = clientInformation.session
@@ -106,6 +113,8 @@ class Client(QtGui.QTreeWidgetItem):
     def sendMessage(self, message):
         thread = MessageSender(self.ip, self.config.network.port, message)
         thread.run()
+        self.threads.append(thread)
+        print "This client has %d threads" % len(self.threads)
 
     def setState(self, state, user = None, endTime = None):
         self.session.state = state
@@ -118,6 +127,16 @@ class Client(QtGui.QTreeWidgetItem):
             self.setText(4, self.session.startTime.time().toString())
             if endTime:
                 self.setText(5, self.session.endTime.time().toString())
+
+class Product(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, productInformation):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.updateValues(productInformation)
+    def updateValues(self, productInformation):
+        self.name, self.price, self.quantity = productInformation
+        self.setText(0,self.name)
+        self.setText(1,locale.format("%.2f", self.price, grouping=True))
+        self.setText(2,str(self.quantity))
 
 class Member(QtGui.QTreeWidgetItem):
     def __init__(self, parent, memberInformation):
@@ -147,7 +166,9 @@ class PykafeServer(QtNetwork.QTcpServer):
         #TODO: Initialize ui
         self.ui = ui
         self.initMembers()
+        self.initProducts()
         self.localize()
+        self.threads = []
 
     def initMembers(self):
         self.members = []
@@ -162,31 +183,39 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.ui.members_debt.setValue(0.0)
         self.ui.members_payingType.setCurrentIndex(0)
 
+    def initProducts(self):
+        self.products = []
+        productList = Database().run("select * from products")
+        for product in productList:
+            self.products.append(Product(self.ui.orders_treeWidget_2, product))
+
     def incomingConnection(self, socketDescriptor):
+        print "connection came"
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
+        self.threads.append(thread)
         QtCore.QObject.connect(thread, QtCore.SIGNAL("stateChange"), self.setClientState)
         thread.start()
+        print "We have %d thread(s)" % len(self.threads)
 
     def setClientState(self, client, state):
         self.clients[client].setState(state)
 
     def startClient(self):
-        current = self.ui.main_treeWidget.currentColumn()
-        if current != -1:
-            client = self.clients[current]
-            state = client.session.state
-            if state == ClientSession.notAvailable:
-                QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-            if state == ClientSession.working:
-                #TODO
-                pass
-            if state == ClientSession.loggedIn:
-                QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
-            if state == ClientSession.requestedOpening:
-                client.sendMessage("0011")
-                client.setState(ClientSession.loggedIn)
-        else:
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        state = client.session.state
+        if state == ClientSession.notAvailable:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+        if state == ClientSession.working:
+            client.sendMessage("005")
+        if state == ClientSession.loggedIn:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
+        if state == ClientSession.requestedOpening:
+            client.sendMessage("0011")
+            client.setState(ClientSession.loggedIn)
+
     def startTimed(self):
         print 2
         pass
@@ -288,6 +317,14 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.ui.members_debt.setValue(float(member.debt))
         self.ui.members_payingType.setEditText(member.payingType)
 
+    def productChanged(self, current, previous):
+        product = current
+        if not product:
+            product = previous
+        self.ui.orders_itemLineEdit.setText(product.name)
+        self.ui.orders_spinBox_2.setValue(product.price)
+        self.ui.orders_spinBox_3.setValue(product.quantity)
+
     def filterMembers(self, text):
         for member in self.members:
             member.setHidden(False)
@@ -297,6 +334,56 @@ class PykafeServer(QtNetwork.QTcpServer):
     def localize(self):
         self.ui.members_debt.setPrefix(self.config.currency.prefix)
         self.ui.members_debt.setSuffix(self.config.currency.suffix)
+        self.ui.orders_spinBox_2.setPrefix(self.config.currency.prefix)
+        self.ui.orders_spinBox_2.setSuffix(self.config.currency.suffix)
+
+    def addProduct(self):
+        productName = unicode(self.ui.orders_itemLineEdit.text())
+        price = self.ui.orders_spinBox_2.value()
+        quantity = self.ui.orders_spinBox_3.value()
+        if not productName:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must enter a product name"))
+            return
+        if price <= 0:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Price must be bigger than 0"))
+            return
+        try:
+            Database().runOnce("insert into products values (?,?,?)", (productName, price, quantity))
+            self.products.append(Product(self.ui.orders_treeWidget_2, (productName, price, quantity)))
+            self.ui.statusbar.showMessage(_("Added product"))
+        except sqlite.IntegrityError:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Product name must be unique"))
+
+    def updateProduct(self):
+        product = self.ui.orders_treeWidget_2.currentItem()
+        if not product:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a product first"))
+            return
+        productName = unicode(self.ui.orders_itemLineEdit.text())
+        price = self.ui.orders_spinBox_2.value()
+        quantity = self.ui.orders_spinBox_3.value()
+        if not productName:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must enter a product name"))
+            return
+        if price <= 0:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Price must be bigger than 0"))
+            return
+        try:
+            Database().runOnce("update products set product_name=?, unit_price=?, stock=? where product_name=?", (productName, price, quantity, product.name))
+            product.updateValues((productName, price, quantity))
+            self.ui.statusbar.showMessage(_("Updated product"))
+        except sqlite.IntegrityError:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Product name must be unique"))
+    def deleteProduct(self):
+        product = self.ui.orders_treeWidget_2.currentItem()
+        if not product:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a product first"))
+            return
+        answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this product?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.Yes:
+            Database().runOnce("delete from products where product_name = ?", (product.name,))
+            self.ui.orders_treeWidget_2.takeTopLevelItem(self.ui.orders_treeWidget_2.indexOfTopLevelItem(product))
+            self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
         QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), _("Authors:") + u"\nUğur Çetin\nMustafa Sarı")
