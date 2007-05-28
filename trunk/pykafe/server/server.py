@@ -111,7 +111,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
 
     def sendMessage(self, message):
-        thread = MessageSender(self.ip, self.config.network.port, message)
+        thread = MessageSender(self.parent(), self.ip, self.config.network.port, message)
         thread.run()
         self.threads.append(thread)
         print "This client has %d threads" % len(self.threads)
@@ -386,7 +386,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
-        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), _("Authors:") + u"\nUğur Çetin\nMustafa Sarı")
+        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), _("Authors:") + u"\nUğur Çetin\nMustafa Sarı\n\n" + _("Mentor:") + u"\nA. Tevfik İnan")
 
     def aboutQt(self):
         QtGui.QMessageBox.aboutQt(self.parent())
