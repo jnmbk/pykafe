@@ -71,7 +71,7 @@ class PykafeClient(QtNetwork.QTcpServer):
         self.threads = [thread]
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.ui)
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.ui.close)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
         thread.start()
         self.threads.append(thread)
