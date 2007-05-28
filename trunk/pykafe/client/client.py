@@ -34,7 +34,7 @@ def sendDataToUi(data):
     tcpSocket.waitForConnected(-1)
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
-    print "sent to server:", data
+    print "sent to ui:", data
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, socketDescriptor, client):
