@@ -56,7 +56,7 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "005":
             os.system("pyKafeclient&")
             self.emit(QtCore.SIGNAL("close"))
-        self.tcpSocket.disconnect()
+        self.tcpSocket.disconnectFromHost()
         self.exec_()
 
 class PykafeClient(QtNetwork.QTcpServer):
