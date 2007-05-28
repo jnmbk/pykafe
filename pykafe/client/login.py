@@ -68,17 +68,22 @@ class PykafeClient(QtNetwork.QTcpServer):
         thread = SenderThread(self.parent(), "004")
         QtCore.QObject.connect(thread, QtCore.SIGNAL("exit()"), parent.close)
         thread.start()
+        self.threads = [thread]
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.ui)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.ui.close)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
         thread.start()
+        self.threads.append(thread)
+        print "login has %d threads" % len(self.threads)
     def login(self):
         thread = SenderThread(self.parent(), "002" + self.ui.username.text + "|" + self.ui.password.text)
         thread.start()
+        self.threads.append(thread)
     def request(self):
         thread = SenderThread(self.parent(), "000")
         thread.start()
+        self.threads.append(thread)
 
 class Ui_LoginWindow(object):
     def setupUi(self, MainWindow):
