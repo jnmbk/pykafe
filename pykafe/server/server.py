@@ -37,7 +37,6 @@ class MessageSender(QtCore.QThread):
         tcpSocket.write(base64.encodestring(self.message))
         tcpSocket.waitForBytesWritten()
         tcpSocket.disconnectFromHost()
-        tcpSocket.waitForDisconnected()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, clients):
@@ -210,6 +209,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
         if state == ClientSession.working:
             client.sendMessage("005")
+            client.setState(ClientSession.loggedIn)
         if state == ClientSession.loggedIn:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
         if state == ClientSession.requestedOpening:
