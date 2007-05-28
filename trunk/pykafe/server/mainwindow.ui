@@ -315,80 +315,48 @@
             <property name="spacing" >
              <number>6</number>
             </property>
-            <item row="2" column="0" >
-             <spacer>
-              <property name="orientation" >
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" >
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="2" column="1" >
-             <widget class="QPushButton" name="orders_addButton_1" >
-              <property name="text" >
-               <string>Add</string>
-              </property>
-              <property name="icon" >
-               <iconset>../../data/icons/edit_add.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2" >
-             <widget class="QPushButton" name="orders_updateButton_1" >
-              <property name="text" >
-               <string>Update</string>
-              </property>
-              <property name="icon" >
-               <iconset>../../data/icons/reload.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3" >
-             <widget class="QPushButton" name="orders_deleteButton_1" >
-              <property name="text" >
-               <string>Delete</string>
-              </property>
-              <property name="icon" >
-               <iconset>../../data/icons/edit_remove.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="4" >
-             <widget class="QPushButton" name="orders_cancelButton_1" >
-              <property name="text" >
-               <string>Cancel</string>
-              </property>
-              <property name="icon" >
-               <iconset>../../data/icons/button_cancel.png</iconset>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="0" colspan="5" >
-             <layout class="QHBoxLayout" >
+             <layout class="QGridLayout" >
               <property name="margin" >
                <number>0</number>
               </property>
               <property name="spacing" >
                <number>6</number>
               </property>
-              <item>
+              <item row="0" column="1" >
+               <widget class="QLabel" name="label_8" >
+                <property name="text" >
+                 <string>Item</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
                <widget class="QComboBox" name="orders_idComboBox" />
               </item>
-              <item>
+              <item row="0" column="0" >
+               <widget class="QLabel" name="label_7" >
+                <property name="text" >
+                 <string>Computer ID</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2" >
+               <widget class="QLabel" name="label_9" >
+                <property name="text" >
+                 <string>Quantity</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
                <widget class="QComboBox" name="orders_itemComboBox" />
               </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="orders_spinBox1" />
+              <item row="1" column="2" >
+               <widget class="QSpinBox" name="orders_spinBox_1" />
               </item>
              </layout>
             </item>
             <item row="0" column="0" colspan="5" >
-             <widget class="QTreeWidget" name="oders_treeWidget_1" >
+             <widget class="QTreeWidget" name="orders_treeWidget_1" >
               <property name="sortingEnabled" >
                <bool>true</bool>
               </property>
@@ -414,11 +382,64 @@
               </column>
              </widget>
             </item>
+            <item row="2" column="4" >
+             <widget class="QPushButton" name="orders_cancelButton_1" >
+              <property name="text" >
+               <string>Cancel</string>
+              </property>
+              <property name="icon" >
+               <iconset>../../data/icons/button_cancel.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3" >
+             <widget class="QPushButton" name="orders_deleteButton_1" >
+              <property name="text" >
+               <string>Delete</string>
+              </property>
+              <property name="icon" >
+               <iconset>../../data/icons/edit_remove.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2" >
+             <widget class="QPushButton" name="orders_updateButton_1" >
+              <property name="text" >
+               <string>Update</string>
+              </property>
+              <property name="icon" >
+               <iconset>../../data/icons/reload.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" >
+             <widget class="QPushButton" name="orders_addButton_1" >
+              <property name="text" >
+               <string>Add</string>
+              </property>
+              <property name="icon" >
+               <iconset>../../data/icons/edit_add.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" >
+             <spacer>
+              <property name="orientation" >
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" >
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
           <widget class="QGroupBox" name="groupBox_3" >
            <property name="title" >
-            <string>Cafeteria Products</string>
+            <string>Cafeteria Stocks</string>
            </property>
            <layout class="QGridLayout" >
             <property name="margin" >
@@ -427,6 +448,76 @@
             <property name="spacing" >
              <number>6</number>
             </property>
+            <item row="0" column="0" colspan="4" >
+             <widget class="QTreeWidget" name="orders_treeWidget_2" >
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Item</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Cost</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Quantity</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="4" >
+             <layout class="QGridLayout" >
+              <property name="margin" >
+               <number>0</number>
+              </property>
+              <property name="spacing" >
+               <number>6</number>
+              </property>
+              <item row="1" column="0" >
+               <widget class="QLineEdit" name="orders_itemLineEdit" />
+              </item>
+              <item row="0" column="2" >
+               <widget class="QLabel" name="label_6" >
+                <property name="text" >
+                 <string>Quantity</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QLabel" name="label_5" >
+                <property name="text" >
+                 <string>Price</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" >
+               <widget class="QLabel" name="label_4" >
+                <property name="text" >
+                 <string>Item</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" >
+               <widget class="QSpinBox" name="orders_spinBox_3" >
+                <property name="maximum" >
+                 <number>5000</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QDoubleSpinBox" name="orders_spinBox_2" >
+                <property name="maximum" >
+                 <double>1000000000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
             <item row="2" column="0" >
              <spacer>
               <property name="orientation" >
@@ -469,47 +560,6 @@
                <iconset>../../data/icons/edit_remove.png</iconset>
               </property>
              </widget>
-            </item>
-            <item row="0" column="0" colspan="4" >
-             <widget class="QTreeWidget" name="orders_treeWidget_2" >
-              <property name="sortingEnabled" >
-               <bool>true</bool>
-              </property>
-              <column>
-               <property name="text" >
-                <string>Item</string>
-               </property>
-              </column>
-              <column>
-               <property name="text" >
-                <string>Cost</string>
-               </property>
-              </column>
-              <column>
-               <property name="text" >
-                <string>Quantity</string>
-               </property>
-              </column>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="4" >
-             <layout class="QHBoxLayout" >
-              <property name="margin" >
-               <number>0</number>
-              </property>
-              <property name="spacing" >
-               <number>6</number>
-              </property>
-              <item>
-               <widget class="QLineEdit" name="orders_itemLineEdit" />
-              </item>
-              <item>
-               <widget class="QSpinBox" name="orders_spinBox_2" />
-              </item>
-              <item>
-               <widget class="QSpinBox" name="orders_spinBox_3" />
-              </item>
-             </layout>
             </item>
            </layout>
           </widget>
@@ -1052,17 +1102,15 @@
   <tabstop>main_settingsButton</tabstop>
   <tabstop>main_shutDownButton</tabstop>
   <tabstop>main_treeWidget</tabstop>
-  <tabstop>oders_treeWidget_1</tabstop>
+  <tabstop>orders_treeWidget_1</tabstop>
   <tabstop>orders_idComboBox</tabstop>
   <tabstop>orders_itemComboBox</tabstop>
-  <tabstop>orders_spinBox1</tabstop>
   <tabstop>orders_addButton_1</tabstop>
   <tabstop>orders_updateButton_1</tabstop>
   <tabstop>orders_deleteButton_1</tabstop>
   <tabstop>orders_cancelButton_1</tabstop>
   <tabstop>orders_treeWidget_2</tabstop>
   <tabstop>orders_itemLineEdit</tabstop>
-  <tabstop>orders_spinBox_2</tabstop>
   <tabstop>orders_spinBox_3</tabstop>
   <tabstop>orders_addButton_2</tabstop>
   <tabstop>orders_updateButton_2</tabstop>
@@ -1465,6 +1513,38 @@
     <hint type="sourcelabel" >
      <x>-1</x>
      <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_treeWidget_1</sender>
+   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>206</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>orders_treeWidget_2</sender>
+   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>503</x>
+     <y>217</y>
     </hint>
     <hint type="destinationlabel" >
      <x>324</x>
