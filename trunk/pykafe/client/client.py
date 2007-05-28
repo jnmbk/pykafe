@@ -53,9 +53,8 @@ class ListenerThread(QtCore.QThread):
         else:
             sys.stderr.write(_("Unauthorized server tried to connect, aborting: %s") % self.tcpSocket.peerAddress())
             self.exit()
-        self.exec_()
         self.tcpSocket.waitForDisconnected()
-        print "disconnected"
+        self.exec_()
 
     def readServer(self):
         data = base64.decodestring(self.tcpSocket.readAll())
@@ -65,6 +64,10 @@ class ListenerThread(QtCore.QThread):
                 sendDataToUi(data)
             else:
                 sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
+        elif data[:3] == "005":
+            if self.client.session.state == ClientSession.working:
+                self.client.session.user = "guest"
+                sendDataToUi(data)
         self.exit()
 
     def readUi(self):

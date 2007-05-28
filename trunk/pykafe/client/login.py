@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import base64, os, sys, time
+import base64, os, sys
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 
@@ -53,8 +53,13 @@ class ListenerThread(QtCore.QThread):
                 self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
         elif data[:3] == "003":
             pass
+        elif data[:3] == "005":
+            os.system("pyKafeclient&")
+            self.emit(QtCore.SIGNAL("close"))
         self.tcpSocket.disconnect()
         self.tcpSocket.waitForDisconnected()
+        self.exec_()
+
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
