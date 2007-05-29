@@ -15,7 +15,7 @@
 from PyQt4 import QtNetwork, QtCore
 from config import PykafeConfiguration
 from session import ClientSession
-import base64, sys
+import base64, sys, os
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -68,6 +68,10 @@ class ListenerThread(QtCore.QThread):
             if self.client.session.state == ClientSession.working:
                 self.client.session.user = "guest"
                 sendDataToUi("005")
+        elif data[:3] == "007":
+            self.emit(QtCore.SIGNAL("filter"), data[4:])
+            for site in data[4:].split('\n'):
+                os.system("iptables -A INPUT -s %s -j DROP", site)
         self.exit()
 
     def readUi(self):
@@ -99,5 +103,8 @@ class PykafeClient(QtNetwork.QTcpServer):
         print "called incomingConnection"
         thread = ListenerThread(socketDescriptor, self)
         thread.start()
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("filter"),self.filterCame)
         self.threads.append(thread)
         print "We have " + str(len(self.threads)) + " thread(s)"
+    def filterCame(self, text):
+        print "filtering:", text
