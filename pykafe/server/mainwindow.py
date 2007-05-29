@@ -146,10 +146,6 @@ class Ui_MainWindow(object):
         self.orders_idComboBox.setObjectName("orders_idComboBox")
         self.gridlayout4.addWidget(self.orders_idComboBox,1,0,1,1)
 
-        self.orders_spinBox_1 = QtGui.QSpinBox(self.groupBox_2)
-        self.orders_spinBox_1.setObjectName("orders_spinBox_1")
-        self.gridlayout4.addWidget(self.orders_spinBox_1,1,2,1,1)
-
         self.label_7 = QtGui.QLabel(self.groupBox_2)
         self.label_7.setObjectName("label_7")
         self.gridlayout4.addWidget(self.label_7,0,0,1,1)
@@ -161,6 +157,10 @@ class Ui_MainWindow(object):
         self.orders_itemComboBox = QtGui.QComboBox(self.groupBox_2)
         self.orders_itemComboBox.setObjectName("orders_itemComboBox")
         self.gridlayout4.addWidget(self.orders_itemComboBox,1,1,1,1)
+
+        self.orders_spinBox_1 = QtGui.QSpinBox(self.groupBox_2)
+        self.orders_spinBox_1.setObjectName("orders_spinBox_1")
+        self.gridlayout4.addWidget(self.orders_spinBox_1,1,2,1,1)
         self.gridlayout3.addLayout(self.gridlayout4,1,0,1,5)
 
         self.orders_treeWidget_1 = QtGui.QTreeWidget(self.groupBox_2)
@@ -213,10 +213,6 @@ class Ui_MainWindow(object):
         self.orders_itemLineEdit.setObjectName("orders_itemLineEdit")
         self.gridlayout6.addWidget(self.orders_itemLineEdit,1,0,1,1)
 
-        self.orders_spinBox_2 = QtGui.QDoubleSpinBox(self.groupBox_3)
-        self.orders_spinBox_2.setObjectName("orders_spinBox_2")
-        self.gridlayout6.addWidget(self.orders_spinBox_2,1,1,1,1)
-
         self.label_6 = QtGui.QLabel(self.groupBox_3)
         self.label_6.setObjectName("label_6")
         self.gridlayout6.addWidget(self.label_6,0,2,1,1)
@@ -230,8 +226,14 @@ class Ui_MainWindow(object):
         self.gridlayout6.addWidget(self.label_4,0,0,1,1)
 
         self.orders_spinBox_3 = QtGui.QSpinBox(self.groupBox_3)
+        self.orders_spinBox_3.setMaximum(5000)
         self.orders_spinBox_3.setObjectName("orders_spinBox_3")
         self.gridlayout6.addWidget(self.orders_spinBox_3,1,2,1,1)
+
+        self.orders_spinBox_2 = QtGui.QDoubleSpinBox(self.groupBox_3)
+        self.orders_spinBox_2.setMaximum(1000000000.0)
+        self.orders_spinBox_2.setObjectName("orders_spinBox_2")
+        self.gridlayout6.addWidget(self.orders_spinBox_2,1,1,1,1)
         self.gridlayout5.addLayout(self.gridlayout6,1,0,1,4)
 
         spacerItem3 = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
@@ -566,15 +568,13 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.main_treeWidget,self.orders_treeWidget_1)
         MainWindow.setTabOrder(self.orders_treeWidget_1,self.orders_idComboBox)
         MainWindow.setTabOrder(self.orders_idComboBox,self.orders_itemComboBox)
-        MainWindow.setTabOrder(self.orders_itemComboBox,self.orders_spinBox_1)
-        MainWindow.setTabOrder(self.orders_spinBox_1,self.orders_addButton_1)
+        MainWindow.setTabOrder(self.orders_itemComboBox,self.orders_addButton_1)
         MainWindow.setTabOrder(self.orders_addButton_1,self.orders_updateButton_1)
         MainWindow.setTabOrder(self.orders_updateButton_1,self.orders_deleteButton_1)
         MainWindow.setTabOrder(self.orders_deleteButton_1,self.orders_cancelButton_1)
         MainWindow.setTabOrder(self.orders_cancelButton_1,self.orders_treeWidget_2)
         MainWindow.setTabOrder(self.orders_treeWidget_2,self.orders_itemLineEdit)
-        MainWindow.setTabOrder(self.orders_itemLineEdit,self.orders_spinBox_2)
-        MainWindow.setTabOrder(self.orders_spinBox_2,self.orders_spinBox_3)
+        MainWindow.setTabOrder(self.orders_itemLineEdit,self.orders_spinBox_3)
         MainWindow.setTabOrder(self.orders_spinBox_3,self.orders_addButton_2)
         MainWindow.setTabOrder(self.orders_addButton_2,self.orders_updateButton_2)
         MainWindow.setTabOrder(self.orders_updateButton_2,self.orders_deleteButton_2)
@@ -637,7 +637,7 @@ class Ui_MainWindow(object):
         self.orders_treeWidget_2.headerItem().setText(1,_("Cost"))
         self.orders_treeWidget_2.headerItem().setText(2,_("Quantity"))
         self.label_6.setText(_("Quantity"))
-        self.label_5.setText(_("Cost"))
+        self.label_5.setText(_("Price"))
         self.label_4.setText(_("Item"))
         self.orders_addButton_2.setText(_("Add"))
         self.orders_updateButton_2.setText(_("Update"))
