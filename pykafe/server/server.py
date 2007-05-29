@@ -18,6 +18,7 @@ from config import PykafeConfiguration
 from session import ClientSession
 from database import Database
 import base64, sha
+from settingswindow import Ui_SettingsWindow
 
 import locale, gettext
 locale.setlocale(locale.LC_MESSAGES, "C")
@@ -110,7 +111,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
 
     def sendMessage(self, message):
-        thread = MessageSender(self.parent(), self.ip, self.config.network.port, message)
+        thread = MessageSender(self.parent(), self.ip, int(self.config.network_port), message)
         thread.run()
         self.threads.append(thread)
         print "This client has %d threads" % len(self.threads)
@@ -118,10 +119,20 @@ class Client(QtGui.QTreeWidgetItem):
     def setState(self, state, user = None, endTime = None):
         self.session.state = state
         self.setText(1, self.session.getCurrentState())
+        if state == ClientSession.working:
+            if self.config.filter_enable:
+                #send filter
+                message = "007"
+                filterFile = open(self.config.filter_file)
+                filters = filterFile.readlines()
+                filterFile.close()
+                for i in filters:
+                    message += i
+                self.sendMessage(message)
         if state == ClientSession.loggedIn:
             self.session.user = user
             self.setText(2, user)
-            self.setText(3, self.config.currency.prefix + "0" + self.config.currency.suffix)
+            self.setText(3, self.config.currency_prefix + "0" + self.config.currency_suffix)
             self.session.startTime = QtCore.QDateTime.currentDateTime()
             self.setText(4, self.session.startTime.time().toString())
             if endTime:
@@ -154,7 +165,7 @@ class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
-        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port):
+        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
             #TODO: retry button
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
             exit()
@@ -332,10 +343,10 @@ class PykafeServer(QtNetwork.QTcpServer):
                 member.setHidden(True)
 
     def localize(self):
-        self.ui.members_debt.setPrefix(self.config.currency.prefix)
-        self.ui.members_debt.setSuffix(self.config.currency.suffix)
-        self.ui.orders_spinBox_2.setPrefix(self.config.currency.prefix)
-        self.ui.orders_spinBox_2.setSuffix(self.config.currency.suffix)
+        self.ui.members_debt.setPrefix(self.config.currency_prefix)
+        self.ui.members_debt.setSuffix(self.config.currency_suffix)
+        self.ui.orders_spinBox_2.setPrefix(self.config.currency_prefix)
+        self.ui.orders_spinBox_2.setSuffix(self.config.currency_suffix)
 
     def addProduct(self):
         productName = unicode(self.ui.orders_itemLineEdit.text())
@@ -382,7 +393,9 @@ class PykafeServer(QtNetwork.QTcpServer):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this product?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from products where product_name = ?", (product.name,))
+            print len(self.products)
             self.ui.orders_treeWidget_2.takeTopLevelItem(self.ui.orders_treeWidget_2.indexOfTopLevelItem(product))
+            print len(self.products)
             self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
@@ -390,3 +403,9 @@ class PykafeServer(QtNetwork.QTcpServer):
 
     def aboutQt(self):
         QtGui.QMessageBox.aboutQt(self.parent())
+
+    def settings(self):
+        settingsDialog = QtGui.QDialog(self.parent())
+        settingsUi = Ui_SettingsWindow()
+        settingsUi.setupUi(settingsDialog, self.config)
+        settingsDialog.show()

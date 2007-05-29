@@ -1030,12 +1030,6 @@
     <addaction name="actionAbout_pyKafe" />
     <addaction name="actionAbout_Qt" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>Tools</string>
-    </property>
-    <addaction name="actionOptions" />
-   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>File</string>
@@ -1050,6 +1044,12 @@
     <addaction name="menuNew" />
     <addaction name="separator" />
     <addaction name="actionExit" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuTools" />
@@ -1086,9 +1086,9 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionOptions" >
+  <action name="actionSettings" >
    <property name="text" >
-    <string>Options...</string>
+    <string>Settings...</string>
    </property>
   </action>
  </widget>
@@ -1545,6 +1545,22 @@
     <hint type="sourcelabel" >
      <x>503</x>
      <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>324</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSettings</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel" >
      <x>324</x>

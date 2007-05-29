@@ -12,6 +12,7 @@
 
 #TODO: Read config from database api
 from session import ClientSession
+from database import Database
 
 class ClientInformation:
     def __init__(self, ip, name):
@@ -21,14 +22,15 @@ class ClientInformation:
 
 class PykafeConfiguration:
     def __init__(self):
-        #TODO: read general settings from database, and provide a method to write them.
-        pass
+        settings = Database().runOnce("select * from general_settings")
+        for config, value in settings:
+            setattr(self, config, value)
     clientList = [ClientInformation("192.168.2.3", "computer1"),
                   ClientInformation("192.168.2.4", "computer2"),
                   ClientInformation("192.168.2.5", "computer3")]
-    class network:
-        port = 23105
-    class currency:
-        prefix = ""
-        suffix = " YTL"
-        seperator = "."
+    def set(self, config, value):
+        if getattr(self, config) == value:
+            return
+        setattr(self, config, value)
+        Database().runOnce("update general_settings set setting_value=? where setting_id=?", (value, config))
+        #TODO: There may be some specific configs that may require extra work
