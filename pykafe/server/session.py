@@ -12,16 +12,17 @@
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
-_ = gettext.translation("pyKafe_common", fallback=True).ugettext
+_ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class ClientSession:
     """class for managing client sessions"""
-    notAvailable, working, loggedIn, requestedOpening = 0, 1, 2, 3
+    notAvailable, working, loggedIn, requestedOpening, waitingMoney = range(5)
     def __init__(self):
         self.state = 0
         self.user = None
         self.settings = None
         self.startTime = None
+        self.endTime = None
         self.orders = []
 
     def isReachable(self):
@@ -49,6 +50,8 @@ class ClientSession:
             return _("Logged In")
         elif self.state == self.requestedOpening:
             return _("Requested Opening")
+        elif self.state == self.waitingMoney:
+            return _("Waiting for Payment")
 
     def setState(self, stateNumber):
         self.state = stateNumber

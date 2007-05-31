@@ -36,10 +36,9 @@ class SenderThread(QtCore.QThread):
             tcpSocket.disconnectFromHost()
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor, ui):
+    def __init__(self, parent, socketDescriptor):
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
-        self.ui = ui
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
@@ -53,7 +52,11 @@ class ListenerThread(QtCore.QThread):
             elif data[3] == "0":
                 self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
         elif data[:3] == "003":
-            pass
+            if data[3] == "1":
+                os.system("pyKafeclient&")
+                self.emit(QtCore.SIGNAL("close"))
+            else:
+                self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"))
         elif data[:3] == "005":
             os.system("pyKafeclient&")
             self.emit(QtCore.SIGNAL("close"))
@@ -71,14 +74,14 @@ class PykafeClient(QtNetwork.QTcpServer):
         thread.start()
         self.threads = [thread]
     def incomingConnection(self, socketDescriptor):
-        thread = ListenerThread(self.parent(), socketDescriptor, self.ui)
+        thread = ListenerThread(self.parent(), socketDescriptor)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
         thread.start()
         self.threads.append(thread)
         print "login has %d threads" % len(self.threads)
     def login(self):
-        thread = SenderThread(self.parent(), "002" + self.ui.username.text + "|" + self.ui.password.text)
+        thread = SenderThread(self.parent(), "002" + unicode(self.ui.username.text()) + "|" + unicode(self.ui.password.text()))
         thread.start()
         self.threads.append(thread)
     def request(self):

@@ -17,7 +17,7 @@ locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, cashier = None):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,650,500).size()).expandedTo(MainWindow.minimumSizeHint()))
         icon = QtGui.QIcon("../../data/icons/pyKafe.png")
@@ -529,11 +529,11 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        self.server = server.PykafeServer(MainWindow, self)
+        self.server = server.PykafeServer(MainWindow, self, cashier)
         QtCore.QObject.connect(self.main_startButton,QtCore.SIGNAL("clicked()"),self.server.startClient)
         QtCore.QObject.connect(self.main_stopButton,QtCore.SIGNAL("clicked()"),self.server.stopClient)
         QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_startTimeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_startTimeButton,QtCore.SIGNAL("clicked()"),self.server.startTimed)
         QtCore.QObject.connect(self.orders_addButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
         QtCore.QObject.connect(self.orders_updateButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
         QtCore.QObject.connect(self.orders_deleteButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
@@ -545,10 +545,10 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.members_updateButton,QtCore.SIGNAL("clicked()"),self.server.updateMember)
         QtCore.QObject.connect(self.members_deleteButton,QtCore.SIGNAL("clicked()"),self.server.deleteMember)
         QtCore.QObject.connect(self.members_reportsButton,QtCore.SIGNAL("clicked()"),self.server.memberReports)
-        QtCore.QObject.connect(self.main_changeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_remoteButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_settingsButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_shutDownButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        QtCore.QObject.connect(self.main_changeButton,QtCore.SIGNAL("clicked()"),self.server.changeButton)
+        QtCore.QObject.connect(self.main_remoteButton,QtCore.SIGNAL("clicked()"),self.server.remoteButton)
+        QtCore.QObject.connect(self.main_settingsButton,QtCore.SIGNAL("clicked()"),self.server.settingsButton)
+        QtCore.QObject.connect(self.main_shutDownButton,QtCore.SIGNAL("clicked()"),self.server.shutdownButton)
         QtCore.QObject.connect(self.members_treeWidget,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem *,QTreeWidgetItem *)"),self.server.memberChanged)
         QtCore.QObject.connect(self.members_clearButton,QtCore.SIGNAL("clicked()"),self.members_filter.clear)
         QtCore.QObject.connect(self.members_filter,QtCore.SIGNAL("textChanged(QString)"),self.server.filterMembers)
@@ -618,7 +618,7 @@ class Ui_MainWindow(object):
         self.main_treeWidget.headerItem().setText(1,_("Status"))
         self.main_treeWidget.headerItem().setText(2,_("User"))
         self.main_treeWidget.headerItem().setText(3,_("Money"))
-        self.main_treeWidget.headerItem().setText(4,_("Time"))
+        self.main_treeWidget.headerItem().setText(4,_("Usage Time"))
         self.main_treeWidget.headerItem().setText(5,_("End Time"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _("Main"))
         self.groupBox_2.setTitle(_("Orders"))

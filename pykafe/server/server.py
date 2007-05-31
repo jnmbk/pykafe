@@ -17,12 +17,13 @@ from pysqlite2 import dbapi2 as sqlite
 from config import PykafeConfiguration
 from session import ClientSession
 from database import Database
-import base64, sha
 from settingswindow import Ui_SettingsWindow
+import logger
+import base64, sha, time, os
 
 import locale, gettext
 locale.setlocale(locale.LC_MESSAGES, "C")
-#for printing money in listwidgets, maybe using monetary would be better
+#maybe using LC_MONETARY would be better for printing money in listwidgets
 locale.setlocale(locale.LC_NUMERIC, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
@@ -81,23 +82,47 @@ class ListenerThread(QtCore.QThread):
             if client.session.state == ClientSession.working:
                 username, password = data[3:].split("|")
                 db = Database()
-                db.cur.execute("select count() from members where username = ? and password = ?", username, password)
+                db.cur.execute("select count() from members where username = ? and password = ?", (username, sha.new(password).hexdigest()))
                 if db.cur.fetchall()[0][0]:
-                    self.secureSend("0031")
-                    client.setState(ClientSession.loggedIn)
+                    client.sendMessage("0031")
+                    client.setState(ClientSession.loggedIn, user = username)
                 else:
                     #TODO: log: wrong password or username entered
-                    self.secureSend("0030")
+                    client.sendMessage("0030")
+        elif data[:3] == "008":
+            client.setState(ClientSession.waitingMoney)
         self.tcpSocket.disconnectFromHost()
-    def secureSend(self, data):
-        self.tcpSocket.write(base64.encodestring(data))
+
+class ClientThread(QtCore.QThread):
+    def __init__(self, parent, config):
+        QtCore.QThread.__init__(self)
+        self.client = parent
+        self.config = config
+    def run(self):
+        while(True):
+            if self.client.session.state == ClientSession.loggedIn:
+                #calculate time
+                utime = self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())
+                if utime/60 < int(self.config.price_fixedpriceminutes):
+                    price = float(self.config.price_fixedprice)
+                else:
+                    #TODO: round the price using price_rounding
+                    price = float(self.config.price_onehourprice)/3600 * utime
+                self.emit(QtCore.SIGNAL("changetext"),3,str(price))
+                usedTime = QtCore.QDateTime()
+                usedTime.setTime_t(utime)
+                self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
+            time.sleep(int(self.config.ui_refreshdelay))
 
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation, config):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.fillList(clientInformation)
         self.config = config 
-        self.threads = []
+        watcherThread = ClientThread(self, config)
+        QtCore.QObject.connect(watcherThread, QtCore.SIGNAL("changetext"), self.setText)
+        watcherThread.start()
+        self.threads = [watcherThread]
 
     def fillList(self, clientInformation):
         self.session = clientInformation.session
@@ -116,27 +141,42 @@ class Client(QtGui.QTreeWidgetItem):
         self.threads.append(thread)
         print "This client has %d threads" % len(self.threads)
 
-    def setState(self, state, user = None, endTime = None):
-        self.session.state = state
-        self.setText(1, self.session.getCurrentState())
+    def setState(self, state, user = "guest", endTime = ""):
+        if self.session.state == ClientSession.requestedOpening and state != ClientSession.requestedOpening:
+            self.changeColor("white")
         if state == ClientSession.working:
-            if self.config.filter_enable:
-                #send filter
-                message = "007"
-                filterFile = open(self.config.filter_file)
-                filters = filterFile.readlines()
-                filterFile.close()
-                for i in filters:
-                    message += i
-                self.sendMessage(message)
-        if state == ClientSession.loggedIn:
+            if self.session.state == ClientSession.loggedIn:
+                #TODO: calculate time and money
+
+                #logger.add("logout", "", cashier, self.name, user, income)
+                #save detailed session information to logs
+                pass
+            if self.session.state == ClientSession.notAvailable:
+                if self.config.filter_enable:
+                    #send filter
+                    message = "007"
+                    filterFile = open(self.config.filter_file)
+                    filters = filterFile.readlines()
+                    filterFile.close()
+                    for i in filters:
+                        message += i
+                    self.sendMessage(message)
+        elif state == ClientSession.loggedIn:
             self.session.user = user
             self.setText(2, user)
             self.setText(3, self.config.currency_prefix + "0" + self.config.currency_suffix)
             self.session.startTime = QtCore.QDateTime.currentDateTime()
-            self.setText(4, self.session.startTime.time().toString())
+            self.setText(4, self.session.startTime.time().toString("00.00"))
             if endTime:
-                self.setText(5, self.session.endTime.time().toString())
+                self.session.endTime = endTime
+                self.setText(5, self.session.endTime.time().toString("hh.mm"))
+        elif state == ClientSession.requestedOpening:
+            self.changeColor("red")
+        elif state == ClientSession.waitingMoney:
+            self.changeColor("red")
+        self.session.state = state
+        self.setText(1, self.session.getCurrentState())
+        #print "state is now %s" % self.session.getCurrentState()
 
 class Product(QtGui.QTreeWidgetItem):
     def __init__(self, parent, productInformation):
@@ -159,12 +199,18 @@ class Member(QtGui.QTreeWidgetItem):
 
     def updateValuesWithoutPassword(self, memberInformation):
         self.userName, self.realName, self.startDate, self.endDate, self.debt, self.payingType = memberInformation
-        self.setText(0, self.userName)        
+        self.setText(0, self.userName)
 
 class PykafeServer(QtNetwork.QTcpServer):
-    def __init__(self, parent, ui):
+    def __init__(self, parent, ui, cashier = None):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.config = PykafeConfiguration()
+        self.ui = ui
+        if self.config.startup_askpassword:
+            self.cashier = cashier
+        else:
+            self.cashier = self.config.last_cashier
+        print "Current cashier is:", self.cashier
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
             #TODO: retry button
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
@@ -173,8 +219,6 @@ class PykafeServer(QtNetwork.QTcpServer):
         for clientInformation in self.config.clientList:
             self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
-        #TODO: Initialize ui
-        self.ui = ui
         self.initMembers()
         self.initProducts()
         self.localize()
@@ -182,7 +226,7 @@ class PykafeServer(QtNetwork.QTcpServer):
 
     def initMembers(self):
         self.members = []
-        memberList = Database().run("select * from members")
+        memberList = Database().run("select * from members where is_cashier='0'")
         for memberInformation in memberList:
             self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
         self.ui.members_dateEdit.setDate(QtCore.QDate.currentDate())
@@ -220,7 +264,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
         if state == ClientSession.working:
             client.sendMessage("005")
-            client.setState(ClientSession.loggedIn)
+            client.setState(ClientSession.loggedIn, user = "guest")
         if state == ClientSession.loggedIn:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
         if state == ClientSession.requestedOpening:
@@ -228,14 +272,78 @@ class PykafeServer(QtNetwork.QTcpServer):
             client.setState(ClientSession.loggedIn)
 
     def startTimed(self):
-        print 2
-        pass
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        state = client.session.state
+        if state == ClientSession.notAvailable:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+            return
+        if state == ClientSession.loggedIn:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
+            return
+        answer = QtGui.QInputDialog.getInteger(self.parent(), _("Enter time"), _("Enter time in minutes"),
+                                      int(self.config.price_fixedpriceminutes),
+                                      int(self.config.price_fixedpriceminutes),
+                                      1440, 15)
+        if answer[1] == False:
+            return
+        if state == ClientSession.working:
+            client.sendMessage("006" + str(answer[0]))
+            client.setState(ClientSession.loggedIn, user = "guest", endTime = QtCore.QDateTime.currentDateTime().addSecs(answer[0]*60))
+
     def stopClient(self):
-        print 3
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        state = client.session.state
+        if state == ClientSession.notAvailable:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+        elif state == ClientSession.working:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already stopped"))
+        elif state == ClientSession.loggedIn:
+            answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to stop this client?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.Yes:
+                client.sendMessage("009")
+                client.setState(ClientSession.working)
+        elif state == ClientSession.requestedOpening:
+            client.sendMessage("0010")
+            client.setState(ClientSession.working)
+
+    def changeButton(self):
         pass
+
+    def remoteButton(self):
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        if client.session.state == ClientSession.notAvailable:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+            return
+        os.system("krdc -s -f -l -c %s&" % client.ip)
+
+    def settingsButton(self):
+        pass
+
+    def shutdownButton(self):
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        state = client.session.state
+        if state == ClientSession.notAvailable:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
+            return
+        answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to shutdown this client?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.Yes:
+            client.sendMessage("010")
+            client.setState(ClientSession.notAvailable)
+
     def addMember(self, toDatabase = True, memberInformation = None):
         "Adds a new member"
-        #check if startdate is smaller than enddate
         if self.ui.members_dateEdit.date().__gt__(self.ui.members_dateEdit_2.date()):
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Start date must be smaller than end date"))
             return
@@ -246,8 +354,7 @@ class PykafeServer(QtNetwork.QTcpServer):
                                  str(self.ui.members_dateEdit.date().toString("yyyy-MM-dd")),
                                  str(self.ui.members_dateEdit_2.date().toString("yyyy-MM-dd")),
                                  self.ui.members_debt.value(),
-                                 str(self.ui.members_payingType.currentText()),
-                                 False]
+                                 str(self.ui.members_payingType.currentText()), 0]
         if "" in memberInformation:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("All member information must be filled"))
         else:
@@ -309,6 +416,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from members where username = ?", (member.userName,))
             self.ui.members_treeWidget.takeTopLevelItem(self.ui.members_treeWidget.indexOfTopLevelItem(member))
+            del(self.members[self.members.index(member)])
             self.filterMembers(self.ui.members_filter.text())
             self.ui.statusbar.showMessage(_("Deleted member"))
 
@@ -385,6 +493,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.ui.statusbar.showMessage(_("Updated product"))
         except sqlite.IntegrityError:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Product name must be unique"))
+
     def deleteProduct(self):
         product = self.ui.orders_treeWidget_2.currentItem()
         if not product:
@@ -393,13 +502,11 @@ class PykafeServer(QtNetwork.QTcpServer):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this product?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from products where product_name = ?", (product.name,))
-            print len(self.products)
             self.ui.orders_treeWidget_2.takeTopLevelItem(self.ui.orders_treeWidget_2.indexOfTopLevelItem(product))
-            print len(self.products)
             self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
-        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), _("Authors:") + u"\nUğur Çetin\nMustafa Sarı\n\n" + _("Mentor:") + u"\nA. Tevfik İnan")
+        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), "pyKafe v0.1_alpha1\n\n" + _("Authors:") + u"\nUğur Çetin\nMustafa Sarı\n\n" + _("Mentor:") + u"\nA. Tevfik İnan")
 
     def aboutQt(self):
         QtGui.QMessageBox.aboutQt(self.parent())
