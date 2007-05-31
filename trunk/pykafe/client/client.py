@@ -83,7 +83,7 @@ class ListenerThread(QtCore.QThread):
                 sendDataToUi("005")
         elif data[:3] == "007":
             self.emit(QtCore.SIGNAL("filter"), data[4:])
-            iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
+            """iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
             for site in data[3:].split('\n'):
                 if siteValidate(site):
                     iptablesFile += "-A INPUT -s %s -j DROP\n" % site
@@ -91,7 +91,9 @@ class ListenerThread(QtCore.QThread):
             file = open("/etc/pyKafe/iptables.conf", "w")
             file.write(iptablesFile)
             file.close()
-            os.system("iptables-restore < /etc/pyKafe/iptables.conf")
+            os.system("iptables-restore < /etc/pyKafe/iptables.conf")"""
+            for site in data[3:].split('\n'):
+                os.system("iptables -A INPUT -s %s -j DROP&" % site)
         elif data[:3] == "010":
             os.system("init 0")
         self.exit()
