@@ -1,0 +1,593 @@
+# translation of server_tr.po to Turkish
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Uğur Çetin <jnmbk@users.sourceforge.net>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: server_tr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-05-31 06:45+0300\n"
+"PO-Revision-Date: 2007-05-31 06:55+0300\n"
+"Last-Translator: Uğur Çetin <jnmbk@users.sourceforge.net>\n"
+"Language-Team: Turkish <tr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: ../pykafe/server/server.py:502
+msgid "About PyKafe"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:682
+msgid "About Qt"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:681
+msgid "About pyKafe"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:635 ../pykafe/server/mainwindow.py:643
+#: ../pykafe/server/mainwindow.py:653 ../pykafe/server/settingswindow.py:368
+#: ../pykafe/server/settingswindow.py:377
+msgid "Add"
+msgstr "Ekle"
+
+#: ../pykafe/server/server.py:360
+msgid "Added member"
+msgstr "Üye eklendi"
+
+#: ../pykafe/server/server.py:465
+msgid "Added product"
+msgstr "Ürün eklendi"
+
+#: ../pykafe/server/settingswindow.py:367
+msgid "Addres:"
+msgstr "Adres:"
+
+#: ../pykafe/server/settings.py:137 ../pykafe/server/settings.py:169
+msgid "All cashier information must be filled"
+msgstr "Bütün kasiyer bilgileri doldurulmalıdır"
+
+#: ../pykafe/server/server.py:352 ../pykafe/server/server.py:382
+msgid "All member information must be filled"
+msgstr "Bütün üye bilgileri doldurulmalıdır"
+
+#: ../pykafe/server/server.py:307 ../pykafe/server/server.py:333
+#: ../pykafe/server/server.py:408 ../pykafe/server/server.py:495
+#: ../pykafe/server/settings.py:154
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: ../pykafe/server/settingswindow.py:354
+msgid "Ask password when opening"
+msgstr "Açılırken parola sor"
+
+#: ../pykafe/server/server.py:502
+msgid "Authors:"
+msgstr "Yazarlar:"
+
+#: ../pykafe/server/settingswindow.py:366
+msgid "Browse"
+msgstr "Gözat"
+
+#: ../pykafe/server/mainwindow.py:636
+msgid "Cafeteria Stocks"
+msgstr ""
+
+#: ../pykafe/server/server.py:264 ../pykafe/server/server.py:281
+#: ../pykafe/server/server.py:303 ../pykafe/server/server.py:331
+msgid "Can't connect to client"
+msgstr "İstemciyle bağlantı kurulamıyor"
+
+#: ../pykafe/server/mainwindow.py:632
+msgid "Cancel"
+msgstr "İptal"
+
+#: ../pykafe/server/mainwindow.py:671
+msgid "Cashier"
+msgstr "Kasiyer"
+
+#: ../pykafe/server/settingswindow.py:373
+msgid "Cashier List"
+msgstr "Kasiyer Listesi"
+
+#: ../pykafe/server/settingswindow.py:381
+msgid "Cashiers"
+msgstr "Kasiyerler"
+
+#: ../pykafe/server/mainwindow.py:614
+msgid "Change"
+msgstr "Değiştir"
+
+#: ../pykafe/server/server.py:260 ../pykafe/server/server.py:277
+#: ../pykafe/server/server.py:299 ../pykafe/server/server.py:327
+msgid "Choose a client first"
+msgstr "Önce bir istemci seçin"
+
+#: ../pykafe/server/mainwindow.py:648
+msgid "Clear"
+msgstr "Temizle"
+
+#: ../pykafe/server/mainwindow.py:649
+msgid "Clears filter"
+msgstr "Filtreyi temizler"
+
+#: ../pykafe/server/server.py:269 ../pykafe/server/server.py:284
+msgid "Client is already logged in"
+msgstr "İstemci zaten giriş yapmış"
+
+#: ../pykafe/server/server.py:305
+msgid "Client is already stopped"
+msgstr "İstemci zaten bekleme konumunda"
+
+#: ../pykafe/server/mainwindow.py:672 ../pykafe/server/mainwindow.py:683
+msgid "Computer"
+msgstr "Bilgisayar"
+
+#: ../pykafe/server/mainwindow.py:626
+msgid "Computer ID"
+msgstr "Bilgisayar Adı"
+
+#: ../pykafe/server/server.py:216
+msgid "Connection Error"
+msgstr "Bağlantı Hatası"
+
+#: ../pykafe/server/mainwindow.py:680
+msgid "Contents"
+msgstr "İçindekiler"
+
+#: ../pykafe/server/mainwindow.py:630 ../pykafe/server/mainwindow.py:638
+msgid "Cost"
+msgstr "Fiyat"
+
+#: ../pykafe/server/settingswindow.py:359
+msgid "Currency prefix:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:360
+msgid "Currency suffix:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:668
+msgid "Date"
+msgstr "Tarih"
+
+#: ../pykafe/server/mainwindow.py:662
+msgid "Debt:"
+msgstr "Borç:"
+
+#: ../pykafe/server/settingswindow.py:357
+msgid "Decimals Seperator:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:633 ../pykafe/server/mainwindow.py:645
+#: ../pykafe/server/mainwindow.py:655 ../pykafe/server/settingswindow.py:369
+#: ../pykafe/server/settingswindow.py:379
+msgid "Delete"
+msgstr "Sil"
+
+#: ../pykafe/server/server.py:414
+msgid "Deleted member"
+msgstr "Üye silindi"
+
+#: ../pykafe/server/server.py:499
+msgid "Deleted product"
+msgstr "Ürün silindi"
+
+#: ../pykafe/server/mainwindow.py:670
+msgid "Description"
+msgstr "Tanım"
+
+#: ../pykafe/server/settings.py:154
+msgid "Do you really want to delete this cashier?"
+msgstr "Bu kasiyeri silmek istediğinizden emin misiniz?"
+
+#: ../pykafe/server/server.py:408
+msgid "Do you really want to delete this member?"
+msgstr "Bu üyeyi silmek istediğinizden emin misiniz?"
+
+#: ../pykafe/server/server.py:495
+msgid "Do you really want to delete this product?"
+msgstr "Bu ürünü silmek istediğinizden emin misiniz?"
+
+#: ../pykafe/server/server.py:333
+msgid "Do you really want to shutdown this client?"
+msgstr "Bu istemciyi kapatmak istediğinizden emin misiniz?"
+
+#: ../pykafe/server/server.py:307
+msgid "Do you really want to stop this client?"
+msgstr "Bu istemciyi durdurmak istediğinizden emin misiniz?"
+
+#: ../pykafe/server/settingswindow.py:371
+msgid "Enable Internet Filter"
+msgstr "İnternet Filtresini Etkinleştir"
+
+#: ../pykafe/server/mainwindow.py:622
+msgid "End Time"
+msgstr "Bitiş Zamanı"
+
+#: ../pykafe/server/mainwindow.py:666
+msgid "Ends"
+msgstr "Bitiş"
+
+#: ../pykafe/server/server.py:286
+msgid "Enter time"
+msgstr "Zamanı girin"
+
+#: ../pykafe/server/server.py:286
+msgid "Enter time in minutes"
+msgstr "Dakika cinsinden zamanı girin"
+
+#: ../pykafe/server/mainwindow.py:684
+msgid "Entertainment"
+msgstr ""
+
+#: ../pykafe/server/passwordwindow.py:88 ../pykafe/server/server.py:264
+#: ../pykafe/server/server.py:281 ../pykafe/server/server.py:303
+#: ../pykafe/server/server.py:331 ../pykafe/server/server.py:341
+#: ../pykafe/server/server.py:352 ../pykafe/server/server.py:362
+#: ../pykafe/server/server.py:367 ../pykafe/server/server.py:371
+#: ../pykafe/server/server.py:382 ../pykafe/server/server.py:391
+#: ../pykafe/server/server.py:400 ../pykafe/server/server.py:406
+#: ../pykafe/server/server.py:457 ../pykafe/server/server.py:460
+#: ../pykafe/server/server.py:467 ../pykafe/server/server.py:472
+#: ../pykafe/server/server.py:478 ../pykafe/server/server.py:481
+#: ../pykafe/server/server.py:488 ../pykafe/server/server.py:493
+#: ../pykafe/server/settings.py:54 ../pykafe/server/settings.py:62
+#: ../pykafe/server/settings.py:70 ../pykafe/server/settings.py:137
+#: ../pykafe/server/settings.py:144 ../pykafe/server/settings.py:148
+#: ../pykafe/server/settings.py:152 ../pykafe/server/settings.py:163
+#: ../pykafe/server/settings.py:169 ../pykafe/server/settings.py:177
+#: ../pykafe/server/settings.py:184
+msgid "Error"
+msgstr "Hata"
+
+#: ../pykafe/server/mainwindow.py:685
+msgid "Exit"
+msgstr "Çıkış"
+
+#: ../pykafe/server/mainwindow.py:678
+msgid "File"
+msgstr "Dosya"
+
+#: ../pykafe/server/settingswindow.py:365
+msgid "Filter File:"
+msgstr "Filtre Dosyası:"
+
+#: ../pykafe/server/settingswindow.py:370
+msgid "Filtered Addresses"
+msgstr "Filtrelenen Adresler"
+
+#: ../pykafe/server/mainwindow.py:650
+msgid "Find:"
+msgstr "Bul:"
+
+#: ../pykafe/server/settingswindow.py:362
+msgid "Fixed price for first 30 minutes:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:356
+msgid "General"
+msgstr "Genel"
+
+#: ../pykafe/server/mainwindow.py:676
+msgid "Help"
+msgstr "Yardım"
+
+#: ../pykafe/server/mainwindow.py:617 ../pykafe/server/mainwindow.py:628
+msgid "ID"
+msgstr "Tanım"
+
+#: ../pykafe/server/mainwindow.py:674
+msgid "Income"
+msgstr "Gelir"
+
+#: ../pykafe/server/server.py:260 ../pykafe/server/server.py:269
+#: ../pykafe/server/server.py:277 ../pykafe/server/server.py:284
+#: ../pykafe/server/server.py:299 ../pykafe/server/server.py:305
+#: ../pykafe/server/server.py:327
+msgid "Information"
+msgstr "Bilgi"
+
+#: ../pykafe/server/settingswindow.py:372
+msgid "Internet Filter"
+msgstr "İnternet Filtresi"
+
+#: ../pykafe/server/mainwindow.py:625 ../pykafe/server/mainwindow.py:629
+#: ../pykafe/server/mainwindow.py:637 ../pykafe/server/mainwindow.py:642
+msgid "Item"
+msgstr "Ürün"
+
+#: ../pykafe/server/session.py:50
+msgid "Logged In"
+msgstr "Giriş Yapmış"
+
+#: ../pykafe/server/mainwindow.py:675
+msgid "Logs"
+msgstr "Kayıtlar"
+
+#: ../pykafe/server/mainwindow.py:623
+msgid "Main"
+msgstr "Ana"
+
+#: ../pykafe/server/mainwindow.py:673
+msgid "Member"
+msgstr "Üye"
+
+#: ../pykafe/server/mainwindow.py:652
+msgid "Member Information"
+msgstr "Üye Bilgileri"
+
+#: ../pykafe/server/mainwindow.py:647
+msgid "Member List"
+msgstr "Üye Listesi"
+
+#: ../pykafe/server/mainwindow.py:667
+msgid "Members"
+msgstr "Üyeler"
+
+#: ../pykafe/server/server.py:502
+msgid "Mentor:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:620
+msgid "Money"
+msgstr "Para"
+
+#: ../pykafe/server/mainwindow.py:613
+msgid "Moves user to another computer"
+msgstr "Kullanıcıyı başka bilgisayara aktarır"
+
+#: ../pykafe/server/session.py:46
+msgid "N/A"
+msgstr "Erişilemez"
+
+#: ../pykafe/server/mainwindow.py:679
+msgid "New"
+msgstr "Yeni"
+
+#: ../pykafe/server/mainwindow.py:660
+msgid "Normal"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:611
+msgid "Opens remote desktop connection"
+msgstr "Uzak masaüstü bağlantısı kurar"
+
+#: ../pykafe/server/mainwindow.py:609
+msgid "Opens settings for this computer"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:624 ../pykafe/server/mainwindow.py:646
+msgid "Orders"
+msgstr "Siparişler"
+
+#: ../pykafe/server/mainwindow.py:658 ../pykafe/server/passwordwindow.py:76
+#: ../pykafe/server/settingswindow.py:376
+msgid "Password:"
+msgstr "Parola:"
+
+#: ../pykafe/server/mainwindow.py:657
+msgid "Paying Type:"
+msgstr "Ödeme Türü"
+
+#: ../pykafe/server/mainwindow.py:659
+msgid "Pre Paid"
+msgstr "Ön Ödemeli"
+
+#: ../pykafe/server/mainwindow.py:641
+msgid "Price"
+msgstr "Fiyat"
+
+#: ../pykafe/server/settingswindow.py:363
+msgid "Price for one hour:"
+msgstr "Bir saatlik ücret:"
+
+#: ../pykafe/server/server.py:460 ../pykafe/server/server.py:481
+msgid "Price must be bigger than 0"
+msgstr "Fiyat sıfırdan büyük olmalıdır"
+
+#: ../pykafe/server/settingswindow.py:364
+msgid "Pricing"
+msgstr ""
+
+#: ../pykafe/server/server.py:467 ../pykafe/server/server.py:488
+msgid "Product name must be unique"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:602
+msgid "PyKafe"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:353
+msgid "PyKafe Settings"
+msgstr "PyKafe Ayarları"
+
+#: ../pykafe/server/mainwindow.py:627 ../pykafe/server/mainwindow.py:631
+#: ../pykafe/server/mainwindow.py:639 ../pykafe/server/mainwindow.py:640
+msgid "Quantity"
+msgstr "Miktar"
+
+#: ../pykafe/server/session.py:48
+msgid "Ready"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:663 ../pykafe/server/settingswindow.py:374
+msgid "Real Name:"
+msgstr "Gerçek Adı:"
+
+#: ../pykafe/server/settingswindow.py:361
+msgid "Regional"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:612
+msgid "Remote"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:656 ../pykafe/server/settingswindow.py:380
+msgid "Reports"
+msgstr ""
+
+#: ../pykafe/server/session.py:52
+msgid "Requested Opening"
+msgstr ""
+
+#: ../pykafe/server/settings.py:98
+msgid "Select Filter File"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:610
+msgid "Settings"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:686
+msgid "Settings..."
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:616
+msgid "Shutdown"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:615
+msgid "Shuts down selected computer"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:608
+msgid "Start"
+msgstr "Başlat"
+
+#: ../pykafe/server/server.py:341 ../pykafe/server/server.py:367
+msgid "Start date must be smaller than end date"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:665
+msgid "Starts"
+msgstr "Başlangıç"
+
+#: ../pykafe/server/mainwindow.py:607
+msgid "Starts selected computer for usage"
+msgstr "Seçilen bilgisayarı kullanıma açar"
+
+#: ../pykafe/server/mainwindow.py:603
+msgid "Starts selected computer for usage (timed)"
+msgstr "Seçilen bilgisayarı süreli olarak kullanıma açar"
+
+#: ../pykafe/server/mainwindow.py:618
+msgid "Status"
+msgstr "Durum"
+
+#: ../pykafe/server/mainwindow.py:606
+msgid "Stop"
+msgstr "Durdur"
+
+#: ../pykafe/server/mainwindow.py:664
+msgid "Subscribing period:"
+msgstr "Üyelik süresi"
+
+#: ../pykafe/server/mainwindow.py:605
+msgid "Switches to login state"
+msgstr ""
+
+#: ../pykafe/server/settings.py:148
+msgid "There should be one cashier at least"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:358
+msgid "Thousands seperator:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:604
+msgid "Timed"
+msgstr "Süreli"
+
+#: ../pykafe/server/mainwindow.py:677
+msgid "Tools"
+msgstr "Araçlar"
+
+#: ../pykafe/server/settingswindow.py:355
+msgid "Tray Icon"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:669
+msgid "Type"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:651
+msgid "Type some letters to filter"
+msgstr ""
+
+#: ../pykafe/server/server.py:216
+#, python-format
+msgid "Unable to start server: %s"
+msgstr "Sunucu başlatılamadı: %s"
+
+#: ../pykafe/server/mainwindow.py:634 ../pykafe/server/mainwindow.py:644
+#: ../pykafe/server/mainwindow.py:654 ../pykafe/server/settingswindow.py:378
+msgid "Update"
+msgstr "Güncelle"
+
+#: ../pykafe/server/server.py:389 ../pykafe/server/server.py:398
+msgid "Updated member information"
+msgstr "Üye bilgisi güncellendi"
+
+#: ../pykafe/server/server.py:486
+msgid "Updated product"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:621
+msgid "Usage Time"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:619
+msgid "User"
+msgstr "Kullanıcı"
+
+#: ../pykafe/server/server.py:362 ../pykafe/server/server.py:391
+#: ../pykafe/server/server.py:400 ../pykafe/server/settings.py:144
+#: ../pykafe/server/settings.py:177 ../pykafe/server/settings.py:184
+msgid "Username must be unique"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:661 ../pykafe/server/passwordwindow.py:75
+#: ../pykafe/server/settingswindow.py:375
+msgid "Username:"
+msgstr ""
+
+#: ../pykafe/server/session.py:54
+msgid "Waiting for Payment"
+msgstr ""
+
+#: ../pykafe/server/passwordwindow.py:88
+msgid "Wrong username or password"
+msgstr ""
+
+#: ../pykafe/server/settings.py:54
+msgid "You didn't enter a valid address"
+msgstr ""
+
+#: ../pykafe/server/server.py:457 ../pykafe/server/server.py:478
+msgid "You must enter a product name"
+msgstr ""
+
+#: ../pykafe/server/settings.py:152 ../pykafe/server/settings.py:163
+msgid "You must select a cashier first"
+msgstr ""
+
+#: ../pykafe/server/settings.py:62 ../pykafe/server/settings.py:70
+msgid "You must select a filter first"
+msgstr ""
+
+#: ../pykafe/server/server.py:371 ../pykafe/server/server.py:406
+msgid "You must select a member first"
+msgstr ""
+
+#: ../pykafe/server/server.py:472 ../pykafe/server/server.py:493
+msgid "You must select a product first"
+msgstr ""
+
+#: ../pykafe/server/passwordwindow.py:74
+msgid "pyKafe"
+msgstr ""
+
