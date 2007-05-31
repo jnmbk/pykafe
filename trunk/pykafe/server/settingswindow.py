@@ -20,7 +20,7 @@ _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 class Ui_SettingsWindow(object):
     def setupUi(self, SettingsWindow, config):
         SettingsWindow.setObjectName("SettingsWindow")
-        SettingsWindow.resize(QtCore.QSize(QtCore.QRect(0,0,400,300).size()).expandedTo(SettingsWindow.minimumSizeHint()))
+        SettingsWindow.resize(QtCore.QSize(QtCore.QRect(0,0,468,300).size()).expandedTo(SettingsWindow.minimumSizeHint()))
         SettingsWindow.setWindowIcon(QtGui.QIcon("../../data/icons/pyKafe.png"))
 
         self.gridlayout = QtGui.QGridLayout(SettingsWindow)
@@ -242,6 +242,87 @@ class Ui_SettingsWindow(object):
         self.filter_enable.setObjectName("filter_enable")
         self.gridlayout4.addWidget(self.filter_enable,0,0,1,1)
         self.tabWidget.addTab(self.tab_4,"")
+
+        self.tab_5 = QtGui.QWidget()
+        self.tab_5.setObjectName("tab_5")
+
+        self.gridlayout5 = QtGui.QGridLayout(self.tab_5)
+        self.gridlayout5.setMargin(9)
+        self.gridlayout5.setSpacing(6)
+        self.gridlayout5.setObjectName("gridlayout5")
+
+        spacerItem6 = QtGui.QSpacerItem(20,40,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        self.gridlayout5.addItem(spacerItem6,1,1,1,1)
+
+        self.cashiers_treeWidget = QtGui.QTreeWidget(self.tab_5)
+        self.cashiers_treeWidget.setRootIsDecorated(False)
+        self.cashiers_treeWidget.setSortingEnabled(True)
+        self.cashiers_treeWidget.setObjectName("cashiers_treeWidget")
+        self.gridlayout5.addWidget(self.cashiers_treeWidget,0,0,3,1)
+
+        self.gridlayout6 = QtGui.QGridLayout()
+        self.gridlayout6.setMargin(0)
+        self.gridlayout6.setSpacing(6)
+        self.gridlayout6.setObjectName("gridlayout6")
+
+        self.cashiers_password = QtGui.QLineEdit(self.tab_5)
+        self.cashiers_password.setEchoMode(QtGui.QLineEdit.Password)
+        self.cashiers_password.setObjectName("cashiers_password")
+        self.gridlayout6.addWidget(self.cashiers_password,1,1,1,1)
+
+        self.cashiers_username = QtGui.QLineEdit(self.tab_5)
+        self.cashiers_username.setObjectName("cashiers_username")
+        self.gridlayout6.addWidget(self.cashiers_username,0,1,1,1)
+
+        self.textLabel3_2 = QtGui.QLabel(self.tab_5)
+        self.textLabel3_2.setWordWrap(False)
+        self.textLabel3_2.setObjectName("textLabel3_2")
+        self.gridlayout6.addWidget(self.textLabel3_2,2,0,1,1)
+
+        self.textLabel1_3 = QtGui.QLabel(self.tab_5)
+        self.textLabel1_3.setWordWrap(False)
+        self.textLabel1_3.setObjectName("textLabel1_3")
+        self.gridlayout6.addWidget(self.textLabel1_3,0,0,1,1)
+
+        self.textLabel2_2 = QtGui.QLabel(self.tab_5)
+        self.textLabel2_2.setWordWrap(False)
+        self.textLabel2_2.setObjectName("textLabel2_2")
+        self.gridlayout6.addWidget(self.textLabel2_2,1,0,1,1)
+
+        self.cashiers_realName = QtGui.QLineEdit(self.tab_5)
+        self.cashiers_realName.setObjectName("cashiers_realName")
+        self.gridlayout6.addWidget(self.cashiers_realName,2,1,1,1)
+        self.gridlayout5.addLayout(self.gridlayout6,0,1,1,1)
+
+        self.hboxlayout2 = QtGui.QHBoxLayout()
+        self.hboxlayout2.setMargin(0)
+        self.hboxlayout2.setSpacing(6)
+        self.hboxlayout2.setObjectName("hboxlayout2")
+
+        spacerItem7 = QtGui.QSpacerItem(80,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.hboxlayout2.addItem(spacerItem7)
+
+        self.cashiers_addButton = QtGui.QPushButton(self.tab_5)
+        self.cashiers_addButton.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
+        self.cashiers_addButton.setObjectName("cashiers_addButton")
+        self.hboxlayout2.addWidget(self.cashiers_addButton)
+
+        self.cashiers_updateButton = QtGui.QPushButton(self.tab_5)
+        self.cashiers_updateButton.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
+        self.cashiers_updateButton.setObjectName("cashiers_updateButton")
+        self.hboxlayout2.addWidget(self.cashiers_updateButton)
+
+        self.cashiers_deleteButton = QtGui.QPushButton(self.tab_5)
+        self.cashiers_deleteButton.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
+        self.cashiers_deleteButton.setObjectName("cashiers_deleteButton")
+        self.hboxlayout2.addWidget(self.cashiers_deleteButton)
+
+        self.cashiers_reportsButton = QtGui.QPushButton(self.tab_5)
+        self.cashiers_reportsButton.setIcon(QtGui.QIcon("../../data/icons/find.png"))
+        self.cashiers_reportsButton.setObjectName("cashiers_reportsButton")
+        self.hboxlayout2.addWidget(self.cashiers_reportsButton)
+        self.gridlayout5.addLayout(self.hboxlayout2,2,1,1,1)
+        self.tabWidget.addTab(self.tab_5,"")
         self.gridlayout.addWidget(self.tabWidget,0,0,1,1)
 
         self.buttonBox = QtGui.QDialogButtonBox(SettingsWindow)
@@ -251,7 +332,7 @@ class Ui_SettingsWindow(object):
         self.gridlayout.addWidget(self.buttonBox,1,0,1,1)
 
         self.retranslateUi(SettingsWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(4)
         self.manager = SettingsManager(self, SettingsWindow, config)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("accepted()"),self.manager.accept)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("rejected()"),SettingsWindow.close)
@@ -261,6 +342,11 @@ class Ui_SettingsWindow(object):
         QtCore.QObject.connect(self.filter_treeWidget,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)"),self.manager.filterChanged)
         QtCore.QObject.connect(self.filter_enable,QtCore.SIGNAL("stateChanged(int)"),self.manager.filterEnable)
         QtCore.QObject.connect(self.filter_browse,QtCore.SIGNAL("clicked()"),self.manager.filterBrowse)
+        QtCore.QObject.connect(self.cashiers_treeWidget,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)"),self.manager.cashierChanged)
+        QtCore.QObject.connect(self.cashiers_addButton,QtCore.SIGNAL("clicked()"),self.manager.cashierAdd)
+        QtCore.QObject.connect(self.cashiers_deleteButton,QtCore.SIGNAL("clicked()"),self.manager.cashierDelete)
+        QtCore.QObject.connect(self.cashiers_updateButton,QtCore.SIGNAL("clicked()"),self.manager.cashierUpdate)
+        QtCore.QObject.connect(self.cashiers_reportsButton,QtCore.SIGNAL("clicked()"),self.manager.cashierReports)
         QtCore.QMetaObject.connectSlotsByName(SettingsWindow)
 
     def retranslateUi(self, SettingsWindow):
@@ -284,3 +370,12 @@ class Ui_SettingsWindow(object):
         self.filter_treeWidget.headerItem().setText(0,_("Filtered Addresses"))
         self.filter_enable.setText(_("Enable Internet Filter"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _("Internet Filter"))
+        self.cashiers_treeWidget.headerItem().setText(0,_("Cashier List"))
+        self.textLabel3_2.setText(_("Real Name:"))
+        self.textLabel1_3.setText(_("Username:"))
+        self.textLabel2_2.setText(_("Password:"))
+        self.cashiers_addButton.setText(_("Add"))
+        self.cashiers_updateButton.setText(_("Update"))
+        self.cashiers_deleteButton.setText(_("Delete"))
+        self.cashiers_reportsButton.setText(_("Reports"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _("Cashiers"))

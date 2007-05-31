@@ -12,10 +12,6 @@
 from database import Database
 from PyQt4 import QtCore
 
-class Logger:
-    def __init__(self):
-        self.database = Database()
-    def addLog(self, log_type, log_value, cashier, computer = "", member = "", income = ""):
-        date = QtCore.QDateTime.currentDateTime().toTime_t()
-        self.database.cur.execute("insert into logs (date, log_type, log_value, cashier, computer, member, income) values (?,?,?,?,?,?,?)", date, log_type, log_value, cashier, computer, member, income)
-        self.database.con.commit()
+def add(self, log_type, log_value, cashier, computer = "", member = "", income = ""):
+    date = QtCore.QDateTime.currentDateTime().toTime_t()
+    Database().runOnce("insert into logs (date, log_type, log_value, cashier, computer, member, income) values (?,?,?,?,?,?,?)", date, log_type, log_value, cashier, computer, member, income)

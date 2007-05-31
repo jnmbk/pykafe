@@ -276,7 +276,7 @@
           </column>
           <column>
            <property name="text" >
-            <string>Time</string>
+            <string>Usage Time</string>
            </property>
           </column>
           <column>

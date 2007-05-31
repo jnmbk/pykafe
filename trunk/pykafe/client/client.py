@@ -28,6 +28,7 @@ def sendDataToServer(data):
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
     print "sent to server:", data
+
 def sendDataToUi(data):
     tcpSocket = QtNetwork.QTcpSocket()
     tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
@@ -35,6 +36,10 @@ def sendDataToUi(data):
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
     print "sent to ui:", data
+
+def siteValidate(site):
+    #TODO: Look if that is an ip adress
+    return True
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, socketDescriptor, client):
@@ -45,7 +50,7 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        print "connection request from:", self.tcpSocket.peerAddress()
+        print "connection request from:", self.tcpSocket.peerAddress().toString()
         if self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readUi)
         elif self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(self.client.config.network.serverIP):
@@ -64,14 +69,31 @@ class ListenerThread(QtCore.QThread):
                 sendDataToUi(data)
             else:
                 sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
+        elif data[:3] == "003":
+            if self.client.session.state == ClientSession.working:
+                sendDataToUi(data)
+                if data[3] == "1":
+                    self.client.session.state = ClientSession.loggedIn
+            else:
+                sys.stderr.write(_("Received %s from server, state was: %s") % (data, self.client.session.getCurrentState()))
         elif data[:3] == "005":
             if self.client.session.state == ClientSession.working:
                 self.client.session.user = "guest"
+                self.client.session.state = ClientSession.loggedIn
                 sendDataToUi("005")
         elif data[:3] == "007":
             self.emit(QtCore.SIGNAL("filter"), data[4:])
-            for site in data[4:].split('\n'):
-                os.system("iptables -A INPUT -s %s -j DROP", site)
+            iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
+            for site in data[3:].split('\n'):
+                if siteValidate(site):
+                    iptablesFile += "-A INPUT -s %s -j DROP\n" % site
+            iptablesFile += "COMMIT\n"
+            file = open("/etc/pyKafe/iptables.conf", "w")
+            file.write(iptablesFile)
+            file.close()
+            os.system("iptables-restore < /etc/pyKafe/iptables.conf")
+        elif data[:3] == "010":
+            os.system("init 0")
         self.exit()
 
     def readUi(self):
@@ -80,14 +102,24 @@ class ListenerThread(QtCore.QThread):
         if data[:3] == "000":
             if self.client.session.state == ClientSession.working:
                 sendDataToServer("000")
+                self.client.session.setState(ClientSession.requestedOpening)
             else:
                 sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.getCurrentState())
+        elif data[:3] == "002":
+            if self.client.session.state == ClientSession.working:
+                sendDataToServer(data)
         elif data[:3] == "004":
             if self.client.session.state == ClientSession.notAvailable:
                 sendDataToServer("004")
                 self.client.session.state = ClientSession.working
             else:
                 sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
+        elif data[:3] == "008":
+            print 8
+            if self.client.session.state == ClientSession.loggedIn:
+                print "gdg"
+                sendDataToServer(data)
+                os.system("service kdebase stop && sleep 3 && service kdebase start")
         self.exit()
 
 class PykafeClient(QtNetwork.QTcpServer):

@@ -12,7 +12,7 @@
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
-_ = gettext.translation("pyKafe_common", fallback=True).ugettext
+_ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
 class ClientSession:
     """class for managing client sessions"""

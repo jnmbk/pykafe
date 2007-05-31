@@ -10,8 +10,9 @@
 # Please read the COPYING file.
 #
 
-import sys, time
-from PyQt4 import QtCore, QtGui
+import sys, time, base64
+from PyQt4 import QtCore, QtGui, QtNetwork
+from config import PykafeConfiguration
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -22,6 +23,71 @@ class CurrencyConfig:
     suffix = " YTL"
     fixedPrice = 0.50
     tenMinutePrice = 0.15
+
+class SenderThread(QtCore.QThread):
+    def __init__(self, parent, data):
+        QtCore.QThread.__init__(self, parent)
+        self.data = data
+    def run(self):
+        tcpSocket = QtNetwork.QTcpSocket()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.port)
+        print "connecting to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost).toString(), PykafeConfiguration().network.port
+        tcpSocket.waitForConnected(-1)
+        tcpSocket.write(base64.encodestring(self.data))
+        tcpSocket.waitForBytesWritten()
+        print "sent:", self.data
+        tcpSocket.disconnectFromHost()
+
+class ListenerThread(QtCore.QThread):
+    def __init__(self, parent, socketDescriptor):
+        QtCore.QThread.__init__(self, parent)
+        self.socketDescriptor = socketDescriptor
+    def run(self):
+        self.tcpSocket = QtNetwork.QTcpSocket()
+        self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
+        self.tcpSocket.waitForReadyRead()
+        data = base64.decodestring(self.tcpSocket.readAll())
+        print "received:", data
+        """if data[:3] == "001":
+            if data[3] == "1":
+                os.system("pyKafeclient&")
+                self.emit(QtCore.SIGNAL("close"))
+            elif data[3] == "0":
+                self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
+        elif data[:3] == "003":
+            if data[3] == 1:
+                os.system("pyKafeclient&")
+                self.emit(QtCore.SIGNAL("close"))
+            else:
+                self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"))
+        elif data[:3] == "005":
+            os.system("pyKafeclient&")
+            self.emit(QtCore.SIGNAL("close"))"""
+        self.tcpSocket.disconnectFromHost()
+        self.exec_()
+
+class PykafeClientMain(QtNetwork.QTcpServer):
+    def __init__(self, parent, ui):
+        QtNetwork.QTcpServer.__init__(self, parent)
+        self.ui = ui
+        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
+        self.threads = []
+    def incomingConnection(self, socketDescriptor):
+        thread = ListenerThread(self.parent(), socketDescriptor)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
+        thread.start()
+        self.threads.append(thread)
+    def sendMessage(self, data):
+        thread = SenderThread(self.parent(), data)
+        thread.start()
+        self.threads.append(thread)
+    def cafeteria(self):
+        pass
+    def logout(self):
+        answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to logout?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.Yes:
+            self.sendMessage("008")
 
 class TimerThread(QtCore.QThread):
     def __init__(self, parent, startTime, endTime, currencyConfig):
@@ -123,8 +189,9 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        QtCore.QObject.connect(self.cafeteriaButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.logoutButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
+        self.server = PykafeClientMain(MainWindow, self)
+        QtCore.QObject.connect(self.cafeteriaButton,QtCore.SIGNAL("clicked()"),self.server.cafeteria)
+        QtCore.QObject.connect(self.logoutButton,QtCore.SIGNAL("clicked()"),self.server.logout)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         #tray things
         trayMenu = QtGui.QMenu("pyKafe", MainWindow)
