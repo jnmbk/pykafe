@@ -16,7 +16,7 @@ _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
 class ClientSession:
     """class for managing client sessions"""
-    notAvailable, working, loggedIn, requestedOpening = 0, 1, 2, 3
+    notAvailable, notConnected, working, loggedIn, requestedOpening = range(5)
     def __init__(self):
         self.state = 0
         self.user = None
