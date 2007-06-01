@@ -66,7 +66,7 @@ class ListenerThread(QtCore.QThread):
         print "data:", data
         if data[:3] == "004":
             #Says I'm here
-            if client.session.state == ClientSession.notAvailable:
+            if client.session.state == ClientSession.notConnected:
                 self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.working)
             else:
                 #TODO: illegal activity
@@ -129,7 +129,7 @@ class Client(QtGui.QTreeWidgetItem):
         self.ip = clientInformation.ip
         self.name = clientInformation.name
         self.setText(0, self.name)
-        self.setState(ClientSession.notAvailable)
+        self.setState(ClientSession.notConnected)
 
     def changeColor(self, colorName):
         for i in range(self.columnCount()):
@@ -148,10 +148,10 @@ class Client(QtGui.QTreeWidgetItem):
             if self.session.state == ClientSession.loggedIn:
                 #TODO: calculate time and money
 
-                #logger.add("logout", "", cashier, self.name, user, income)
+                #logger.add("logout", "", self.config.cashier, self.name, user, income)
                 #save detailed session information to logs
                 pass
-            if self.session.state == ClientSession.notAvailable:
+            if self.session.state == ClientSession.notConnected:
                 if self.config.filter_enable:
                     #send filter
                     message = "007"
@@ -207,10 +207,10 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.config = PykafeConfiguration()
         self.ui = ui
         if self.config.startup_askpassword:
-            self.cashier = cashier
+            self.config.set("last_cashier", cashier)
         else:
             self.cashier = self.config.last_cashier
-        print "Current cashier is:", self.cashier
+        print "Current cashier is:", self.config.last_cashier
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
             #TODO: retry button
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
@@ -260,7 +260,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
             return
         state = client.session.state
-        if state == ClientSession.notAvailable:
+        if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
         if state == ClientSession.working:
             client.sendMessage("005")
@@ -277,7 +277,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
             return
         state = client.session.state
-        if state == ClientSession.notAvailable:
+        if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
             return
         if state == ClientSession.loggedIn:
@@ -299,7 +299,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
             return
         state = client.session.state
-        if state == ClientSession.notAvailable:
+        if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
         elif state == ClientSession.working:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already stopped"))
@@ -320,7 +320,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         if not client:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
             return
-        if client.session.state == ClientSession.notAvailable:
+        if client.session.state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
             return
         os.system("krdc -s -f -l -c %s&" % client.ip)
@@ -334,13 +334,13 @@ class PykafeServer(QtNetwork.QTcpServer):
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
             return
         state = client.session.state
-        if state == ClientSession.notAvailable:
+        if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
             return
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to shutdown this client?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             client.sendMessage("010")
-            client.setState(ClientSession.notAvailable)
+            client.setState(ClientSession.notConnected)
 
     def addMember(self, toDatabase = True, memberInformation = None):
         "Adds a new member"

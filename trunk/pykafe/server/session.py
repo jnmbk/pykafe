@@ -16,7 +16,7 @@ _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class ClientSession:
     """class for managing client sessions"""
-    notAvailable, working, loggedIn, requestedOpening, waitingMoney = range(5)
+    notConnected, notReady, working, loggedIn, requestedOpening, waitingMoney = range(6)
     def __init__(self):
         self.state = 0
         self.user = None
@@ -42,8 +42,8 @@ class ClientSession:
             return False
     def getCurrentState(self):
         """returns current state as a string"""
-        if self.state == self.notAvailable:
-            return _("N/A")
+        if self.state == self.notConnected:
+            return _("Not Connected")
         elif self.state == self.working:
             return _("Ready")
         elif self.state == self.loggedIn:
@@ -52,6 +52,8 @@ class ClientSession:
             return _("Requested Opening")
         elif self.state == self.waitingMoney:
             return _("Waiting for Payment")
+        elif self.state == self.notReady:
+            return _("Not ready")
 
     def setState(self, stateNumber):
         self.state = stateNumber
