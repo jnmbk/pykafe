@@ -25,7 +25,7 @@
    <item row="0" column="0" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -39,26 +39,6 @@
         <number>6</number>
        </property>
        <item row="1" column="0" >
-        <widget class="QCheckBox" name="checkBox_2" >
-         <property name="text" >
-          <string>Ask password when opening</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -72,90 +52,27 @@
         </spacer>
        </item>
        <item row="0" column="0" >
-        <widget class="QCheckBox" name="checkBox" >
+        <widget class="QCheckBox" name="checkBox_2" >
+         <property name="toolTip" >
+          <string>If selected, cashier password will be asked on opening</string>
+         </property>
          <property name="text" >
-          <string>Tray Icon</string>
+          <string>Ask password when opening</string>
          </property>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2" >
-      <attribute name="title" >
-       <string>Regional</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="2" column="2" >
+       <item row="0" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>21</width>
+           <width>40</width>
            <height>20</height>
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="4" column="1" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QLineEdit" name="lineEdit_4" />
-       </item>
-       <item row="2" column="1" >
-        <widget class="QLineEdit" name="lineEdit_3" />
-       </item>
-       <item row="1" column="1" >
-        <widget class="QLineEdit" name="lineEdit_2" />
-       </item>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="lineEdit" />
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="label_4" >
-         <property name="text" >
-          <string>Decimals Seperator:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Thousands seperator:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label" >
-         <property name="text" >
-          <string>Currency prefix:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
-          <string>Currency suffix:</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -170,40 +87,31 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_5" >
-         <property name="text" >
-          <string>Fixed price for first 30 minutes:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
-          <string>Price for one hour:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QSpinBox" name="spinBox_2" />
-       </item>
-       <item row="0" column="1" >
-        <widget class="QSpinBox" name="spinBox" />
-       </item>
-       <item row="1" column="2" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="2" column="0" >
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Price rounding:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox" >
+           <property name="maximum" >
+            <double>1000000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -212,6 +120,84 @@
           <size>
            <width>20</width>
            <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" >
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_5" >
+           <property name="text" >
+            <string>Fixed price for first</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox" >
+           <property name="maximum" >
+            <number>3600</number>
+           </property>
+           <property name="singleStep" >
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label" >
+           <property name="text" >
+            <string>minutes:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="pricing_30minutes" >
+           <property name="maximum" >
+            <double>1000000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0" >
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_6" >
+           <property name="text" >
+            <string>Price for one hour:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="pricing_onehour" >
+           <property name="maximum" >
+            <double>1000000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item rowspan="2" row="0" column="1" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>40</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -579,6 +565,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>pricing_30minutes</tabstop>
+  <tabstop>pricing_onehour</tabstop>
+  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>filter_enable</tabstop>
+  <tabstop>filter_file</tabstop>
+  <tabstop>filter_browse</tabstop>
+  <tabstop>filter_address</tabstop>
+  <tabstop>filter_add</tabstop>
+  <tabstop>filter_delete</tabstop>
+  <tabstop>filter_update</tabstop>
+  <tabstop>filter_treeWidget</tabstop>
+  <tabstop>cashiers_treeWidget</tabstop>
+  <tabstop>cashiers_username</tabstop>
+  <tabstop>cashiers_password</tabstop>
+  <tabstop>cashiers_realName</tabstop>
+  <tabstop>cashiers_addButton</tabstop>
+  <tabstop>cashiers_updateButton</tabstop>
+  <tabstop>cashiers_deleteButton</tabstop>
+  <tabstop>cashiers_reportsButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -588,8 +599,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel" >
      <x>157</x>
@@ -604,8 +615,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel" >
      <x>286</x>
@@ -620,8 +631,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>292</x>
-     <y>83</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
@@ -636,8 +647,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>328</x>
-     <y>83</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
@@ -652,8 +663,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>364</x>
-     <y>83</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
@@ -668,8 +679,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>199</x>
-     <y>174</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
@@ -684,8 +695,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>199</x>
-     <y>53</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
@@ -700,8 +711,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>363</x>
-     <y>84</y>
+     <x>110</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>199</x>
