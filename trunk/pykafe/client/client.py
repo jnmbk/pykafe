@@ -15,7 +15,7 @@
 from PyQt4 import QtNetwork, QtCore
 from config import PykafeConfiguration
 from session import ClientSession
-import base64, sys, os
+import base64, sys, os, socket
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -37,9 +37,11 @@ def sendDataToUi(data):
     tcpSocket.waitForBytesWritten()
     print "sent to ui:", data
 
-def siteValidate(site):
-    #TODO: Look if that is an ip adress
-    return True
+def getSiteIP(site):
+    try:
+        return socket.gethostbyname(site)
+    except socket.gaierror:
+        return False
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, socketDescriptor, client):
@@ -56,7 +58,7 @@ class ListenerThread(QtCore.QThread):
         elif self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(self.client.config.network.serverIP):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readServer)
         else:
-            sys.stderr.write(_("Unauthorized server tried to connect, aborting: %s") % self.tcpSocket.peerAddress())
+            sys.stderr.write(_("Unauthorized server tried to connect, aborting connection: %s") % self.tcpSocket.peerAddress())
             self.exit()
         self.tcpSocket.waitForDisconnected()
         self.exec_()
@@ -83,17 +85,16 @@ class ListenerThread(QtCore.QThread):
                 sendDataToUi("005")
         elif data[:3] == "007":
             self.emit(QtCore.SIGNAL("filter"), data[4:])
-            """iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
+            iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
             for site in data[3:].split('\n'):
-                if siteValidate(site):
+                ip = getSiteIP(site)
+                if ip:
                     iptablesFile += "-A INPUT -s %s -j DROP\n" % site
             iptablesFile += "COMMIT\n"
             file = open("/etc/pyKafe/iptables.conf", "w")
             file.write(iptablesFile)
             file.close()
-            os.system("iptables-restore < /etc/pyKafe/iptables.conf")"""
-            for site in data[3:].split('\n'):
-                os.system("iptables -A INPUT -s %s -j DROP&" % site)
+            os.system("iptables-restore < /etc/pyKafe/iptables.conf")
         elif data[:3] == "010":
             os.system("init 0")
         self.exit()
