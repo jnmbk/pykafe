@@ -43,6 +43,17 @@ def getSiteIP(site):
     except socket.gaierror:
         return False
 
+def getNetworkBytes():
+    "returns a tuple of received bytes and transferred bytes"
+    receivedBytes = 0
+    transferredBytes = 0
+    interfaces = os.listdir("/sys/class/net")
+    for interface in interfaces:
+        if file("/sys/class/net/%s/operstate" % interface).read() == "up\n":
+            receivedBytes += int(file("/sys/class/net/%s/statistics/rx_bytes" % interface).read())
+            transferredBytes += int(file("/sys/class/net/%s/statistics/tx_bytes" % interface).read())
+    return receivedBytes, transferredBytes
+
 class ListenerThread(QtCore.QThread):
     def __init__(self, socketDescriptor, client):
         QtCore.QThread.__init__(self)
@@ -112,7 +123,7 @@ class ListenerThread(QtCore.QThread):
             if self.client.session.state == ClientSession.working:
                 sendDataToServer(data)
         elif data[:3] == "004":
-            if self.client.session.state == ClientSession.notAvailable:
+            if self.client.session.state == ClientSession.notConnected:
                 sendDataToServer("004")
                 self.client.session.state = ClientSession.working
             else:
