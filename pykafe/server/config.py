@@ -21,6 +21,7 @@ class ClientInformation:
         self.session = ClientSession()
 
 class PykafeConfiguration:
+    "configuration class reads configuration values from database, you can reach them like config.my_config"
     def __init__(self):
         settings = Database().runOnce("select * from general_settings")
         for config, value in settings:
@@ -29,6 +30,7 @@ class PykafeConfiguration:
                   ClientInformation("192.168.2.4", "computer2"),
                   ClientInformation("192.168.2.5", "computer3")]
     def set(self, config, value):
+        "sets given configuration as given value writes to database, this doesn't do anything if there's not a real change"
         if getattr(self, config) == value:
             return
         setattr(self, config, value)
