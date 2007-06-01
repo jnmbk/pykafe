@@ -71,7 +71,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_("pyKafe"))
+        Dialog.setWindowTitle("pyKafe")
         self.label.setText(_("Username:"))
         self.label_2.setText(_("Password:"))
 
