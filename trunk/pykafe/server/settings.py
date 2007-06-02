@@ -21,7 +21,7 @@ _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 def getSiteIP(site):
     try:
-        return socket.gethostbyname(site)
+        return socket.gethostbyname(str(site))
     except socket.gaierror:
         return False
 
@@ -55,6 +55,7 @@ class SettingsManager:
     def filterAdd(self, text = None, errorDialog = True):
         if not text:
             text = self.ui.filter_address.text()
+        #TODO: a QtGui.QProgressDialog() is needed here because getSiteIP takes some time to complete its job
         if not getSiteIP(text):
             if errorDialog:
                 QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You didn't enter a valid address"))
