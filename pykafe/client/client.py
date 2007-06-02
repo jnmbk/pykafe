@@ -15,6 +15,7 @@
 from PyQt4 import QtNetwork, QtCore
 from config import PykafeConfiguration
 from session import ClientSession
+from currencyformat import currency
 import base64, sys, os, socket, time
 
 import locale, gettext
@@ -156,6 +157,27 @@ class ListenerThread(QtCore.QThread):
                 print "gdg"
                 sendDataToServer(data)
                 os.system("service kdebase stop && sleep 3 && service kdebase start")
+        elif data[:3] == "017":
+            currentTime = QtCore.QDateTime.currentDateTime()
+            usedTime = self.client.session.startTime.secsTo(currentTime)
+            price = (usedTime/600)*(config.price_onehourprice/6.0)
+            remainingTime = QtCore.QDateTime()
+            if self.endTime.isValid():
+                remainingTime.setTime_t(currentTime.secsTo(self.client.session.endTime))
+            else:
+                remainingTime.setTime_t(0)
+            temp = usedTime
+            usedTime = QtCore.QDateTime()
+            usedTime.setTime_t(temp)
+            text = self.startTime.time().toString("hh.mm") + "\n" +\
+                   remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
+                   usedTime.toUTC().time().toString("hh.mm") + "|"
+            if float(config.price_fixedprice) < price:
+                text += currency(price)
+            else:
+                text += currency(float(config.price_fixedprice))
+            self.tcpSocket.write(text)
+            self.tcpSocket.waitForBytesWritten()
         self.exit()
 
 class PykafeClient(QtNetwork.QTcpServer):
