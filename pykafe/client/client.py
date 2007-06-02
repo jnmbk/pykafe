@@ -31,6 +31,7 @@ class SenderThread(QtCore.QThread):
     def run(self):
         while not sendDataToServer(self.data):
             self.emit(QtCore.SIGNAL("connectionError"))
+            print "connection error retrying"
             time.sleep(10)
         self.emit(QtCore.SIGNAL("messageSent"))
 
@@ -84,11 +85,11 @@ class ListenerThread(QtCore.QThread):
         print "connection request from:", self.tcpSocket.peerAddress().toString()
         if self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readUi)
-        elif self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(self.client.config.network.serverIP):
+        elif self.tcpSocket.peerAddress() == QtNetwork.QHostAddress(config.network_serverIP):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readServer)
         else:
             sys.stderr.write(_("Unauthorized server tried to connect, aborting connection: %s") % self.tcpSocket.peerAddress())
-            self.exit()
+            self.terminate()
         self.tcpSocket.waitForDisconnected()
         self.exec_()
 
@@ -122,6 +123,7 @@ class ListenerThread(QtCore.QThread):
             file = open("/etc/pyKafe/iptables.conf", "w")
             file.write(iptablesFile)
             file.close()
+            print iptablesFile
             os.system("iptables-restore < /etc/pyKafe/iptables.conf")
         elif data[:3] == "010":
             os.system("init 0")
@@ -189,6 +191,7 @@ class PykafeClient(QtNetwork.QTcpServer):
             sys.exit()
         thread = SenderThread("011")
         QtCore.QObject.connect(thread, QtCore.SIGNAL("messageSent"), self.initialConnection)
+        thread.start()
         self.threads = [thread]
         print "trying to connect to server"
     def incomingConnection(self, socketDescriptor):
