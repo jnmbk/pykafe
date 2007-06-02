@@ -13,7 +13,6 @@
 from PyQt4 import QtGui, QtCore
 from pysqlite2 import dbapi2 as sqlite
 from database import Database
-from client import getSiteIP
 import sha, socket
 
 import locale, gettext
