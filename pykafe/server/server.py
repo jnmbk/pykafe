@@ -41,10 +41,11 @@ class MessageSender(QtCore.QThread):
         tcpSocket.disconnectFromHost()
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor, clients):
+    def __init__(self, parent, socketDescriptor, clients, config):
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
         self.clients = clients
+        self.config = config
 
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
@@ -64,12 +65,30 @@ class ListenerThread(QtCore.QThread):
         client = self.clients[self.clientNumber]
         data = base64.decodestring(self.tcpSocket.readAll())
         print "data:", data
-        if data[:3] == "004":
-            #Says I'm here
+        
+        if data[:3] == "011":
             if client.session.state == ClientSession.notConnected:
+                logger.add(logger.logTypes.information, "client connected", self.config.last_cashier, client.name)
+                if self.config.filter_enable:
+                    message = "007"
+                    filterFile = open(self.config.filter_file)
+                    filters = filterFile.readlines()
+                    filterFile.close()
+                    for i in filters:
+                        message += i
+                    client.sendMessage(message)
                 self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.working)
+                message = "016"
+                message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
+                                            self.config.price_fixedpriceminutes,
+                                            self.config.price_onehourprice,
+                                            self.config.price_rounding)
+                client.sendMessage(message)
             else:
-                #TODO: illegal activity
+                #client is somehow rebooted
+                #TODO: send current session information after taking 004
+                #message = "013"
+                #client.sendSession()
                 pass
         elif data[:3] == "000":
             #User wants to open
@@ -82,16 +101,18 @@ class ListenerThread(QtCore.QThread):
             if client.session.state == ClientSession.working:
                 username, password = data[3:].split("|")
                 db = Database()
-                db.cur.execute("select count() from members where username = ? and password = ?", (username, sha.new(password).hexdigest()))
+                db.cur.execute("select count() from members where username = ? and password = ?", (username, password))
                 if db.cur.fetchall()[0][0]:
                     client.sendMessage("0031")
+                    logger.add(logger.logTypes.information, _("member login"), self.config.last_cashier, client.name, username)
                     client.setState(ClientSession.loggedIn, user = username)
                 else:
-                    #TODO: log: wrong password or username entered
+                    logger.add(logger.logTypes.warning, _("Someone entered wrong password or username"), self.config.last_cashier, client.name, username)
                     client.sendMessage("0030")
         elif data[:3] == "008":
             client.setState(ClientSession.waitingMoney)
         self.tcpSocket.disconnectFromHost()
+        self.terminate()
 
 class ClientThread(QtCore.QThread):
     def __init__(self, parent, config):
@@ -144,23 +165,6 @@ class Client(QtGui.QTreeWidgetItem):
     def setState(self, state, user = "guest", endTime = ""):
         if self.session.state == ClientSession.requestedOpening and state != ClientSession.requestedOpening:
             self.changeColor("white")
-        if state == ClientSession.working:
-            if self.session.state == ClientSession.loggedIn:
-                #TODO: calculate time and money
-
-                #logger.add("logout", "", self.config.cashier, self.name, user, income)
-                #save detailed session information to logs
-                pass
-            if self.session.state == ClientSession.notConnected:
-                if self.config.filter_enable:
-                    #send filter
-                    message = "007"
-                    filterFile = open(self.config.filter_file)
-                    filters = filterFile.readlines()
-                    filterFile.close()
-                    for i in filters:
-                        message += i
-                    self.sendMessage(message)
         elif state == ClientSession.loggedIn:
             self.session.user = user
             self.setText(2, user)
@@ -175,8 +179,12 @@ class Client(QtGui.QTreeWidgetItem):
         elif state == ClientSession.waitingMoney:
             self.changeColor("red")
         self.session.state = state
-        self.setText(1, self.session.getCurrentState())
-        #print "state is now %s" % self.session.getCurrentState()
+        self.setText(1, self.session.toString())
+
+    def sendSession(self):
+        #send latest session to the client
+        message = "012"
+        self.sendMessage(message)
 
 class Product(QtGui.QTreeWidgetItem):
     def __init__(self, parent, productInformation):
@@ -210,11 +218,11 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.config.set("last_cashier", cashier)
         else:
             self.cashier = self.config.last_cashier
-        print "Current cashier is:", self.config.last_cashier
+        logger.add(logger.logTypes.information, _("cashier login to server"), self.config.last_cashier)
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
-            #TODO: retry button
+            logger.add(logger.logTypes.error, _("Unable to start server: %s") % self.errorString(), self.config.last_cashier)
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
-            exit()
+            self.parent().close()
         self.clients = []
         for clientInformation in self.config.clientList:
             self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
@@ -244,8 +252,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.products.append(Product(self.ui.orders_treeWidget_2, product))
 
     def incomingConnection(self, socketDescriptor):
-        print "connection came"
-        thread = ListenerThread(self.parent(), socketDescriptor, self.clients)
+        thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.config)
         self.threads.append(thread)
         QtCore.QObject.connect(thread, QtCore.SIGNAL("stateChange"), self.setClientState)
         thread.start()

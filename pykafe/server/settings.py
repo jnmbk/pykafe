@@ -13,11 +13,18 @@
 from PyQt4 import QtGui, QtCore
 from pysqlite2 import dbapi2 as sqlite
 from database import Database
-import sha
+from client import getSiteIP
+import sha, socket
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
+
+def getSiteIP(site):
+    try:
+        return socket.gethostbyname(site)
+    except socket.gaierror:
+        return False
 
 class Cashier(QtGui.QTreeWidgetItem):
     def __init__(self, parent, cashierInformation):
@@ -49,7 +56,7 @@ class SettingsManager:
     def filterAdd(self, text = None, errorDialog = True):
         if not text:
             text = self.ui.filter_address.text()
-        if not text:
+        if not getSiteIP(text):
             if errorDialog:
                 QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You didn't enter a valid address"))
             return
