@@ -96,19 +96,19 @@ class ListenerThread(QtCore.QThread):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received from server:", data
         if data[:3] == "001":
-            if self.client.session.state == ClientSession.working:
+            if self.client.session.state == ClientSession.ready:
                 sendDataToUi(data)
             else:
                 sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
         elif data[:3] == "003":
-            if self.client.session.state == ClientSession.working:
+            if self.client.session.state == ClientSession.ready:
                 sendDataToUi(data)
                 if data[3] == "1":
                     self.client.session.state = ClientSession.loggedIn
             else:
                 sys.stderr.write(_("Received %s from server, state was: %s") % (data, self.client.session.getCurrentState()))
         elif data[:3] == "005":
-            if self.client.session.state == ClientSession.working:
+            if self.client.session.state == ClientSession.ready:
                 self.client.session.user = "guest"
                 self.client.session.state = ClientSession.loggedIn
                 sendDataToUi("005")
@@ -137,18 +137,18 @@ class ListenerThread(QtCore.QThread):
             sendDataToUi("014")
             return
         if data[:3] == "000":
-            if self.client.session.state == ClientSession.working:
+            if self.client.session.state == ClientSession.ready:
                 sendDataToServer("000")
                 self.client.session.setState(ClientSession.requestedOpening)
             else:
                 sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.getCurrentState())
         elif data[:3] == "002":
-            if self.client.session.state == ClientSession.working:
+            if self.client.session.state == ClientSession.ready:
                 sendDataToServer(data)
         elif data[:3] == "004":
             if self.client.session.state == ClientSession.notReady:
                 sendDataToServer("004")
-                self.client.session.state = ClientSession.working
+                self.client.session.state = ClientSession.ready
             else:
                 sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
         elif data[:3] == "008":
