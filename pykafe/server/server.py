@@ -28,8 +28,8 @@ locale.setlocale(locale.LC_NUMERIC, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class MessageSender(QtCore.QThread):
-    def __init__(self, parent, ip, port, message):
-        QtCore.QThread.__init__(self, parent)
+    def __init__(self, ip, port, message):
+        QtCore.QThread.__init__(self)
         self.ip, self.port, self.message = ip, port, message
         print "sending %s to %s:%d" % (message, ip, port)
     def run(self):
@@ -39,7 +39,6 @@ class MessageSender(QtCore.QThread):
         tcpSocket.write(base64.encodestring(self.message))
         tcpSocket.waitForBytesWritten()
         tcpSocket.disconnectFromHost()
-        self.terminate()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, clients, config):
@@ -91,7 +90,6 @@ class ListenerThread(QtCore.QThread):
                 #TODO: send current session information after taking 004
                 #message = "013"
                 #client.sendSession()
-                pass
         elif data[:3] == "000":
             #User wants to open
             if client.session.state == ClientSession.working:
@@ -114,7 +112,6 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "008":
             client.setState(ClientSession.waitingMoney)
         self.tcpSocket.disconnectFromHost()
-        self.terminate()
 
 class ClientThread(QtCore.QThread):
     def __init__(self, parent, config):
@@ -159,7 +156,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
 
     def sendMessage(self, message):
-        thread = MessageSender(self.parent(), self.ip, int(self.config.network_port), message)
+        thread = MessageSender(self.ip, int(self.config.network_port), message)
         thread.start()
         self.threads.append(thread)
         print "This client has %d threads" % len(self.threads)
