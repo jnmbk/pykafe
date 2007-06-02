@@ -89,7 +89,6 @@ class ListenerThread(QtCore.QThread):
             QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readServer)
         else:
             sys.stderr.write(_("Unauthorized server tried to connect, aborting connection: %s") % self.tcpSocket.peerAddress())
-            self.terminate()
         self.tcpSocket.waitForDisconnected()
         self.exec_()
 
@@ -130,7 +129,6 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "016":
             for c, value in map(lambda x,y:(x,y), ("price_fixedprice", "price_fixedpriceminutes", "price_onehourprice", "price_rounding"), data[3:].split("|")):
                 config.set(c, value)
-        self.terminate()
 
     def readUi(self):
         data = base64.decodestring(self.tcpSocket.readAll())
