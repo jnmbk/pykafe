@@ -67,7 +67,7 @@ class ListenerThread(QtCore.QThread):
         print "data:", data
 
         if data[:3] == "011":
-            if client.session.state == ClientSession.notConnected:
+            if client.session.state in (ClientSession.notConnected, ClientSession.notReady):
                 logger.add(logger.logTypes.information, "client connected", self.config.last_cashier, client.name)
                 if self.config.filter_enable:
                     message = "007"
@@ -78,7 +78,7 @@ class ListenerThread(QtCore.QThread):
                         message += i
                     client.sendMessage(message)
                 message = "016"
-                message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
+                message += "%s|%s|%s|%s".strip() % (self.config.price_fixedprice,
                                             self.config.price_fixedpriceminutes,
                                             self.config.price_onehourprice,
                                             self.config.price_rounding)
@@ -90,15 +90,18 @@ class ListenerThread(QtCore.QThread):
                 #TODO: send current session information after taking 004
                 #message = "013"
                 #client.sendSession()
+        elif data[:3] == "004":
+            if client.session.state == ClientSession.notReady:
+                client.setState(ClientSession.ready)
         elif data[:3] == "000":
             #User wants to open
-            if client.session.state == ClientSession.working:
+            if client.session.state == ClientSession.ready:
                 self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.requestedOpening)
             else:
                 #TODO: illegal activity
                 pass
         elif data[:3] == "002":
-            if client.session.state == ClientSession.working:
+            if client.session.state == ClientSession.ready:
                 username, password = data[3:].split("|")
                 db = Database()
                 db.cur.execute("select count() from members where username = ? and password = ?", (username, password))
@@ -266,7 +269,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         state = client.session.state
         if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-        if state == ClientSession.working:
+        if state == ClientSession.ready:
             client.sendMessage("005")
             client.setState(ClientSession.loggedIn, user = "guest")
         if state == ClientSession.loggedIn:
@@ -293,7 +296,7 @@ class PykafeServer(QtNetwork.QTcpServer):
                                       1440, 15)
         if answer[1] == False:
             return
-        if state == ClientSession.working:
+        if state == ClientSession.ready:
             client.sendMessage("006" + str(answer[0]))
             client.setState(ClientSession.loggedIn, user = "guest", endTime = QtCore.QDateTime.currentDateTime().addSecs(answer[0]*60))
 
@@ -305,16 +308,16 @@ class PykafeServer(QtNetwork.QTcpServer):
         state = client.session.state
         if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-        elif state == ClientSession.working:
+        elif state == ClientSession.ready:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already stopped"))
         elif state == ClientSession.loggedIn:
             answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to stop this client?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes:
                 client.sendMessage("009")
-                client.setState(ClientSession.working)
+                client.setState(ClientSession.ready)
         elif state == ClientSession.requestedOpening:
             client.sendMessage("0010")
-            client.setState(ClientSession.working)
+            client.setState(ClientSession.ready)
 
     def changeButton(self):
         pass
