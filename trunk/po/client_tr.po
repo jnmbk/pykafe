@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: client_tr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-31 06:45+0300\n"
+"POT-Creation-Date: 2007-06-02 12:54+0300\n"
 "PO-Revision-Date: 2007-05-30 12:34+0300\n"
 "Last-Translator: Uğur Çetin <jnmbk@users.sourceforge.net>\n"
 "Language-Team: Turkish <tr@li.org>\n"
@@ -24,12 +24,20 @@ msgstr ""
 msgid "Cafeteria"
 msgstr ""
 
-#: ../pykafe/client/client.py:114
+#: ../pykafe/client/login.py:106
+msgid "Can't connect to local daemon, please contact cashier"
+msgstr ""
+
+#: ../pykafe/client/login.py:71
+msgid "Can't connect to server"
+msgstr ""
+
+#: ../pykafe/client/client.py:152
 #, python-format
 msgid "Client tried to say I'm here, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/client.py:105
+#: ../pykafe/client/client.py:143
 #, python-format
 msgid "Client tried to send opening request, state was: %s"
 msgstr ""
@@ -42,11 +50,11 @@ msgstr ""
 msgid "Exit"
 msgstr ""
 
-#: ../pykafe/client/session.py:49
+#: ../pykafe/client/session.py:50
 msgid "Logged In"
 msgstr ""
 
-#: ../pykafe/client/login.py:170
+#: ../pykafe/client/login.py:186
 msgid "Login"
 msgstr "Giriş"
 
@@ -54,28 +62,32 @@ msgstr "Giriş"
 msgid "Logout"
 msgstr ""
 
-#: ../pykafe/client/session.py:45
-msgid "N/A"
+#: ../pykafe/client/session.py:46
+msgid "Not Connected"
 msgstr ""
 
-#: ../pykafe/client/login.py:171
+#: ../pykafe/client/session.py:56
+msgid "Not ready"
+msgstr ""
+
+#: ../pykafe/client/login.py:187
 msgid "Password:"
 msgstr ""
 
-#: ../pykafe/client/login.py:173
+#: ../pykafe/client/login.py:189
 msgid "Please contact cashier or enter your account information"
 msgstr ""
 
-#: ../pykafe/client/session.py:47
+#: ../pykafe/client/session.py:48
 msgid "Ready"
 msgstr ""
 
-#: ../pykafe/client/client.py:76
+#: ../pykafe/client/client.py:108
 #, python-format
 msgid "Received %s from server, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/client.py:69
+#: ../pykafe/client/client.py:101
 #, python-format
 msgid "Received ack from server, state was: %s"
 msgstr ""
@@ -84,15 +96,15 @@ msgstr ""
 msgid "Remaining Time:"
 msgstr ""
 
-#: ../pykafe/client/login.py:172
+#: ../pykafe/client/login.py:188
 msgid "Request Opening"
 msgstr ""
 
-#: ../pykafe/client/session.py:51
+#: ../pykafe/client/session.py:52
 msgid "Requested Opening"
 msgstr ""
 
-#: ../pykafe/client/login.py:53
+#: ../pykafe/client/login.py:60
 msgid "Server didn't give acknowledge"
 msgstr ""
 
@@ -100,23 +112,27 @@ msgstr ""
 msgid "Starting Time:"
 msgstr ""
 
-#: ../pykafe/client/client.py:57
+#: ../pykafe/client/client.py:89
 #, python-format
-msgid "Unauthorized server tried to connect, aborting: %s"
+msgid "Unauthorized server tried to connect, aborting connection: %s"
 msgstr ""
 
 #: ../pykafe/client/clientmain.py:222
 msgid "Used Time:"
 msgstr ""
 
-#: ../pykafe/client/login.py:169
+#: ../pykafe/client/login.py:185
 msgid "Username:"
 msgstr ""
 
-#: ../pykafe/client/login.py:59
+#: ../pykafe/client/session.py:54
+msgid "Waiting for Payment"
+msgstr ""
+
+#: ../pykafe/client/login.py:66
 msgid "Wrong username or password"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:217 ../pykafe/client/login.py:168
+#: ../pykafe/client/clientmain.py:217
 msgid "pyKafe"
 msgstr ""
