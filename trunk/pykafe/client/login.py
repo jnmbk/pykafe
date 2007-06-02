@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import base64, os, sys
+import base64, os, sys, sha, time
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 
@@ -18,22 +18,28 @@ import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
+config = PykafeConfiguration()
+
 class SenderThread(QtCore.QThread):
-    def __init__(self, parent, data):
+    def __init__(self, parent, data, retry = False):
         QtCore.QThread.__init__(self, parent)
         self.data = data
+        self.retry = retry
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
-        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.port)
-        print "connecting to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost).toString(), PykafeConfiguration().network.port
-        if not tcpSocket.waitForConnected(-1):
-            print "error:", tcpSocket.errorString(), "sending exit signal"
-            self.emit(QtCore.SIGNAL("exit()"))
-        else:
-            tcpSocket.write(base64.encodestring(self.data))
-            tcpSocket.waitForBytesWritten()
-            print "sent:", self.data
-            tcpSocket.disconnectFromHost()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+        while not tcpSocket.waitForConnected(-1) and self.retry:
+            self.emit(QtCore.SIGNAL("connectionError()"))
+            print "trying to reconnect in 5 seconds"
+            time.sleep(5)
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+        if tcpSocket.write(base64.encodestring(self.data)) == -1:
+            print "couldn't send:", self.data
+            self.emit(QtCore.SIGNAL("connectionError()"))
+            self.terminate()
+        tcpSocket.waitForBytesWritten()
+        print "sent:", self.data
+        tcpSocket.disconnectFromHost()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor):
@@ -42,7 +48,8 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        self.tcpSocket.waitForReadyRead()
+        self.tcpSocket.isReadable()
+        self.tcpSocket.waitForReadyRead(-1)
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
         if data[:3] == "001":
@@ -60,6 +67,8 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "005":
             os.system("pyKafeclient&")
             self.emit(QtCore.SIGNAL("close"))
+        elif data[:3] == "014":
+            self.emit(QtCore.SIGNAL("message"), _("Can't connect to server"))
         self.tcpSocket.disconnectFromHost()
         self.exec_()
 
@@ -67,10 +76,13 @@ class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.ui = ui
-        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
-        print "listening localhost on port:", PykafeConfiguration().network.localPort
-        thread = SenderThread(self.parent(), "004")
-        QtCore.QObject.connect(thread, QtCore.SIGNAL("exit()"), parent.close)
+        listening  = self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
+        if not listening:
+            print "Can't bind port %d" % config.network_localPort
+            sys.exit()
+        print "listening localhost on port:", config.network_localPort
+        thread = SenderThread(self.parent(), "004", retry = True)
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
         self.threads = [thread]
     def incomingConnection(self, socketDescriptor):
@@ -81,13 +93,17 @@ class PykafeClient(QtNetwork.QTcpServer):
         self.threads.append(thread)
         print "login has %d threads" % len(self.threads)
     def login(self):
-        thread = SenderThread(self.parent(), "002" + unicode(self.ui.username.text()) + "|" + unicode(self.ui.password.text()))
+        thread = SenderThread(self.parent(), "002" + unicode(self.ui.username.text()) + "|" + sha.new(unicode(self.ui.password.text())).hexdigest())
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
         self.threads.append(thread)
     def request(self):
         thread = SenderThread(self.parent(), "000")
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
         self.threads.append(thread)
+    def connectionError(self):
+        self.ui.statusbar.showMessage(_("Can't connect to local daemon, please contact cashier"))
 
 class Ui_LoginWindow(object):
     def setupUi(self, MainWindow):
@@ -165,7 +181,7 @@ class Ui_LoginWindow(object):
         MainWindow.setTabOrder(self.password,self.loginButton)
 
     def retranslateUi(self, LoginWindow):
-        LoginWindow.setWindowTitle(_("pyKafe"))
+        LoginWindow.setWindowTitle("pyKafe")
         self.textLabel1.setText(_("Username:"))
         self.loginButton.setText(_("Login"))
         self.textLabel2.setText(_("Password:"))
