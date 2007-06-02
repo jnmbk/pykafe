@@ -40,7 +40,7 @@ class ClientSession:
             return True
         else:
             return False
-    def getCurrentState(self):
+    def toString(self):
         """returns current state as a string"""
         if self.state == self.notConnected:
             return _("Not Connected")
