@@ -18,11 +18,7 @@ import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
-class CurrencyConfig:
-    prefix = ""
-    suffix = " YTL"
-    fixedPrice = 0.50
-    tenMinutePrice = 0.15
+config = PykafeConfiguration()
 
 class SenderThread(QtCore.QThread):
     def __init__(self, parent, data):
@@ -30,8 +26,8 @@ class SenderThread(QtCore.QThread):
         self.data = data
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
-        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.port)
-        print "connecting to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost).toString(), PykafeConfiguration().network.port
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+        print "connecting to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost).toString(), config.network_port
         tcpSocket.waitForConnected(-1)
         tcpSocket.write(base64.encodestring(self.data))
         tcpSocket.waitForBytesWritten()
@@ -70,7 +66,7 @@ class PykafeClientMain(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
         QtNetwork.QTcpServer.__init__(self, parent)
         self.ui = ui
-        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
+        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
         self.threads = []
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor)
@@ -100,26 +96,15 @@ class TimerThread(QtCore.QThread):
             self.do()
             time.sleep(60)
     def do(self):
-        currentTime = QtCore.QDateTime.currentDateTime()
-        usedTime = self.startTime.secsTo(currentTime)
-        price = usedTime/600*self.currencyConfig.tenMinutePrice
-        remainingTime = QtCore.QDateTime()
-        if self.endTime.isValid():
-            remainingTime.setTime_t(currentTime.secsTo(self.endTime))
-        else:
-            remainingTime.setTime_t(0)
-        temp = usedTime
-        usedTime = QtCore.QDateTime()
-        usedTime.setTime_t(temp)
-        text = self.startTime.time().toString("hh.mm") + "\n" +\
-               remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
-               usedTime.toUTC().time().toString("hh.mm")
-        self.emit(QtCore.SIGNAL("changeTimeLabel"), text)
-        if self.currencyConfig.fixedPrice < price:
-            text = self.currencyConfig.prefix + str(price) + self.currencyConfig.suffix
-        else:
-            text = self.currencyConfig.prefix + str(self.currencyConfig.fixedPrice) + self.currencyConfig.suffix
-        self.emit(QtCore.SIGNAL("changeMoneyLabel"), text)
+        tcpSocket = QtNetwork.QTcpSocket()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+        tcpSocket.waitForConnected()
+        tcpSocket.write("017")
+        tcpSocket.waitForReadyRead()
+        text = tcpSocket.readAll()
+        text1, text2 = text.rsplit('|', 1)
+        self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
+        self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -202,7 +187,7 @@ class Ui_MainWindow(object):
         self.trayIcon.show()
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
-        thread = TimerThread(MainWindow, QtCore.QDateTime.currentDateTime(), QtCore.QDateTime(), CurrencyConfig())
+        thread = TimerThread(MainWindow, QtCore.QDateTime.currentDateTime(), QtCore.QDateTime())
         QtCore.QObject.connect(thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
         thread.start()
