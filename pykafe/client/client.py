@@ -15,23 +15,40 @@
 from PyQt4 import QtNetwork, QtCore
 from config import PykafeConfiguration
 from session import ClientSession
-import base64, sys, os, socket
+import base64, sys, os, socket, time
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
+config = PykafeConfiguration()
+
+class SenderThread(QtCore.QThread):
+    def __init__(self, data):
+        QtCore.QThread.__init__(self)
+        self.data = data
+    def run(self):
+        while not sendDataToServer(self.data):
+            self.emit(QtCore.SIGNAL("connectionError"))
+            time.sleep(10)
+        self.emit(QtCore.SIGNAL("messageSent"))
+
 def sendDataToServer(data):
     tcpSocket = QtNetwork.QTcpSocket()
-    tcpSocket.connectToHost(QtNetwork.QHostAddress(PykafeConfiguration().network.serverIP), PykafeConfiguration().network.port)
+    tcpSocket.connectToHost(QtNetwork.QHostAddress(config.network_serverIP), config.network_port)
     tcpSocket.waitForConnected(-1)
-    tcpSocket.write(base64.encodestring(data))
-    tcpSocket.waitForBytesWritten()
-    print "sent to server:", data
+    print "trying to send:", data
+    if tcpSocket.write(base64.encodestring(data)) == -1:
+        print "failed"
+        return False
+    else:
+        print "success"
+        tcpSocket.waitForBytesWritten()
+        return True
 
 def sendDataToUi(data):
     tcpSocket = QtNetwork.QTcpSocket()
-    tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), PykafeConfiguration().network.localPort)
+    tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
     tcpSocket.waitForConnected(-1)
     tcpSocket.write(base64.encodestring(data))
     tcpSocket.waitForBytesWritten()
@@ -95,12 +112,11 @@ class ListenerThread(QtCore.QThread):
                 self.client.session.state = ClientSession.loggedIn
                 sendDataToUi("005")
         elif data[:3] == "007":
-            self.emit(QtCore.SIGNAL("filter"), data[4:])
             iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
             for site in data[3:].split('\n'):
                 ip = getSiteIP(site)
                 if ip:
-                    iptablesFile += "-A INPUT -s %s -j DROP\n" % site
+                    iptablesFile += "-A INPUT -s %s -j DROP\n" % ip
             iptablesFile += "COMMIT\n"
             file = open("/etc/pyKafe/iptables.conf", "w")
             file.write(iptablesFile)
@@ -108,11 +124,17 @@ class ListenerThread(QtCore.QThread):
             os.system("iptables-restore < /etc/pyKafe/iptables.conf")
         elif data[:3] == "010":
             os.system("init 0")
-        self.exit()
+        elif data[:3] == "016":
+            for c, value in map(lambda x,y:(x,y), ("price_fixedprice", "price_fixedpriceminutes", "price_onehourprice", "price_rounding"), data[3:].split("|")):
+                config.set(c, value)
+        self.terminate()
 
     def readUi(self):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received from user:", data
+        if self.client.session.state == ClientSession.notConnected:
+            sendDataToUi("014")
+            return
         if data[:3] == "000":
             if self.client.session.state == ClientSession.working:
                 sendDataToServer("000")
@@ -123,7 +145,7 @@ class ListenerThread(QtCore.QThread):
             if self.client.session.state == ClientSession.working:
                 sendDataToServer(data)
         elif data[:3] == "004":
-            if self.client.session.state == ClientSession.notConnected:
+            if self.client.session.state == ClientSession.notReady:
                 sendDataToServer("004")
                 self.client.session.state = ClientSession.working
             else:
@@ -139,18 +161,19 @@ class ListenerThread(QtCore.QThread):
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self):
         QtNetwork.QTcpServer.__init__(self)
-        self.config = PykafeConfiguration()
         self.session = ClientSession()
-        self.threads = []
-        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.config.network.port)
-        print "listening?", self.isListening()
-        print "listening to:", QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any).toString() ,self.config.network.port
+        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), config.network_port):
+            print "cant bind, exitting"
+            sys.exit()
+        thread = SenderThread("011")
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("messageSent"), self.initialConnection)
+        self.threads = [thread]
+        print "trying to connect to server"
     def incomingConnection(self, socketDescriptor):
-        print "called incomingConnection"
         thread = ListenerThread(socketDescriptor, self)
         thread.start()
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("filter"),self.filterCame)
         self.threads.append(thread)
         print "We have " + str(len(self.threads)) + " thread(s)"
-    def filterCame(self, text):
-        print "filtering:", text
+    def initialConnection(self):
+        print "connected to server"
+        self.session.setState(ClientSession.notReady)

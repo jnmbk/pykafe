@@ -12,7 +12,9 @@
 
 #TODO: Read config from config file
 class PykafeConfiguration:
-    class network:
-        serverIP = "192.168.2.2"
-        port = 23105
-        localPort = 23106
+    network_serverIP  = "192.168.2.2"
+    network_port      = 23105
+    network_localPort = 23106
+
+    def set(self, config, value):
+        setattr(self, config, value)
