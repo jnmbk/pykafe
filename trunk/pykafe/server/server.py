@@ -39,6 +39,7 @@ class MessageSender(QtCore.QThread):
         tcpSocket.write(base64.encodestring(self.message))
         tcpSocket.waitForBytesWritten()
         tcpSocket.disconnectFromHost()
+        self.terminate()
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, clients, config):
@@ -65,7 +66,7 @@ class ListenerThread(QtCore.QThread):
         client = self.clients[self.clientNumber]
         data = base64.decodestring(self.tcpSocket.readAll())
         print "data:", data
-        
+
         if data[:3] == "011":
             if client.session.state == ClientSession.notConnected:
                 logger.add(logger.logTypes.information, "client connected", self.config.last_cashier, client.name)
@@ -77,14 +78,15 @@ class ListenerThread(QtCore.QThread):
                     for i in filters:
                         message += i
                     client.sendMessage(message)
-                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.working)
                 message = "016"
                 message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
                                             self.config.price_fixedpriceminutes,
                                             self.config.price_onehourprice,
                                             self.config.price_rounding)
                 client.sendMessage(message)
+                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.notReady)
             else:
+                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.notReady)
                 #client is somehow rebooted
                 #TODO: send current session information after taking 004
                 #message = "013"
@@ -158,7 +160,7 @@ class Client(QtGui.QTreeWidgetItem):
 
     def sendMessage(self, message):
         thread = MessageSender(self.parent(), self.ip, int(self.config.network_port), message)
-        thread.run()
+        thread.start()
         self.threads.append(thread)
         print "This client has %d threads" % len(self.threads)
 
@@ -216,8 +218,6 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.ui = ui
         if self.config.startup_askpassword:
             self.config.set("last_cashier", cashier)
-        else:
-            self.cashier = self.config.last_cashier
         logger.add(logger.logTypes.information, _("cashier login to server"), self.config.last_cashier)
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
             logger.add(logger.logTypes.error, _("Unable to start server: %s") % self.errorString(), self.config.last_cashier)
