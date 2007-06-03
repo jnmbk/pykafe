@@ -103,7 +103,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox" >
+          <widget class="QDoubleSpinBox" name="pricing_rounding" >
            <property name="maximum" >
             <double>1000000000.000000000000000</double>
            </property>
@@ -140,7 +140,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox" >
+          <widget class="QSpinBox" name="pricing_minutes" >
            <property name="maximum" >
             <number>3600</number>
            </property>
@@ -157,7 +157,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="pricing_30minutes" >
+          <widget class="QDoubleSpinBox" name="pricing_fixed" >
            <property name="maximum" >
             <double>1000000000.000000000000000</double>
            </property>
@@ -568,10 +568,10 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>checkBox_2</tabstop>
-  <tabstop>spinBox</tabstop>
-  <tabstop>pricing_30minutes</tabstop>
+  <tabstop>pricing_minutes</tabstop>
+  <tabstop>pricing_fixed</tabstop>
   <tabstop>pricing_onehour</tabstop>
-  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>pricing_rounding</tabstop>
   <tabstop>filter_enable</tabstop>
   <tabstop>filter_file</tabstop>
   <tabstop>filter_browse</tabstop>

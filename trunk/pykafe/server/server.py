@@ -18,13 +18,13 @@ from config import PykafeConfiguration
 from session import ClientSession
 from database import Database
 from settingswindow import Ui_SettingsWindow
+from currencyformat import currency
 import logger
 import base64, sha, time, os
 
 import locale, gettext
 locale.setlocale(locale.LC_MESSAGES, "C")
-#maybe using LC_MONETARY would be better for printing money in listwidgets
-locale.setlocale(locale.LC_NUMERIC, "")
+locale.setlocale(locale.LC_MONETARY, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class MessageSender(QtCore.QThread):
@@ -65,10 +65,9 @@ class ListenerThread(QtCore.QThread):
         client = self.clients[self.clientNumber]
         data = base64.decodestring(self.tcpSocket.readAll())
         print "data:", data
-
         if data[:3] == "011":
+            #TODO: Move these into setState
             if client.session.state in (ClientSession.notConnected, ClientSession.notReady):
-                logger.add(logger.logTypes.information, "client connected", self.config.last_cashier, client.name)
                 if self.config.filter_enable:
                     message = "007"
                     filterFile = open(self.config.filter_file)
@@ -76,9 +75,9 @@ class ListenerThread(QtCore.QThread):
                     filterFile.close()
                     for i in filters:
                         message += i
-                    client.sendMessage(message)
+                    client.sendMessage(message.strip())
                 message = "016"
-                message += "%s|%s|%s|%s".strip() % (self.config.price_fixedprice,
+                message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
                                             self.config.price_fixedpriceminutes,
                                             self.config.price_onehourprice,
                                             self.config.price_rounding)
@@ -92,7 +91,7 @@ class ListenerThread(QtCore.QThread):
                 #client.sendSession()
         elif data[:3] == "004":
             if client.session.state == ClientSession.notReady:
-                client.setState(ClientSession.ready)
+                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.ready)
         elif data[:3] == "000":
             #User wants to open
             if client.session.state == ClientSession.ready:
@@ -107,13 +106,13 @@ class ListenerThread(QtCore.QThread):
                 db.cur.execute("select count() from members where username = ? and password = ?", (username, password))
                 if db.cur.fetchall()[0][0]:
                     client.sendMessage("0031")
-                    logger.add(logger.logTypes.information, _("member login"), self.config.last_cashier, client.name, username)
-                    client.setState(ClientSession.loggedIn, user = username)
+                    logger.add(logger.logTypes.information, _("Member logged in"), computer = client.name, member = username)
+                    self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.waitingMoney, user = username)
                 else:
-                    logger.add(logger.logTypes.warning, _("Someone entered wrong password or username"), self.config.last_cashier, client.name, username)
+                    logger.add(logger.logTypes.warning, _("Someone entered wrong password or username"), computer = client.name, member = username)
                     client.sendMessage("0030")
         elif data[:3] == "008":
-            client.setState(ClientSession.waitingMoney)
+            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.waitingMoney)
         self.tcpSocket.disconnectFromHost()
 
 class ClientThread(QtCore.QThread):
@@ -131,7 +130,7 @@ class ClientThread(QtCore.QThread):
                 else:
                     #TODO: round the price using price_rounding
                     price = float(self.config.price_onehourprice)/3600 * utime
-                self.emit(QtCore.SIGNAL("changetext"),3,str(price))
+                self.emit(QtCore.SIGNAL("changetext"),3,currency(price))
                 usedTime = QtCore.QDateTime()
                 usedTime.setTime_t(utime)
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
@@ -140,8 +139,8 @@ class ClientThread(QtCore.QThread):
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation, config):
         QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.config = config
         self.fillList(clientInformation)
-        self.config = config 
         watcherThread = ClientThread(self, config)
         QtCore.QObject.connect(watcherThread, QtCore.SIGNAL("changetext"), self.setText)
         watcherThread.start()
@@ -170,7 +169,7 @@ class Client(QtGui.QTreeWidgetItem):
         elif state == ClientSession.loggedIn:
             self.session.user = user
             self.setText(2, user)
-            self.setText(3, self.config.currency_prefix + "0" + self.config.currency_suffix)
+            self.setText(3, currency(0.0))
             self.session.startTime = QtCore.QDateTime.currentDateTime()
             self.setText(4, self.session.startTime.time().toString("00.00"))
             if endTime:
@@ -182,20 +181,26 @@ class Client(QtGui.QTreeWidgetItem):
             self.changeColor("red")
         self.session.state = state
         self.setText(1, self.session.toString())
+        logger.add(logger.logTypes.information, _("State changed to %s") % self.session.toString(), member = self.name)
 
     def sendSession(self):
-        #send latest session to the client
-        message = "012"
+        "sends latest session to the client, this is for eliminating client side problems like rebooting"
+        message = "012"+\
+            str(self.session.state)+'|'+\
+            self.session.user+'|'+\
+            str(self.session.startTime.toTime_t())+'|'+\
+            str(self.session.endTime.toTime_t())
         self.sendMessage(message)
 
 class Product(QtGui.QTreeWidgetItem):
     def __init__(self, parent, productInformation):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.updateValues(productInformation)
+
     def updateValues(self, productInformation):
         self.name, self.price, self.quantity = productInformation
         self.setText(0,self.name)
-        self.setText(1,locale.format("%.2f", self.price, grouping=True))
+        self.setText(1,currency(float(self.price)))
         self.setText(2,str(self.quantity))
 
 class Member(QtGui.QTreeWidgetItem):
@@ -218,25 +223,27 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.ui = ui
         if self.config.startup_askpassword:
             self.config.set("last_cashier", cashier)
-        logger.add(logger.logTypes.information, _("cashier login to server"), self.config.last_cashier)
+        logger.add(logger.logTypes.information, _("cashier login to server"))
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), int(self.config.network_port)):
-            logger.add(logger.logTypes.error, _("Unable to start server: %s") % self.errorString(), self.config.last_cashier)
+            logger.add(logger.logTypes.error, _("Unable to start server: %s") % self.errorString())
             QtGui.QMessageBox.critical(self.parent(), _("Connection Error"), _("Unable to start server: %s") % self.errorString())
             self.parent().close()
         self.clients = []
         for clientInformation in self.config.clientList:
             self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
-        self.initMembers()
+        self.initMembers(first = True)
         self.initProducts()
         self.localize()
         self.threads = []
 
-    def initMembers(self):
-        self.members = []
-        memberList = Database().run("select * from members where is_cashier='0'")
-        for memberInformation in memberList:
-            self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
+    def initMembers(self, first = False):
+        #TODO: Call this function after adding and deleting
+        if first:
+            self.members = []
+            memberList = Database().run("select * from members where is_cashier='0'")
+            for memberInformation in memberList:
+                self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
         self.ui.members_dateEdit.setDate(QtCore.QDate.currentDate())
         self.ui.members_dateEdit_2.setDate(QtCore.QDate.currentDate().addMonths(1))
         self.ui.members_username.clear()
@@ -372,6 +379,7 @@ class PykafeServer(QtNetwork.QTcpServer):
                     self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
                     self.filterMembers(self.ui.members_filter.text())
                     self.ui.statusbar.showMessage(_("Added member"))
+                    logger.add(logger.logTypes.information, _("Added member"), member = memberInformation[0])
                 except sqlite.IntegrityError:
                     QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Username must be unique"))
 
@@ -458,10 +466,16 @@ class PykafeServer(QtNetwork.QTcpServer):
                 member.setHidden(True)
 
     def localize(self):
-        self.ui.members_debt.setPrefix(self.config.currency_prefix)
-        self.ui.members_debt.setSuffix(self.config.currency_suffix)
-        self.ui.orders_spinBox_2.setPrefix(self.config.currency_prefix)
-        self.ui.orders_spinBox_2.setSuffix(self.config.currency_suffix)
+        conv = locale.localeconv()
+        symbol = conv['currency_symbol']
+        if conv['p_cs_precedes']:
+            symbol += ' '
+            self.ui.members_debt.setPrefix(symbol)
+            self.ui.orders_spinBox_2.setPrefix(symbol)
+        else:
+            symbol = ' ' + symbol
+            self.ui.members_debt.setSuffix(symbol)
+            self.ui.orders_spinBox_2.setSuffix(symbol)
 
     def addProduct(self):
         productName = unicode(self.ui.orders_itemLineEdit.text())
@@ -519,7 +533,29 @@ class PykafeServer(QtNetwork.QTcpServer):
         QtGui.QMessageBox.aboutQt(self.parent())
 
     def settings(self):
-        settingsDialog = QtGui.QDialog(self.parent())
+        self.settingsDialog = QtGui.QDialog(self.parent())
+        QtCore.QObject.connect(self.settingsDialog, QtCore.SIGNAL("accepted()"), self.sendOptions)
         settingsUi = Ui_SettingsWindow()
-        settingsUi.setupUi(settingsDialog, self.config)
-        settingsDialog.show()
+        settingsUi.setupUi(self.settingsDialog, self.config)
+        self.settingsDialog.show()
+
+    def sendOptions(self):
+        "Sends internet filtering and pricing settings to all clients"
+        if self.config.filter_enable:
+            filterMessage = "007"
+            filterFile = open(self.config.filter_file)
+            filters = filterFile.readlines()
+            filterFile.close()
+            for i in filters:
+                filterMessage += i
+            filterMessage = filterMessage.strip()
+        priceMessage = "016"
+        priceMessage += "%s|%s|%s|%s" % (self.config.price_fixedprice,
+                                         self.config.price_fixedpriceminutes,
+                                         self.config.price_onehourprice,
+                                         self.config.price_rounding)
+        for client in self.clients:
+            if client.session.state != ClientSession.notConnected:
+                client.sendMessage(priceMessage)
+                if self.config.filter_enable:
+                    client.sendMessage(filterMessage)

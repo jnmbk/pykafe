@@ -13,7 +13,8 @@
 from database import Database
 from PyQt4 import QtCore
 
-def add(log_type, log_value, cashier, computer = "", member = "", income = ""):
+def add(log_type, log_value, computer = "", member = "", income = ""):
+    cashier = Database().runOnce("select setting_value from general_settings where setting_id = 'last_cashier'")[0][0]
     date = QtCore.QDateTime.currentDateTime().toTime_t()
     Database().runOnce("insert into logs (date, log_type, log_value, cashier, computer, member, income) values (?,?,?,?,?,?,?)", (date, log_type, log_value, cashier, computer, member, income))
 class logTypes:
