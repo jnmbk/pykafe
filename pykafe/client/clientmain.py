@@ -44,21 +44,6 @@ class ListenerThread(QtCore.QThread):
         self.tcpSocket.waitForReadyRead()
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
-        """if data[:3] == "001":
-            if data[3] == "1":
-                os.system("pyKafeclient&")
-                self.emit(QtCore.SIGNAL("close"))
-            elif data[3] == "0":
-                self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
-        elif data[:3] == "003":
-            if data[3] == 1:
-                os.system("pyKafeclient&")
-                self.emit(QtCore.SIGNAL("close"))
-            else:
-                self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"))
-        elif data[:3] == "005":
-            os.system("pyKafeclient&")
-            self.emit(QtCore.SIGNAL("close"))"""
         self.tcpSocket.disconnectFromHost()
         self.exec_()
 
@@ -182,10 +167,10 @@ class Ui_MainWindow(object):
         self.trayIcon.show()
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
-        self.thread = TimerThread(MainWindow)
-        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
-        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
-        self.thread.start()
+        thread = TimerThread()
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
+        thread.start()
     def iconActivated(self, reason):
         if reason == QtGui.QSystemTrayIcon.Trigger:
             if self.ui.isVisible():
