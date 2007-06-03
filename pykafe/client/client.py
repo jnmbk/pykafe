@@ -99,14 +99,14 @@ class ListenerThread(QtCore.QThread):
             if self.client.session.state == ClientSession.ready:
                 sendDataToUi(data)
             else:
-                sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.getCurrentState())
+                sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.toString())
         elif data[:3] == "003":
             if self.client.session.state == ClientSession.ready:
                 sendDataToUi(data)
                 if data[3] == "1":
                     self.client.session.state = ClientSession.loggedIn
             else:
-                sys.stderr.write(_("Received %s from server, state was: %s") % (data, self.client.session.getCurrentState()))
+                sys.stderr.write(_("Received %s from server, state was: %s") % (data, self.client.session.toString()))
         elif data[:3] == "005":
             if self.client.session.state == ClientSession.ready:
                 self.client.session.user = "guest"
@@ -141,7 +141,7 @@ class ListenerThread(QtCore.QThread):
                 sendDataToServer("000")
                 self.client.session.setState(ClientSession.requestedOpening)
             else:
-                sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.getCurrentState())
+                sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.toString())
         elif data[:3] == "002":
             if self.client.session.state == ClientSession.ready:
                 sendDataToServer(data)
@@ -150,7 +150,7 @@ class ListenerThread(QtCore.QThread):
                 sendDataToServer("004")
                 self.client.session.state = ClientSession.ready
             else:
-                sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.getCurrentState())
+                sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.toString())
         elif data[:3] == "008":
             print 8
             if self.client.session.state == ClientSession.loggedIn:
