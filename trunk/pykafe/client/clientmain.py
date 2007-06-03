@@ -86,26 +86,20 @@ class PykafeClientMain(QtNetwork.QTcpServer):
             self.sendMessage("008")
 
 class TimerThread(QtCore.QThread):
-    def __init__(self, parent, startTime, endTime):
-        QtCore.QThread.__init__(self, parent)
-        self.startTime = startTime
-        self.endTime = endTime
     def run(self):
         while True:
-            self.do()
+            tcpSocket = QtNetwork.QTcpSocket()
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+            tcpSocket.waitForConnected()
+            tcpSocket.write(base64.encodestring("017"))
+            tcpSocket.waitForReadyRead()
+            text = base64.decodestring(tcpSocket.readAll())
+            text1, text2 = text.rsplit('|', 1)
+            #there's a big problem here, somehow time returns "1" and money returns ""
+            #TODO: fix it
+            self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
+            self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
             time.sleep(60)
-    def do(self):
-        tcpSocket = QtNetwork.QTcpSocket()
-        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
-        tcpSocket.waitForConnected()
-        tcpSocket.write(base64.encodestring("017"))
-        tcpSocket.waitForReadyRead()
-        text = base64.decodestring(tcpSocket.readAll())
-        text1, text2 = text.rsplit('|', 1)
-        #there's a big problem here, somehow time returns "1" and money returns ""
-        #TODO: fix it
-        self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
-        self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -188,10 +182,10 @@ class Ui_MainWindow(object):
         self.trayIcon.show()
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
-        thread = TimerThread(MainWindow, QtCore.QDateTime.currentDateTime(), QtCore.QDateTime())
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
-        thread.start()
+        self.thread = TimerThread(MainWindow)
+        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
+        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
+        self.thread.start()
     def iconActivated(self, reason):
         if reason == QtGui.QSystemTrayIcon.Trigger:
             if self.ui.isVisible():
