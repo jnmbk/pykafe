@@ -131,20 +131,13 @@ class ListenerThread(QtCore.QThread):
             sendDataToUi("014")
             return
         if data[:3] == "000":
-            if self.client.session.state == ClientSession.ready:
-                sendDataToServer("000")
-                self.client.session.setState(ClientSession.requestedOpening)
-            else:
-                sys.stderr.write(_("Client tried to send opening request, state was: %s") % self.client.session.toString())
+            sendDataToServer("000")
+            self.client.session.setState(ClientSession.requestedOpening)
         elif data[:3] == "002":
-            if self.client.session.state == ClientSession.ready:
-                sendDataToServer(data)
+            sendDataToServer(data)
         elif data[:3] == "004":
-            if self.client.session.state == ClientSession.notReady:
-                sendDataToServer("004")
-                self.client.session.state = ClientSession.ready
-            else:
-                sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.toString())
+            sendDataToServer("004")
+            self.client.session.state = ClientSession.ready
         elif data[:3] == "008":
             sendDataToServer(data)
             os.system("restartkde&")
@@ -163,6 +156,7 @@ class ListenerThread(QtCore.QThread):
                    remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
                    usedTime.toUTC().time().toString("hh.mm") + "|"
             text += currency(self.client.session.calculatePrice(config))
+            print "sending:", text
             self.tcpSocket.write(base64.encodestring(text))
             self.tcpSocket.waitForBytesWritten()
         self.exit()
