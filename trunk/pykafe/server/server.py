@@ -98,7 +98,7 @@ class ClientThread(QtCore.QThread):
     def run(self):
         while(True):
             if self.client.session.state == ClientSession.loggedIn:
-                self.emit(QtCore.SIGNAL("changetext"),3,currency(self.session.calculatePrice(self.config)))
+                self.emit(QtCore.SIGNAL("changetext"),3,currency(self.client.session.calculatePrice(self.config)))
                 usedTime = QtCore.QDateTime()
                 usedTime.setTime_t(self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime()))
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
