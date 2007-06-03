@@ -17,6 +17,7 @@ import sha, socket
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
+locale.setlocale(locale.LC_MONETARY, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 def getSiteIP(site):
@@ -46,6 +47,7 @@ class SettingsManager:
         self.filterRead()
         self.cashiers = []
         self.fillCashiers()
+        self.localize()
 
     def fillCashiers(self):
         cashierList = Database().run("select username,password,name from members where is_cashier='1'")
@@ -56,17 +58,17 @@ class SettingsManager:
         if not text:
             text = self.ui.filter_address.text()
         #TODO: a QtGui.QProgressDialog() is needed here because getSiteIP takes some time to complete its job
-        if not getSiteIP(text):
-            if errorDialog:
-                QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You didn't enter a valid address"))
-            return
+        if errorDialog:
+            if not getSiteIP(text):
+                QtGui.QMessageBox.critical(self.parent, _("Error"), _("You didn't enter a valid address"))
+                return
         self.filterItems.append(QtGui.QTreeWidgetItem(self.ui.filter_treeWidget))
         self.filterItems[-1].setText(0, text)
 
     def filterDelete(self):
         currentFilter = self.ui.filter_treeWidget.currentItem()
         if not currentFilter:
-            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a filter first"))
+            QtGui.QMessageBox.critical(self.parent, _("Error"), _("You must select a filter first"))
             return
         self.ui.filter_treeWidget.takeTopLevelItem(self.ui.filter_treeWidget.indexOfTopLevelItem(currentFilter))
         del(self.filterItems[self.filterItems.index(currentFilter)])
@@ -74,7 +76,7 @@ class SettingsManager:
     def filterUpdate(self):
         currentFilter = self.ui.filter_treeWidget.currentItem()
         if not currentFilter:
-            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a filter first"))
+            QtGui.QMessageBox.critical(self.parent, _("Error"), _("You must select a filter first"))
             return
         currentFilter.setText(0, self.ui.filter_address.text())
 
@@ -83,6 +85,7 @@ class SettingsManager:
         if not currentFilter:
             currentFilter = previous
         self.ui.filter_address.setText(currentFilter.text(0))
+
     def filterEnable(self):
         if self.ui.filter_enable.checkState() == QtCore.Qt.Checked:
             self.ui.filter_address.setEnabled(True)
@@ -102,7 +105,7 @@ class SettingsManager:
             self.ui.filter_browse.setEnabled(False)
 
     def filterBrowse(self):
-        fileName = QtGui.QFileDialog.getOpenFileName(self.parent(), _("Select Filter File"), self.config.filter_file[:self.config.filter_file.rfind('/')], "Text files (*.txt)")
+        fileName = QtGui.QFileDialog.getOpenFileName(self.parent, _("Select Filter File"), self.config.filter_file[:self.config.filter_file.rfind('/')], "Text files (*.txt)")
         if not fileName:
             return
         self.ui.filter_file.setText(fileName)
@@ -120,8 +123,12 @@ class SettingsManager:
         filter_file.writelines(filters)
         filter_file.close()
         self.config.set("filter_file", unicode(self.ui.filter_file.text()))
+        self.config.set("price_fixedpriceminutes", str(self.ui.pricing_minutes.value()))
+        self.config.set("price_fixedprice", str(self.ui.pricing_fixed.value()))
+        self.config.set("price_onehourprice", str(self.ui.pricing_onehour.value()))
+        self.config.set("price_rounding", str(self.ui.pricing_rounding.value()))
         #TODO: cashier changes should be applied here, not directly to db!
-        self.parent.close()
+        self.parent.accept()
 
     def readFromConfig(self):
         if self.config.filter_enable:
@@ -129,6 +136,24 @@ class SettingsManager:
         self.ui.filter_file.setText(self.config.filter_file)
         if self.config.startup_askpassword:
             self.ui.checkBox_2.setCheckState(QtCore.Qt.Checked)
+        self.ui.pricing_minutes.setValue(int(self.config.price_fixedpriceminutes))
+        self.ui.pricing_fixed.setValue(float(self.config.price_fixedprice))
+        self.ui.pricing_onehour.setValue(float(self.config.price_onehourprice))
+        self.ui.pricing_rounding.setValue(float(self.config.price_rounding))
+
+    def localize(self):
+        conv = locale.localeconv()
+        symbol = conv['currency_symbol']
+        if conv['p_cs_precedes']:
+            symbol += ' '
+            self.ui.pricing_fixed.setPrefix(symbol)
+            self.ui.pricing_onehour.setPrefix(symbol)
+            self.ui.pricing_rounding.setPrefix(symbol)
+        else:
+            symbol = ' ' + symbol
+            self.ui.pricing_fixed.setSuffix(symbol)
+            self.ui.pricing_onehour.setSuffix(symbol)
+            self.ui.pricing_rounding.setSuffix(symbol)
 
     def filterRead(self):
         file = open(unicode(self.ui.filter_file.text()))
