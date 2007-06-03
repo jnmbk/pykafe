@@ -20,7 +20,7 @@ from database import Database
 from settingswindow import Ui_SettingsWindow
 from currencyformat import currency
 import logger
-import base64, sha, time, os
+import base64, sha, os
 
 import locale, gettext
 locale.setlocale(locale.LC_MESSAGES, "C")
@@ -102,7 +102,7 @@ class ClientThread(QtCore.QThread):
                 usedTime = QtCore.QDateTime()
                 usedTime.setTime_t(self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime()))
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
-            time.sleep(int(self.config.ui_refreshdelay))
+            self.sleep(int(self.config.ui_refreshdelay))
 
 class Client(QtGui.QTreeWidgetItem):
     def __init__(self, parent, clientInformation, config):
