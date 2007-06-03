@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-02 12:54+0300\n"
+"POT-Creation-Date: 2007-06-03 14:39+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../pykafe/client/clientmain.py:88
+#: ../pykafe/client/clientmain.py:84
 msgid "Are you sure?"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:219
+#: ../pykafe/client/clientmain.py:204
 msgid "Cafeteria"
 msgstr ""
 
@@ -32,21 +32,21 @@ msgstr ""
 msgid "Can't connect to server"
 msgstr ""
 
-#: ../pykafe/client/client.py:152
+#: ../pykafe/client/client.py:153
 #, python-format
 msgid "Client tried to say I'm here, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/client.py:143
+#: ../pykafe/client/client.py:144
 #, python-format
 msgid "Client tried to send opening request, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:88
+#: ../pykafe/client/clientmain.py:84
 msgid "Do you really want to logout?"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:198
+#: ../pykafe/client/clientmain.py:183
 msgid "Exit"
 msgstr ""
 
@@ -58,7 +58,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:218
+#: ../pykafe/client/clientmain.py:203
 msgid "Logout"
 msgstr ""
 
@@ -82,17 +82,17 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
-#: ../pykafe/client/client.py:108
+#: ../pykafe/client/client.py:109
 #, python-format
 msgid "Received %s from server, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/client.py:101
+#: ../pykafe/client/client.py:102
 #, python-format
 msgid "Received ack from server, state was: %s"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:222
+#: ../pykafe/client/clientmain.py:207
 msgid "Remaining Time:"
 msgstr ""
 
@@ -108,16 +108,16 @@ msgstr ""
 msgid "Server didn't give acknowledge"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:222
+#: ../pykafe/client/clientmain.py:207
 msgid "Starting Time:"
 msgstr ""
 
-#: ../pykafe/client/client.py:89
+#: ../pykafe/client/client.py:91
 #, python-format
 msgid "Unauthorized server tried to connect, aborting connection: %s"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:222
+#: ../pykafe/client/clientmain.py:207
 msgid "Used Time:"
 msgstr ""
 
@@ -133,6 +133,6 @@ msgstr ""
 msgid "Wrong username or password"
 msgstr ""
 
-#: ../pykafe/client/clientmain.py:217
+#: ../pykafe/client/clientmain.py:202
 msgid "pyKafe"
 msgstr ""
