@@ -96,22 +96,16 @@ class ListenerThread(QtCore.QThread):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received from server:", data
         if data[:3] == "001":
-            if self.client.session.state == ClientSession.ready:
-                sendDataToUi(data)
-            else:
-                sys.stderr.write(_("Received ack from server, state was: %s") % self.client.session.toString())
+            sendDataToUi(data)
         elif data[:3] == "003":
-            if self.client.session.state == ClientSession.ready:
-                sendDataToUi(data)
-                if data[3] == "1":
-                    self.client.session.state = ClientSession.loggedIn
-            else:
-                sys.stderr.write(_("Received %s from server, state was: %s") % (data, self.client.session.toString()))
+            sendDataToUi(data)
+            if data[3] == "1":
+                self.client.setState(ClientSession.loggedIn)
         elif data[:3] == "005":
-            if self.client.session.state == ClientSession.ready:
-                self.client.session.user = "guest"
-                self.client.session.state = ClientSession.loggedIn
-                sendDataToUi("005")
+            self.client.setState(ClientSession.loggedIn)
+            sendDataToUi("005")
+        elif data[:3] == "006":
+            self.client.setState(ClientSession.loggedIn, endTime = QtCore.QDateTime.fromTime_t(int(data[3:])))
         elif data[:3] == "007":
             iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
             for site in data[3:].split('\n'):
@@ -152,31 +146,24 @@ class ListenerThread(QtCore.QThread):
             else:
                 sys.stderr.write(_("Client tried to say I'm here, state was: %s") % self.client.session.toString())
         elif data[:3] == "008":
-            print 8
-            if self.client.session.state == ClientSession.loggedIn:
-                print "gdg"
-                sendDataToServer(data)
-                os.system("service kdebase stop && sleep 3 && service kdebase start")
+            sendDataToServer(data)
+            os.system("restartkde&")
         elif data[:3] == "017":
             currentTime = QtCore.QDateTime.currentDateTime()
             usedTime = self.client.session.startTime.secsTo(currentTime)
-            price = (usedTime/600)*(config.price_onehourprice/6.0)
             remainingTime = QtCore.QDateTime()
-            if self.endTime.isValid():
+            if self.client.session.endTime:
                 remainingTime.setTime_t(currentTime.secsTo(self.client.session.endTime))
             else:
                 remainingTime.setTime_t(0)
             temp = usedTime
             usedTime = QtCore.QDateTime()
             usedTime.setTime_t(temp)
-            text = self.startTime.time().toString("hh.mm") + "\n" +\
+            text = self.client.session.startTime.time().toString("hh.mm") + "\n" +\
                    remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
                    usedTime.toUTC().time().toString("hh.mm") + "|"
-            if float(config.price_fixedprice) < price:
-                text += currency(price)
-            else:
-                text += currency(float(config.price_fixedprice))
-            self.tcpSocket.write(text)
+            text += currency(self.client.session.calculatePrice(config))
+            self.tcpSocket.write(base64.encodestring(text))
             self.tcpSocket.waitForBytesWritten()
         self.exit()
 
@@ -192,11 +179,21 @@ class PykafeClient(QtNetwork.QTcpServer):
         thread.start()
         self.threads = [thread]
         print "trying to connect to server"
+
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(socketDescriptor, self)
         thread.start()
         self.threads.append(thread)
         print "We have " + str(len(self.threads)) + " thread(s)"
+
     def initialConnection(self):
         print "connected to server"
         self.session.setState(ClientSession.notReady)
+
+    def setState(self, state, user = "guest", endTime = ""):
+        if state == ClientSession.loggedIn:
+            self.session.user = user
+            self.session.startTime = QtCore.QDateTime.currentDateTime()
+            if endTime:
+                self.session.endTime = endTime
+        self.session.setState(state)
