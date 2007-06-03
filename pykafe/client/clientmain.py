@@ -86,11 +86,10 @@ class PykafeClientMain(QtNetwork.QTcpServer):
             self.sendMessage("008")
 
 class TimerThread(QtCore.QThread):
-    def __init__(self, parent, startTime, endTime, currencyConfig):
+    def __init__(self, parent, startTime, endTime):
         QtCore.QThread.__init__(self, parent)
         self.startTime = startTime
         self.endTime = endTime
-        self.currencyConfig = currencyConfig
     def run(self):
         while True:
             self.do()
@@ -99,10 +98,12 @@ class TimerThread(QtCore.QThread):
         tcpSocket = QtNetwork.QTcpSocket()
         tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
         tcpSocket.waitForConnected()
-        tcpSocket.write("017")
+        tcpSocket.write(base64.encodestring("017"))
         tcpSocket.waitForReadyRead()
-        text = tcpSocket.readAll()
+        text = base64.decodestring(tcpSocket.readAll())
         text1, text2 = text.rsplit('|', 1)
+        #there's a big problem here, somehow time returns "1" and money returns ""
+        #TODO: fix it
         self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
         self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
 
