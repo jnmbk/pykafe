@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import sys, time, base64
+import sys, base64
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 
@@ -99,7 +99,7 @@ class TimerThread(QtCore.QThread):
             #TODO: fix it
             self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
             self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
-            time.sleep(60)
+            self.sleep(60)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
