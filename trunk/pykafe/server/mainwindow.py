@@ -159,11 +159,13 @@ class Ui_MainWindow(object):
         self.gridlayout4.addWidget(self.orders_itemComboBox,1,1,1,1)
 
         self.orders_spinBox_1 = QtGui.QSpinBox(self.groupBox_2)
+        self.orders_spinBox_1.setMinimum(1)
         self.orders_spinBox_1.setObjectName("orders_spinBox_1")
         self.gridlayout4.addWidget(self.orders_spinBox_1,1,2,1,1)
         self.gridlayout3.addLayout(self.gridlayout4,1,0,1,5)
 
         self.orders_treeWidget_1 = QtGui.QTreeWidget(self.groupBox_2)
+        self.orders_treeWidget_1.setRootIsDecorated(False)
         self.orders_treeWidget_1.setSortingEnabled(True)
         self.orders_treeWidget_1.setObjectName("orders_treeWidget_1")
         self.gridlayout3.addWidget(self.orders_treeWidget_1,0,0,1,5)
@@ -200,6 +202,7 @@ class Ui_MainWindow(object):
         self.gridlayout5.setObjectName("gridlayout5")
 
         self.orders_treeWidget_2 = QtGui.QTreeWidget(self.groupBox_3)
+        self.orders_treeWidget_2.setRootIsDecorated(False)
         self.orders_treeWidget_2.setSortingEnabled(True)
         self.orders_treeWidget_2.setObjectName("orders_treeWidget_2")
         self.gridlayout5.addWidget(self.orders_treeWidget_2,0,0,1,4)
@@ -479,14 +482,14 @@ class Ui_MainWindow(object):
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
 
-        self.menuTools = QtGui.QMenu(self.menubar)
-        self.menuTools.setObjectName("menuTools")
-
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
 
         self.menuNew = QtGui.QMenu(self.menuFile)
         self.menuNew.setObjectName("menuNew")
+
+        self.menuTools = QtGui.QMenu(self.menubar)
+        self.menuTools.setObjectName("menuTools")
         MainWindow.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -517,12 +520,12 @@ class Ui_MainWindow(object):
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout_pyKafe)
         self.menuHelp.addAction(self.actionAbout_Qt)
-        self.menuTools.addAction(self.actionSettings)
         self.menuNew.addAction(self.actionComputer)
         self.menuNew.addAction(self.actionEntertainment)
         self.menuFile.addAction(self.menuNew.menuAction())
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
+        self.menuTools.addAction(self.actionSettings)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -599,7 +602,7 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.logs_dateTimeEdit_2,self.logs_treeWidget)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_("PyKafe"))
+        MainWindow.setWindowTitle("PyKafe")
         self.main_startTimeButton.setStatusTip(_("Starts selected computer for usage (timed)"))
         self.main_startTimeButton.setText(_("Timed"))
         self.main_stopButton.setStatusTip(_("Switches to login state"))
@@ -674,9 +677,9 @@ class Ui_MainWindow(object):
         self.logs_treeWidget.headerItem().setText(6,_("Income"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _("Logs"))
         self.menuHelp.setTitle(_("Help"))
-        self.menuTools.setTitle(_("Tools"))
         self.menuFile.setTitle(_("File"))
         self.menuNew.setTitle(_("New"))
+        self.menuTools.setTitle(_("Tools"))
         self.actionContents.setText(_("Contents"))
         self.actionAbout_pyKafe.setText(_("About pyKafe"))
         self.actionAbout_Qt.setText(_("About Qt"))
