@@ -351,12 +351,19 @@
                <widget class="QComboBox" name="orders_itemComboBox" />
               </item>
               <item row="1" column="2" >
-               <widget class="QSpinBox" name="orders_spinBox_1" />
+               <widget class="QSpinBox" name="orders_spinBox_1" >
+                <property name="minimum" >
+                 <number>1</number>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
             <item row="0" column="0" colspan="5" >
              <widget class="QTreeWidget" name="orders_treeWidget_1" >
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
               <property name="sortingEnabled" >
                <bool>true</bool>
               </property>
@@ -450,6 +457,9 @@
             </property>
             <item row="0" column="0" colspan="4" >
              <widget class="QTreeWidget" name="orders_treeWidget_2" >
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
               <property name="sortingEnabled" >
                <bool>true</bool>
               </property>
