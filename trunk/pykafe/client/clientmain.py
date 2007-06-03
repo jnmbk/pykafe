@@ -80,7 +80,7 @@ class TimerThread(QtCore.QThread):
             tcpSocket.waitForReadyRead()
             text = base64.decodestring(tcpSocket.readAll())
             text1, text2 = text.rsplit('|', 1)
-            #there's a big problem here, somehow time returns "1" and money returns ""
+            #there's a big problem here, somehow time returns the first letter of time and money returns ""
             #TODO: fix it
             self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
             self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
