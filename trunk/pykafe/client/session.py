@@ -10,9 +10,11 @@
 # Please read the COPYING file.
 #
 
+from PyQt4 import QtCore
+
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
-_ = gettext.translation("pyKafe_client", fallback=True).ugettext
+_ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 class ClientSession:
     """class for managing client sessions"""
@@ -25,21 +27,15 @@ class ClientSession:
         self.endTime = None
         self.orders = []
 
-    def isReachable(self):
-        if self.state == 0:
-            return False
+    def calculatePrice(self, config):
+        time = self.startTime.secsTo(QtCore.QDateTime.currentDateTime())
+        if time/60 < int(config.price_fixedpriceminutes):
+            price = float(config.price_fixedprice)
         else:
-            return True
-    def isWorking(self):
-        if self.state == 1:
-            return True
-        else:
-            return False
-    def isLoggedIn(self):
-        if self.state == 2:
-            return True
-        else:
-            return False
+            #TODO: round the price using price_rounding
+            price = float(config.price_onehourprice)/3600 * time
+        return price
+
     def toString(self):
         """returns current state as a string"""
         if self.state == self.notConnected:
