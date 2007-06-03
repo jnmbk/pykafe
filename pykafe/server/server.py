@@ -27,6 +27,7 @@ locale.setlocale(locale.LC_MESSAGES, "C")
 locale.setlocale(locale.LC_MONETARY, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
+
 class MessageSender(QtCore.QThread):
     def __init__(self, ip, port, message):
         QtCore.QThread.__init__(self)
@@ -39,6 +40,7 @@ class MessageSender(QtCore.QThread):
         tcpSocket.write(base64.encodestring(self.message))
         tcpSocket.waitForBytesWritten()
         tcpSocket.disconnectFromHost()
+
 
 class ListenerThread(QtCore.QThread):
     def __init__(self, parent, socketDescriptor, clients, config):
@@ -66,39 +68,13 @@ class ListenerThread(QtCore.QThread):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "data:", data
         if data[:3] == "011":
-            #TODO: Move these into setState
-            if client.session.state in (ClientSession.notConnected, ClientSession.notReady):
-                if self.config.filter_enable:
-                    message = "007"
-                    filterFile = open(self.config.filter_file)
-                    filters = filterFile.readlines()
-                    filterFile.close()
-                    for i in filters:
-                        message += i
-                    client.sendMessage(message.strip())
-                message = "016"
-                message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
-                                            self.config.price_fixedpriceminutes,
-                                            self.config.price_onehourprice,
-                                            self.config.price_rounding)
-                client.sendMessage(message)
-                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.notReady)
-            else:
-                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.notReady)
-                #client is somehow rebooted
-                #TODO: send current session information after taking 004
-                #message = "013"
-                #client.sendSession()
+            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.notReady)
         elif data[:3] == "004":
-            if client.session.state == ClientSession.notReady:
-                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.ready)
+            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.ready)
         elif data[:3] == "000":
-            #User wants to open
-            if client.session.state == ClientSession.ready:
-                self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.requestedOpening)
-            else:
-                #TODO: illegal activity
-                pass
+            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.requestedOpening)
+        elif data[:3] == "008":
+            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.waitingMoney)
         elif data[:3] == "002":
             if client.session.state == ClientSession.ready:
                 username, password = data[3:].split("|")
@@ -107,13 +83,12 @@ class ListenerThread(QtCore.QThread):
                 if db.cur.fetchall()[0][0]:
                     client.sendMessage("0031")
                     logger.add(logger.logTypes.information, _("Member logged in"), computer = client.name, member = username)
-                    self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.waitingMoney, user = username)
+                    self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.loggedIn, user = username)
                 else:
                     logger.add(logger.logTypes.warning, _("Someone entered wrong password or username"), computer = client.name, member = username)
                     client.sendMessage("0030")
-        elif data[:3] == "008":
-            self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.waitingMoney)
         self.tcpSocket.disconnectFromHost()
+
 
 class ClientThread(QtCore.QThread):
     def __init__(self, parent, config):
@@ -123,16 +98,9 @@ class ClientThread(QtCore.QThread):
     def run(self):
         while(True):
             if self.client.session.state == ClientSession.loggedIn:
-                #calculate time
-                utime = self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())
-                if utime/60 < int(self.config.price_fixedpriceminutes):
-                    price = float(self.config.price_fixedprice)
-                else:
-                    #TODO: round the price using price_rounding
-                    price = float(self.config.price_onehourprice)/3600 * utime
-                self.emit(QtCore.SIGNAL("changetext"),3,currency(price))
+                self.emit(QtCore.SIGNAL("changetext"),3,currency(self.session.calculatePrice(self.config)))
                 usedTime = QtCore.QDateTime()
-                usedTime.setTime_t(utime)
+                usedTime.setTime_t(self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime()))
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
             time.sleep(int(self.config.ui_refreshdelay))
 
@@ -164,24 +132,48 @@ class Client(QtGui.QTreeWidgetItem):
         print "This client has %d threads" % len(self.threads)
 
     def setState(self, state, user = "guest", endTime = ""):
-        if self.session.state == ClientSession.requestedOpening and state != ClientSession.requestedOpening:
-            self.changeColor("white")
-        elif state == ClientSession.loggedIn:
+        if state == ClientSession.loggedIn:
             self.session.user = user
-            self.setText(2, user)
-            self.setText(3, currency(0.0))
             self.session.startTime = QtCore.QDateTime.currentDateTime()
-            self.setText(4, self.session.startTime.time().toString("00.00"))
+            self.setTexts((2,3,4), (user,currency(0.0), self.session.startTime.time().toString("00.00")))
             if endTime:
                 self.session.endTime = endTime
                 self.setText(5, self.session.endTime.time().toString("hh.mm"))
+            self.changeColor("green")
+        elif state == ClientSession.notReady:
+            #if self.session.state in (ClientSession.notConnected, ClientSession.notReady):
+            if self.config.filter_enable:
+                message = "007"
+                filterFile = open(self.config.filter_file)
+                filters = filterFile.readlines()
+                filterFile.close()
+                for i in filters:
+                    message += i
+                self.sendMessage(message.strip())
+            message = "016"
+            message += "%s|%s|%s|%s" % (self.config.price_fixedprice,
+                                        self.config.price_fixedpriceminutes,
+                                        self.config.price_onehourprice,
+                                        self.config.price_rounding)
+            self.sendMessage(message)
+            self.setTexts((2,3,4,5), ("","","",""))
+            self.changeColor("orange")
         elif state == ClientSession.requestedOpening:
             self.changeColor("red")
         elif state == ClientSession.waitingMoney:
             self.changeColor("red")
+        elif state == ClientSession.notConnected:
+            if self.session.state == ClientSession.loggedIn:
+                logger.add(logger.logTypes.information, "client shutted down while logged in", computer = self.name, member = self.session.user, income = self.session.calculatePrice(self.config))
+            self.setTexts((2,3,4,5), ("","","",""))
+            self.changeColor("orange")
+        elif state == ClientSession.ready:
+            self.setTexts((2,3,4,5), ("","","",""))
+            self.changeColor("lightblue")
         self.session.state = state
         self.setText(1, self.session.toString())
         logger.add(logger.logTypes.information, _("State changed to %s") % self.session.toString(), member = self.name)
+        self.setSelected(False)
 
     def sendSession(self):
         "sends latest session to the client, this is for eliminating client side problems like rebooting"
@@ -191,6 +183,13 @@ class Client(QtGui.QTreeWidgetItem):
             str(self.session.startTime.toTime_t())+'|'+\
             str(self.session.endTime.toTime_t())
         self.sendMessage(message)
+
+    def setTexts(self, columns, texts):
+        "Sets multiple texts at once"
+        #there may be a better way to do this
+        for column, text in map(lambda x,y:(x,y), columns, texts):
+            self.setText(column, text)
+
 
 class Product(QtGui.QTreeWidgetItem):
     def __init__(self, parent, productInformation):
@@ -276,14 +275,19 @@ class PykafeServer(QtNetwork.QTcpServer):
         state = client.session.state
         if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-        if state == ClientSession.ready:
+        elif state == ClientSession.ready:
             client.sendMessage("005")
             client.setState(ClientSession.loggedIn, user = "guest")
-        if state == ClientSession.loggedIn:
+        elif state == ClientSession.loggedIn:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
-        if state == ClientSession.requestedOpening:
+        elif state == ClientSession.requestedOpening:
             client.sendMessage("0011")
             client.setState(ClientSession.loggedIn)
+        elif state == ClientSession.waitingMoney:
+            client.setState(ClientSession.ready)
+            client.sendMessage("015")
+        elif state == ClientSession.notReady:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client isn't ready"))
 
     def startTimed(self):
         client = self.ui.main_treeWidget.currentItem()
@@ -293,19 +297,25 @@ class PykafeServer(QtNetwork.QTcpServer):
         state = client.session.state
         if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-            return
-        if state == ClientSession.loggedIn:
+        elif state == ClientSession.loggedIn:
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already logged in"))
-            return
-        answer = QtGui.QInputDialog.getInteger(self.parent(), _("Enter time"), _("Enter time in minutes"),
-                                      int(self.config.price_fixedpriceminutes),
-                                      int(self.config.price_fixedpriceminutes),
-                                      1440, 15)
-        if answer[1] == False:
-            return
-        if state == ClientSession.ready:
-            client.sendMessage("006" + str(answer[0]))
-            client.setState(ClientSession.loggedIn, user = "guest", endTime = QtCore.QDateTime.currentDateTime().addSecs(answer[0]*60))
+        elif state == ClientSession.requestedOpening:
+            client.sendMessage("0011")
+            client.setState(ClientSession.loggedIn)
+        elif state == ClientSession.waitingMoney:
+            client.setState(ClientSession.ready)
+            client.sendMessage("015")
+        elif state == ClientSession.notReady:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client isn't ready"))
+        elif state == ClientSession.ready:
+            answer = QtGui.QInputDialog.getInteger(self.parent(), _("Enter time"), _("Enter time in minutes"),
+                                                   int(self.config.price_fixedpriceminutes),
+                                                   int(self.config.price_fixedpriceminutes),
+                                                   1440, 15)
+            if answer[1] != False:
+                myTime = QtCore.QDateTime.currentDateTime().addSecs(answer[0]*60)
+                client.sendMessage("006" + str(myTime.toTime_t()))
+                client.setState(ClientSession.loggedIn, user = "guest", endTime = myTime)
 
     def stopClient(self):
         client = self.ui.main_treeWidget.currentItem()
@@ -315,16 +325,19 @@ class PykafeServer(QtNetwork.QTcpServer):
         state = client.session.state
         if state == ClientSession.notConnected:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Can't connect to client"))
-        elif state == ClientSession.ready:
+        elif state in (ClientSession.ready, ClientSession.notReady):
             QtGui.QMessageBox.information(self.parent(), _("Information"), _("Client is already stopped"))
         elif state == ClientSession.loggedIn:
             answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to stop this client?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes:
                 client.sendMessage("009")
-                client.setState(ClientSession.ready)
+                client.setState(ClientSession.notReady)
         elif state == ClientSession.requestedOpening:
             client.sendMessage("0010")
             client.setState(ClientSession.ready)
+        elif state == ClientSession.waitingMoney:
+            client.setState(ClientSession.ready)
+            client.sendMessage("015")
 
     def changeButton(self):
         pass
@@ -527,7 +540,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
-        QtGui.QMessageBox.about(self.parent(), _("About PyKafe"), "pyKafe v0.1_alpha1\n\n" + _("Authors:") + u"\nUğur Çetin\nMustafa Sarı\n\n" + _("Mentor:") + u"\nA. Tevfik İnan")
+        QtGui.QMessageBox.about(self.parent(), _("About pyKafe"), "pyKafe v0.1_alpha1\n\n" + _("Authors:") + u"\nUğur Çetin\nMustafa Sarı\n\n" + _("Mentor:") + u"\nA. Tevfik İnan")
 
     def aboutQt(self):
         QtGui.QMessageBox.aboutQt(self.parent())
