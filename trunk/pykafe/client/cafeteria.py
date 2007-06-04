@@ -133,7 +133,7 @@ class Ui_Dialog(object):
         self.orders = []
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("accepted()"),Dialog.accept)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("rejected()"),Dialog.reject)
-        QtCore.QObject.connect(self.addOrder,QtCore.SIGNAL("clicked()"),self.orderAdd)
+        QtCore.QObject.connect(self.addOrder,QtCore.SIGNAL("clicked()"),self.orderAdd())
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -151,7 +151,6 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _("Sent Orders"))
 
     def orderAdd(self):
-        print 1234
         cost = self.quantity.value() * findProductPrice(self.products, self.product.currentText())
         self.orders.append(Order(self.ordersToSend, self.product.currentText(), cost, self.quantity.value()))
         self.client.temporders.append[self.product.currentText() + '|' + str(self.quantity.value())]
