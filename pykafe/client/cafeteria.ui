@@ -47,7 +47,7 @@
       </spacer>
      </item>
      <item row="1" column="2" >
-      <widget class="QPushButton" name="pushButton" >
+      <widget class="QPushButton" name="addOrder" >
        <property name="text" >
         <string>Add Order</string>
        </property>
@@ -57,7 +57,7 @@
       </widget>
      </item>
      <item row="1" column="0" >
-      <widget class="QComboBox" name="comboBox" />
+      <widget class="QComboBox" name="product" />
      </item>
      <item row="0" column="0" >
       <widget class="QLabel" name="label" >
@@ -75,7 +75,11 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QSpinBox" name="spinBox" />
+      <widget class="QSpinBox" name="quantity" >
+       <property name="minimum" >
+        <number>1</number>
+       </property>
+      </widget>
      </item>
      <item row="0" column="1" >
       <widget class="QLabel" name="label_2" >
@@ -121,7 +125,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QTreeWidget" name="treeWidget" >
+        <widget class="QTreeWidget" name="ordersToSend" >
          <column>
           <property name="text" >
            <string>Item</string>
@@ -153,7 +157,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QTreeWidget" name="treeWidget_2" >
+        <widget class="QTreeWidget" name="sentOrders" >
          <column>
           <property name="text" >
            <string>Item</string>
@@ -208,6 +212,22 @@
     <hint type="destinationlabel" >
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addOrder</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>295</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>180</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
