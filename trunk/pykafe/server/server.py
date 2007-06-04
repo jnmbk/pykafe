@@ -43,11 +43,13 @@ class MessageSender(QtCore.QThread):
 
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor, clients, config):
+    def __init__(self, parent, socketDescriptor, clients, config, server):
+        #TODO: We should use server only, clients and config aren't necessary
         QtCore.QThread.__init__(self, parent)
         self.socketDescriptor = socketDescriptor
         self.clients = clients
         self.config = config
+        self.server = server
 
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
@@ -83,10 +85,17 @@ class ListenerThread(QtCore.QThread):
                 if db.cur.fetchall()[0][0]:
                     client.sendMessage("0031")
                     logger.add(logger.logTypes.information, _("Member logged in"), computer = client.name, member = username)
-                    self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.loggedIn, user = username)
+                    self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.loggedIn, username)
                 else:
                     logger.add(logger.logTypes.warning, _("Someone entered wrong password or username"), computer = client.name, member = username)
                     client.sendMessage("0030")
+        elif data[:3] == "018":
+            message = ""
+            for product in self.server.products:
+                message += product.name +'|'+ str(product.price) +'|'+ str(product.quantity) +'||'
+            print "sending:", message[:-2]
+            self.tcpSocket.write(base64.encodestring(message[:-2]))
+            self.tcpSocket.waitForBytesWritten()
         self.tcpSocket.disconnectFromHost()
 
 
@@ -135,13 +144,16 @@ class Client(QtGui.QTreeWidgetItem):
         if state == ClientSession.loggedIn:
             self.session.user = user
             self.session.startTime = QtCore.QDateTime.currentDateTime()
-            self.setTexts((2,3,4), (user,currency(0.0), self.session.startTime.time().toString("00.00")))
+            self.setTexts((2,3,4), (user,currency(float(self.config.price_fixedprice)), self.session.startTime.time().toString("00.00")))
             if endTime:
                 self.session.endTime = endTime
                 self.setText(5, self.session.endTime.time().toString("hh.mm"))
             self.changeColor("green")
         elif state == ClientSession.notReady:
-            #if self.session.state in (ClientSession.notConnected, ClientSession.notReady):
+            if self.session.state == ClientSession.loggedIn:
+                """if self.parent().payingType == _("Pre Paid"):
+                    print "user is pre_paid and has %s credit" % currency(self.parent().debt)
+                    self.parent().reduceCredit(self.session.calculatePrice())"""
             if self.config.filter_enable:
                 message = "007"
                 filterFile = open(self.config.filter_file)
@@ -214,6 +226,8 @@ class Member(QtGui.QTreeWidgetItem):
     def updateValuesWithoutPassword(self, memberInformation):
         self.userName, self.realName, self.startDate, self.endDate, self.debt, self.payingType = memberInformation
         self.setText(0, self.userName)
+    def reduceCredit(self, value):
+        self.debt -= value
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui, cashier = None):
@@ -258,14 +272,14 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.products.append(Product(self.ui.orders_treeWidget_2, product))
 
     def incomingConnection(self, socketDescriptor):
-        thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.config)
+        thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.config, self)
         self.threads.append(thread)
         QtCore.QObject.connect(thread, QtCore.SIGNAL("stateChange"), self.setClientState)
         thread.start()
         print "We have %d thread(s)" % len(self.threads)
 
-    def setClientState(self, client, state):
-        self.clients[client].setState(state)
+    def setClientState(self, client, state, user = "guest"):
+        self.clients[client].setState(state, user)
 
     def startClient(self):
         client = self.ui.main_treeWidget.currentItem()
@@ -284,7 +298,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             client.sendMessage("0011")
             client.setState(ClientSession.loggedIn)
         elif state == ClientSession.waitingMoney:
-            client.setState(ClientSession.ready)
+            client.setState(ClientSession.notReady)
             client.sendMessage("015")
         elif state == ClientSession.notReady:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client isn't ready"))
@@ -303,7 +317,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             client.sendMessage("0011")
             client.setState(ClientSession.loggedIn)
         elif state == ClientSession.waitingMoney:
-            client.setState(ClientSession.ready)
+            client.setState(ClientSession.notReady)
             client.sendMessage("015")
         elif state == ClientSession.notReady:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client isn't ready"))
@@ -336,7 +350,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             client.sendMessage("0010")
             client.setState(ClientSession.ready)
         elif state == ClientSession.waitingMoney:
-            client.setState(ClientSession.ready)
+            client.setState(ClientSession.notReady)
             client.sendMessage("015")
 
     def changeButton(self):
@@ -405,6 +419,9 @@ class PykafeServer(QtNetwork.QTcpServer):
         if not member:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a member first"))
             return
+        if member.userName == "guest":
+            QtGui.QMessageBox.information(self.parent(), _("Error"), _("You can't change guest"))
+            return
         memberInformation = [unicode(self.ui.members_username.text()),
                              " ",
                              unicode(self.ui.members_realName.text()),
@@ -439,6 +456,9 @@ class PykafeServer(QtNetwork.QTcpServer):
         member = self.ui.members_treeWidget.currentItem()
         if not member:
             QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a member first"))
+            return
+        if member.userName == "guest":
+            QtGui.QMessageBox.information(self.parent(), _("Error"), _("You can't delete guest"))
             return
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this member?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
