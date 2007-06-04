@@ -48,7 +48,6 @@ class ListenerThread(QtCore.QThread):
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        self.tcpSocket.isReadable()
         self.tcpSocket.waitForReadyRead(-1)
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
