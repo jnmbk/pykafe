@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import sys, base64
+import sys, base64, socket
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 import cafeteria
@@ -36,17 +36,26 @@ class SenderThread(QtCore.QThread):
         tcpSocket.disconnectFromHost()
 
 class ListenerThread(QtCore.QThread):
-    def __init__(self, parent, socketDescriptor):
-        QtCore.QThread.__init__(self, parent)
+    def __init__(self, socketDescriptor):
+        QtCore.QThread.__init__(self)
         self.socketDescriptor = socketDescriptor
     def run(self):
         self.tcpSocket = QtNetwork.QTcpSocket()
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
-        self.tcpSocket.waitForReadyRead()
-        data = base64.decodestring(self.tcpSocket.readAll())
-        print "received:", data
-        self.tcpSocket.disconnectFromHost()
+        print "connection request from:", self.tcpSocket.peerAddress().toString()
+        QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readRoot)
+        self.tcpSocket.waitForDisconnected()
         self.exec_()
+    def readRoot(self):
+        data = self.tcpSocket.readAll()
+        print "received:", data
+        if data[:3] == "017":
+            text = data[3:]
+            if not text:
+                print "couldn't read"
+            else:
+                text1, text2 = text.split('|',1)
+                self.emit(QtCore.SIGNAL("updateLabels"), str(text1), str(text2))
 
 class PykafeClientMain(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
@@ -57,9 +66,10 @@ class PykafeClientMain(QtNetwork.QTcpServer):
         self.orders = []
         self.temporders = []
     def incomingConnection(self, socketDescriptor):
-        thread = ListenerThread(self.parent(), socketDescriptor)
+        thread = ListenerThread(socketDescriptor)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("updateLabels"),self.ui.updateLabels)
         thread.start()
         self.threads.append(thread)
     def sendMessage(self, data):
@@ -100,17 +110,11 @@ class PykafeClientMain(QtNetwork.QTcpServer):
 class TimerThread(QtCore.QThread):
     def run(self):
         while True:
-            tcpSocket = QtNetwork.QTcpSocket()
-            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
-            tcpSocket.waitForConnected()
-            tcpSocket.write(base64.encodestring("017"))
-            tcpSocket.waitForReadyRead()
-            text = base64.decodestring(tcpSocket.readAll())
-            text1, text2 = text.rsplit('|', 1)
-            #there's a big problem here, somehow time returns the first letter of time and money returns ""
-            #TODO: fix it
-            self.emit(QtCore.SIGNAL("changeTimeLabel"), text1)
-            self.emit(QtCore.SIGNAL("changeMoneyLabel"), text2)
+            #self.emit(QtCore.SIGNAL("updateLabels"), "sadasf","retr")
+            tcpSocket = socket.socket()
+            tcpSocket.connect(("",config.network_port))
+            tcpSocket.send(base64.encodestring("017"))
+            tcpSocket.close()
             self.sleep(60)
 
 class Ui_MainWindow(object):
@@ -195,18 +199,22 @@ class Ui_MainWindow(object):
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
         self.thread = TimerThread()
-        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
-        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
         QtCore.QObject.connect(self.thread,QtCore.SIGNAL("setCafeteria"),self.setCafeteria)
         self.thread.start()
+
     def setCafeteria(self, cafeteria):
         self.cafeteria = cafeteria
+
     def iconActivated(self, reason):
         if reason == QtGui.QSystemTrayIcon.Trigger:
             if self.ui.isVisible():
                 self.ui.hide()
             else:
                 self.ui.show()
+
+    def updateLabels(self, text1, text2):
+        self.timeLabel.setText(text1)
+        self.moneyLabel.setText(text2)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_("pyKafe"))

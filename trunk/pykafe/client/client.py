@@ -52,9 +52,14 @@ def sendDataToUi(data):
     tcpSocket = QtNetwork.QTcpSocket()
     tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
     tcpSocket.waitForConnected(-1)
-    tcpSocket.write(base64.encodestring(data))
-    tcpSocket.waitForBytesWritten()
-    print "sent to ui:", data
+    print "trying to send to ui:", data
+    if tcpSocket.write(base64.encodestring(data)) == -1:
+        print "failed"
+        return False
+    else:
+        print "success"
+        tcpSocket.waitForBytesWritten()
+        return True
 
 def getSiteIP(site):
     try:
@@ -163,8 +168,13 @@ class ListenerThread(QtCore.QThread):
                    usedTime.toUTC().time().toString("hh.mm") + "|"
             text += currency(self.client.session.calculatePrice(config))
             print "sending:", text
-            self.tcpSocket.write(base64.encodestring(text))
-            self.tcpSocket.waitForBytesWritten()
+            tcpSocket = QtNetwork.QTcpSocket()
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
+            tcpSocket.waitForConnected()
+            temp = data+text
+            tcpSocket.write(str(temp))
+            tcpSocket.waitForBytesWritten()
+            #sendDataToUi(data+text)
         elif data[:3] == "018":
             tcpSocket = QtNetwork.QTcpSocket()
             tcpSocket.connectToHost(QtNetwork.QHostAddress(config.network_serverIP), config.network_port)
