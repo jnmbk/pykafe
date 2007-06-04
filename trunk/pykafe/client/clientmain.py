@@ -13,6 +13,7 @@
 import sys, base64
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
+import cafeteria
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -21,8 +22,8 @@ _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 config = PykafeConfiguration()
 
 class SenderThread(QtCore.QThread):
-    def __init__(self, parent, data):
-        QtCore.QThread.__init__(self, parent)
+    def __init__(self, data):
+        QtCore.QThread.__init__(self)
         self.data = data
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
@@ -53,6 +54,8 @@ class PykafeClientMain(QtNetwork.QTcpServer):
         self.ui = ui
         self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
         self.threads = []
+        self.orders = []
+        self.temporders = []
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
@@ -60,15 +63,39 @@ class PykafeClientMain(QtNetwork.QTcpServer):
         thread.start()
         self.threads.append(thread)
     def sendMessage(self, data):
-        thread = SenderThread(self.parent(), data)
+        thread = SenderThread(data)
         thread.start()
         self.threads.append(thread)
     def cafeteria(self):
-        pass
+        tcpSocket = QtNetwork.QTcpSocket()
+        tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
+        tcpSocket.waitForConnected()
+        tcpSocket.write(base64.encodestring("018"))
+        tcpSocket.waitForBytesWritten()
+        tcpSocket.waitForReadyRead()
+        data = base64.decodestring(tcpSocket.readAll())
+        print "received:", data
+        tcpSocket.disconnectFromHost()
+        self.cafeteriaContents = []
+        for i in data.split('||'):
+            self.cafeteriaContents.append(i)
+        self.cafeteriaWindow = QtGui.QDialog(self.parent())
+        QtCore.QObject.connect(self.cafeteriaWindow, QtCore.SIGNAL("accepted()"), self.sendOrders)
+        dialog = cafeteria.Ui_Dialog()
+        dialog.setupUi(self.cafeteriaWindow, self)
+        self.cafeteriaWindow.setModal(True)
+        self.cafeteriaWindow.show()
     def logout(self):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to logout?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             self.sendMessage("008")
+    def sendOrders(self):
+        text = "019"
+        for order in self.temporders:
+            text += order
+            self.orders.append(order)
+        if len(text)>3:
+            self.sendMessage(text)
 
 class TimerThread(QtCore.QThread):
     def run(self):
@@ -167,10 +194,13 @@ class Ui_MainWindow(object):
         self.trayIcon.show()
         self.ui = MainWindow
         QtCore.QObject.connect(self.trayIcon, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.iconActivated)
-        thread = TimerThread()
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
-        QtCore.QObject.connect(thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
-        thread.start()
+        self.thread = TimerThread()
+        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeTimeLabel"),self.timeLabel.setText)
+        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("changeMoneyLabel"),self.moneyLabel.setText)
+        QtCore.QObject.connect(self.thread,QtCore.SIGNAL("setCafeteria"),self.setCafeteria)
+        self.thread.start()
+    def setCafeteria(self, cafeteria):
+        self.cafeteria = cafeteria
     def iconActivated(self, reason):
         if reason == QtGui.QSystemTrayIcon.Trigger:
             if self.ui.isVisible():

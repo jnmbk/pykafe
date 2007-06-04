@@ -103,8 +103,9 @@ class ListenerThread(QtCore.QThread):
                 self.client.setState(ClientSession.loggedIn)
         elif data[:3] == "005":
             self.client.setState(ClientSession.loggedIn)
-            sendDataToUi("005")
+            sendDataToUi(data)
         elif data[:3] == "006":
+            sendDataToUi("005")
             self.client.setState(ClientSession.loggedIn, endTime = QtCore.QDateTime.fromTime_t(int(data[3:])))
         elif data[:3] == "007":
             iptablesFile = "*filter\n:INPUT ACCEPT [94:7144]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [177:10428]\n"
@@ -118,8 +119,13 @@ class ListenerThread(QtCore.QThread):
             file.close()
             print iptablesFile
             os.system("iptables-restore < /etc/pyKafe/iptables.conf")
+        elif data[:3] == "009":
+            os.system("restartkde&")
         elif data[:3] == "010":
             os.system("init 0")
+        elif data[:3] == "015":
+            if self.client.state == ClientSession.ready:
+                sendDataToServer("004")
         elif data[:3] == "016":
             for c, value in map(lambda x,y:(x,y), ("price_fixedprice", "price_fixedpriceminutes", "price_onehourprice", "price_rounding"), data[3:].split("|")):
                 config.set(c, value)
@@ -132,12 +138,12 @@ class ListenerThread(QtCore.QThread):
             return
         if data[:3] == "000":
             sendDataToServer("000")
-            self.client.session.setState(ClientSession.requestedOpening)
+            self.client.setState(ClientSession.requestedOpening)
         elif data[:3] == "002":
             sendDataToServer(data)
         elif data[:3] == "004":
             sendDataToServer("004")
-            self.client.session.state = ClientSession.ready
+            self.client.setState(ClientSession.ready)
         elif data[:3] == "008":
             sendDataToServer(data)
             os.system("restartkde&")
@@ -159,7 +165,16 @@ class ListenerThread(QtCore.QThread):
             print "sending:", text
             self.tcpSocket.write(base64.encodestring(text))
             self.tcpSocket.waitForBytesWritten()
-        self.exit()
+        elif data[:3] == "018":
+            tcpSocket = QtNetwork.QTcpSocket()
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(config.network_serverIP), config.network_port)
+            tcpSocket.waitForConnected()
+            tcpSocket.write(base64.encodestring(data))
+            tcpSocket.waitForBytesWritten()
+            tcpSocket.waitForReadyRead()
+            data = tcpSocket.readAll()
+            self.tcpSocket.write(data)
+            self.tcpSocket.waitForBytesWritten()
 
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self):

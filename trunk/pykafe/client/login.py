@@ -54,23 +54,23 @@ class ListenerThread(QtCore.QThread):
         print "received:", data
         if data[:3] == "001":
             if data[3] == "1":
-                os.system("pyKafeclient&")
-                self.emit(QtCore.SIGNAL("close"))
+                self.login()
             elif data[3] == "0":
                 self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
         elif data[:3] == "003":
             if data[3] == "1":
-                os.system("pyKafeclient&")
-                self.emit(QtCore.SIGNAL("close"))
+                self.login()
             else:
                 self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"))
         elif data[:3] == "005":
-            os.system("pyKafeclient&")
-            self.emit(QtCore.SIGNAL("close"))
+            self.login()
         elif data[:3] == "014":
             self.emit(QtCore.SIGNAL("message"), _("Can't connect to server"))
         self.tcpSocket.disconnectFromHost()
         self.exec_()
+    def login(self):
+        os.system("pyKafeclient&")
+        self.emit(QtCore.SIGNAL("close"))
 
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
