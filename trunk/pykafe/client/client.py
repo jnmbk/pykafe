@@ -167,14 +167,7 @@ class ListenerThread(QtCore.QThread):
                    remainingTime.toUTC().time().toString("hh.mm") + "\n" +\
                    usedTime.toUTC().time().toString("hh.mm") + "|"
             text += currency(self.client.session.calculatePrice(config))
-            print "sending:", text
-            tcpSocket = QtNetwork.QTcpSocket()
-            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
-            tcpSocket.waitForConnected()
-            temp = data+text
-            tcpSocket.write(str(temp))
-            tcpSocket.waitForBytesWritten()
-            #sendDataToUi(data+text)
+            sendDataToUi(str(data+text))
         elif data[:3] == "018":
             tcpSocket = QtNetwork.QTcpSocket()
             tcpSocket.connectToHost(QtNetwork.QHostAddress(config.network_serverIP), config.network_port)

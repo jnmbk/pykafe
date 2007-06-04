@@ -47,7 +47,7 @@ class ListenerThread(QtCore.QThread):
         self.tcpSocket.waitForDisconnected()
         self.exec_()
     def readRoot(self):
-        data = self.tcpSocket.readAll()
+        data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
         if data[:3] == "017":
             text = data[3:]
