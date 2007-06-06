@@ -26,9 +26,11 @@ class PykafeConfiguration:
         settings = Database().runOnce("select * from general_settings")
         for config, value in settings:
             setattr(self, config, value)
-    clientList = [ClientInformation("192.168.2.3", "computer1"),
-                  ClientInformation("192.168.2.4", "computer2"),
-                  ClientInformation("192.168.2.5", "computer3")]
+        self.clientList=[]
+        clients = Database().runOnce("select ip, name from computers")
+        for client in clients:
+            self.clientList.append(ClientInformation(client[0], client[1]))
+
     def set(self, config, value):
         "sets given configuration as given value writes to database, this doesn't do anything if there's not a real change"
         if getattr(self, config) == value:

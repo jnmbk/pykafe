@@ -14,10 +14,11 @@
 
 from PyQt4 import QtNetwork, QtCore, QtGui
 from pysqlite2 import dbapi2 as sqlite
-from config import PykafeConfiguration
+from config import PykafeConfiguration, ClientInformation
 from session import ClientSession
 from database import Database
 from settingswindow import Ui_SettingsWindow
+from clientsettingswindow import Ui_ClientSettingsWindow
 from currencyformat import currency
 import logger
 import base64, sha, os
@@ -80,10 +81,14 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "002":
             if client.session.state == ClientSession.ready:
                 username, password = data[3:].split("|")
-                db = Database()
-                db.cur.execute("select count() from members where username = ? and password = ?", (username, password))
-                if db.cur.fetchall()[0][0]:
-                    client.sendMessage("0031")
+                if Database().runOnce("select count() from members where username = ? and password = ?", (username, password))[0][0]:
+                    wallpaper = ""
+                    try:
+                        wallpaper = Database().runOnce("select setting_value from member_settings where username=? and setting_name=?", (username,"wallpaper"))[0][0]
+                        print wallpaper
+                    except IndexError:
+                        pass
+                    client.sendMessage("0031%s|%s" % (username, wallpaper))
                     logger.add(logger.logTypes.information, _("Member logged in"), computer = client.name, member = username)
                     self.emit(QtCore.SIGNAL("stateChange"), self.clientNumber, ClientSession.loggedIn, username)
                 else:
@@ -92,10 +97,20 @@ class ListenerThread(QtCore.QThread):
         elif data[:3] == "018":
             message = ""
             for product in self.server.products:
-                message += product.name +'|'+ str(product.price) +'|'+ str(product.quantity) +'||'
+                message += product.name +'|'+ str(product.quantity) +'|'+ str(product.price) +'||'
             print "sending:", message[:-2]
             self.tcpSocket.write(base64.encodestring(message[:-2]))
             self.tcpSocket.waitForBytesWritten()
+        elif data[:3] == "019":
+            for order in data[3:].split('||'):
+                self.emit(QtCore.SIGNAL("orderCame"), order.split('|'), client.name)
+        elif data[:3] == "022":
+            self.sleep(2)
+            Database().runOnce("update member_settings set setting_value=? where username=? and setting_name=?", (data[3:], client.session.user, "wallpaper"))
+        elif data[:3] == "023":
+            self.sleep(5)
+            member, recv, trans = data[3:].split('|')
+            logger.add(logger.logTypes.information, _("received, sent:") + recv + '|' + trans, client.name, member)
         self.tcpSocket.disconnectFromHost()
 
 
@@ -107,16 +122,64 @@ class ClientThread(QtCore.QThread):
     def run(self):
         while(True):
             if self.client.session.state == ClientSession.loggedIn:
-                self.emit(QtCore.SIGNAL("changetext"),3,currency(self.client.session.calculatePrice(self.config)))
+                self.emit(QtCore.SIGNAL("changetext"),3,currency(self.client.session.calculateTotal(self.config)))
                 usedTime = QtCore.QDateTime()
                 usedTime.setTime_t(self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime()))
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
             self.sleep(int(self.config.ui_refreshdelay))
 
+class Log(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, textTuple):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.updateTexts(textTuple)
+    def updateTexts(self, textTuple):
+        for column, text in map(lambda x,y:(x,y), xrange(7), textTuple):
+            self.setText(column, unicode(str(text)))
+            if column == 1:
+                if text == _("emergency"): color = "purple"
+                elif text == _("warning"): color = "orange"
+                elif text == _("error"): color = "red"
+                elif text == _("information"): color = "lightblue"
+        self.changeColor(color)
+    def changeColor(self, colorName):
+        for i in range(self.columnCount()):
+            self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
+
+class Order(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, order, clientName, toDatabase = True):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.productName = str(order[0])
+        self.quantity = int(order[1])
+        self.clientName = str(clientName)
+        self.updateTexts()
+        if toDatabase:
+            Database().run("insert into orders values(?,?,?)", (self.productName, self.quantity, self.clientName))
+
+    def updateTexts(self):
+        for column, text in map(lambda x,y:(x,y), xrange(4), (self.clientName, self.productName, currency(self.price()), str(self.quantity))):
+            self.setText(column, text)
+
+    def price(self):
+        "Calculates and returns price of order"
+        products = Database().runOnce("select product_name, unit_price from products")
+        for product in products:
+            if self.productName == product[0]:
+                return float(product[1]) * self.quantity
+        return 0.0
+
+    def update(self, clientName, productName, quantity):
+        Database().run("update orders set product_name=?,quantity=?,computer_name=? where product_name=? and quantity=? and computer_name=?", (str(productName), int(quantity), str(clientName), self.productName, self.quantity, self.clientName))
+        self.clientName = str(clientName)
+        self.productName = str(productName)
+        self.quantity = int(quantity)
+        self.updateTexts()
+
+
 class Client(QtGui.QTreeWidgetItem):
-    def __init__(self, parent, clientInformation, config):
+    def __init__(self, parent, clientInformation, config, server):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.config = config
+        self.server = server
         self.fillList(clientInformation)
         watcherThread = ClientThread(self, config)
         QtCore.QObject.connect(watcherThread, QtCore.SIGNAL("changetext"), self.setText)
@@ -124,11 +187,21 @@ class Client(QtGui.QTreeWidgetItem):
         self.threads = [watcherThread]
 
     def fillList(self, clientInformation):
+        self.id = id
         self.session = clientInformation.session
         self.ip = clientInformation.ip
         self.name = clientInformation.name
         self.setText(0, self.name)
         self.setState(ClientSession.notConnected)
+
+    def updateInformation(self, parent, name, ip):
+        try:
+            Database().runOnce("update computers set name=?,ip=? where name=?", (str(name), str(ip), self.name))
+            self.name = name
+            self.ip = ip
+            self.setText(0, self.name)
+        except sqlite.IntegrityError:
+            QtGui.QMessageBox.critical(parent, _("Error"), _("Client ip and name must be unique.") + " " + _("Client information won't be changed"))
 
     def changeColor(self, colorName):
         for i in range(self.columnCount()):
@@ -150,10 +223,40 @@ class Client(QtGui.QTreeWidgetItem):
                 self.setText(5, self.session.endTime.time().toString("hh.mm"))
             self.changeColor("green")
         elif state == ClientSession.notReady:
+            if self.session.state == ClientSession.waitingMoney:
+                total = self.session.calculateTotal(self.config)
+                print "will pay", total
+                payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
+                print payingType, credit
+                if payingType == _("Pre Paid"):
+                    print "user is pre_paid and has %s credit" % currency(credit)
+                    for member in self.server.members:
+                        print member.userName, self.session.user
+                        if member.userName == self.session.user:
+                            if member.debt < total:
+                                QtGui.QMessageBox.warning(self.server.parent(), _("Low credit"), _("%s's credit has finished! Has %s debt.") % (member.userName, currency(total - member.debt)))
+                                logger.add(logger.logTypes.warning, _("Member has low credit"), self.name, member.userName, member.debt - total)
+                            member.debt -= total
+                            Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
+                else:
+                    logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
+                    Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
+                    #logger.add(logger.logTypes.information, _("money paid"), self.name, self.session.user, self.session.calculateTotal()
             if self.session.state == ClientSession.loggedIn:
-                """if self.parent().payingType == _("Pre Paid"):
-                    print "user is pre_paid and has %s credit" % currency(self.parent().debt)
-                    self.parent().reduceCredit(self.session.calculatePrice())"""
+                total = self.session.calculateTotal(self.config)
+                payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
+                if payingType == _("Pre Paid"):
+                    print "user is pre_paid and has %s credit" % currency(credit)
+                    for member in self.server.members:
+                        if member.userName == self.session.user:
+                            if member.debt < total:
+                                QtGui.QMessageBox.warning(self.server.parent(), _("Low credit"), _("%s's credit has finished! Has %s debt.") % (member.userName, currency(total - member.debt)))
+                                logger.add(logger.logTypes.warning, _("Member has low credit"), self.name, member.userName, member.debt - total)
+                            member.debt -= total
+                            Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
+                else:
+                    logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
+                    Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
             if self.config.filter_enable:
                 message = "007"
                 filterFile = open(self.config.filter_file)
@@ -184,7 +287,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.changeColor("lightblue")
         self.session.state = state
         self.setText(1, self.session.toString())
-        logger.add(logger.logTypes.information, _("State changed to %s") % self.session.toString(), member = self.name)
+        logger.add(logger.logTypes.information, _("State changed to %s") % self.session.toString(), computer = self.name, member = self.session.user)
         self.setSelected(False)
 
     def sendSession(self):
@@ -211,7 +314,7 @@ class Product(QtGui.QTreeWidgetItem):
     def updateValues(self, productInformation):
         self.name, self.price, self.quantity = productInformation
         self.setText(0,self.name)
-        self.setText(1,currency(float(self.price)))
+        self.setText(1,str(self.price))
         self.setText(2,str(self.quantity))
 
 class Member(QtGui.QTreeWidgetItem):
@@ -226,8 +329,6 @@ class Member(QtGui.QTreeWidgetItem):
     def updateValuesWithoutPassword(self, memberInformation):
         self.userName, self.realName, self.startDate, self.endDate, self.debt, self.payingType = memberInformation
         self.setText(0, self.userName)
-    def reduceCredit(self, value):
-        self.debt -= value
 
 class PykafeServer(QtNetwork.QTcpServer):
     def __init__(self, parent, ui, cashier = None):
@@ -243,10 +344,15 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.parent().close()
         self.clients = []
         for clientInformation in self.config.clientList:
-            self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config))
+            self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config, self))
+            self.ui.orders_idComboBox.addItem(clientInformation.name, QtCore.QVariant(clientInformation.ip))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
         self.initMembers(first = True)
         self.initProducts()
+        self.initOrders()
+        self.ui.logs_dateTimeEdit_1.setDateTime(QtCore.QDateTime.currentDateTime().addDays(-1))
+        self.ui.logs_dateTimeEdit_2.setDateTime(QtCore.QDateTime.currentDateTime().addDays(1))
+        self.refreshLogs()
         self.localize()
         self.threads = []
 
@@ -270,11 +376,19 @@ class PykafeServer(QtNetwork.QTcpServer):
         productList = Database().run("select * from products")
         for product in productList:
             self.products.append(Product(self.ui.orders_treeWidget_2, product))
+            self.ui.orders_itemComboBox.addItem(product[0])
+
+    def initOrders(self):
+        self.orders = []
+        orderList = Database().run("select * from orders")
+        for order in orderList:
+            self.orderAdd(order[:2], order[2], toDatabase = False)
 
     def incomingConnection(self, socketDescriptor):
         thread = ListenerThread(self.parent(), socketDescriptor, self.clients, self.config, self)
         self.threads.append(thread)
         QtCore.QObject.connect(thread, QtCore.SIGNAL("stateChange"), self.setClientState)
+        QtCore.QObject.connect(thread, QtCore.SIGNAL("orderCame"), self.orderAdd)
         thread.start()
         print "We have %d thread(s)" % len(self.threads)
 
@@ -366,9 +480,6 @@ class PykafeServer(QtNetwork.QTcpServer):
             return
         os.system("krdc -s -f -l -c %s&" % client.ip)
 
-    def settingsButton(self):
-        pass
-
     def shutdownButton(self):
         client = self.ui.main_treeWidget.currentItem()
         if not client:
@@ -403,6 +514,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             if toDatabase:
                 try:
                     Database().runOnce("insert into members values (?,?,?,?,?,?,?,?)", memberInformation)
+                    Database().runOnce("insert into member_settings values (?,?,?)", (memberInformation[0], "wallpaper", ""))
                     self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
                     self.filterMembers(self.ui.members_filter.text())
                     self.ui.statusbar.showMessage(_("Added member"))
@@ -436,8 +548,10 @@ class PykafeServer(QtNetwork.QTcpServer):
         if self.ui.members_password.text():
             try:
                 Database().runOnce("update members set username=?,password=?,name=?,starting_date=?,finish_date=?,debt=?,paying_type=? where username = ?", memberInformation)
+                Database().runOnce("update member_settings set username=? where username = ?", (memberInformation[0], member.userName))
                 member.updateValues(memberInformation[:7])
                 self.filterMembers(self.ui.members_filter.text())
+                logger.add(logger.logTypes.warning, _("Updated member"), member = member.userName)
                 self.ui.statusbar.showMessage(_("Updated member information"))
             except sqlite.IntegrityError:
                 QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Username must be unique"))
@@ -445,6 +559,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             del(memberInformation[1])
             try:
                 Database().runOnce("update members set username=?,name=?,starting_date=?,finish_date=?,debt=?,paying_type=? where username=?", memberInformation)
+                Database().runOnce("update member_settings set username=? where username = ?", (memberInformation[0], member.userName))
                 member.updateValuesWithoutPassword(memberInformation[:6])
                 self.filterMembers(self.ui.members_filter.text())
                 self.ui.statusbar.showMessage(_("Updated member information"))
@@ -463,9 +578,11 @@ class PykafeServer(QtNetwork.QTcpServer):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to delete this member?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from members where username = ?", (member.userName,))
+            Database().runOnce("delete from member_settings where username = ?", (member.userName,))
             self.ui.members_treeWidget.takeTopLevelItem(self.ui.members_treeWidget.indexOfTopLevelItem(member))
             del(self.members[self.members.index(member)])
             self.filterMembers(self.ui.members_filter.text())
+            logger.add(logger.logTypes.warning, _("Deleted member"), member = member.userName)
             self.ui.statusbar.showMessage(_("Deleted member"))
 
     def memberReports(self):
@@ -557,6 +674,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         if answer == QtGui.QMessageBox.Yes:
             Database().runOnce("delete from products where product_name = ?", (product.name,))
             self.ui.orders_treeWidget_2.takeTopLevelItem(self.ui.orders_treeWidget_2.indexOfTopLevelItem(product))
+            del(self.products[self.products.index(product)])
             self.ui.statusbar.showMessage(_("Deleted product"))
 
     def about(self):
@@ -571,6 +689,39 @@ class PykafeServer(QtNetwork.QTcpServer):
         settingsUi = Ui_SettingsWindow()
         settingsUi.setupUi(self.settingsDialog, self.config)
         self.settingsDialog.show()
+
+    def settingsButton(self, add = False):
+        client = self.ui.main_treeWidget.currentItem()
+        if not client and not add:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        clientSettingsDialog = QtGui.QDialog(self.parent())
+        self.clientSettingsUi = Ui_ClientSettingsWindow()
+        self.clientSettingsUi.setupUi(clientSettingsDialog, client)
+        if add:
+            clientSettingsDialog.setWindowTitle(_("Add Computer"))
+            clientSettingsDialog.setWindowIcon(self.ui.pyKafeIcon)
+            QtCore.QObject.connect(clientSettingsDialog, QtCore.SIGNAL("accepted()"), self.clientAdder)
+        else:
+            QtCore.QObject.connect(clientSettingsDialog, QtCore.SIGNAL("accepted()"), self.changeClient)
+        clientSettingsDialog.show()
+
+    def changeClient(self):
+        client = self.ui.main_treeWidget.currentItem()
+        client.updateInformation(self.parent(), unicode(self.clientSettingsUi.clientID.text()), self.clientSettingsUi.clientIP.text())
+
+    def addClient(self):
+        self.settingsButton(add = True)
+
+    def clientAdder(self):
+        name = unicode(self.clientSettingsUi.clientID.text())
+        ip = unicode(self.clientSettingsUi.clientIP.text())
+        try:
+            Database().runOnce("insert into computers(ip,name) values(?,?)", (ip, name))
+            info = ClientInformation(ip, name)
+            self.clients.append(Client(self.ui.main_treeWidget, info, self.config, self))
+        except sqlite.IntegrityError:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client ip and name must be unique"))
 
     def sendOptions(self):
         "Sends internet filtering and pricing settings to all clients"
@@ -592,3 +743,83 @@ class PykafeServer(QtNetwork.QTcpServer):
                 client.sendMessage(priceMessage)
                 if self.config.filter_enable:
                     client.sendMessage(filterMessage)
+
+    def orderAdd(self, order = None, clientName = None, toDatabase = True):
+        if not order:
+            clientName = self.ui.orders_idComboBox.currentText()
+            order = (self.ui.orders_itemComboBox.currentText(), self.ui.orders_spinBox_1.value())
+        self.orders.append(Order(self.ui.orders_treeWidget_1, order, clientName, toDatabase))
+
+    def orderChanged(self, current, previous):
+        order = current
+        if not order:
+            order = previous
+            if not order: return
+        self.ui.orders_idComboBox.setCurrentIndex(self.ui.orders_idComboBox.findText(order.clientName))
+        self.ui.orders_itemComboBox.setCurrentIndex(self.ui.orders_itemComboBox.findText(order.productName))
+        self.ui.orders_spinBox_1.setValue(order.quantity)
+
+    def orderUpdate(self):
+        order = self.ui.orders_treeWidget_1.currentItem()
+        if not order:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose an order first"))
+            return
+        order.update(self.ui.orders_idComboBox.currentText() ,self.ui.orders_itemComboBox.currentText(), self.ui.orders_spinBox_1.value())
+
+    def orderCancel(self, question = True):
+        order = self.ui.orders_treeWidget_1.currentItem()
+        if not order:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose an order first"))
+            return
+        if question:
+            answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to cancel this order?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
+        else:
+            answer = QtGui.QMessageBox.Yes
+        if answer == QtGui.QMessageBox.Yes:
+            Database().runOnce("delete from orders where product_name=? and quantity=? and computer_name=?", (order.productName, order.quantity, order.clientName))
+            self.ui.orders_treeWidget_1.takeTopLevelItem(self.ui.orders_treeWidget_1.indexOfTopLevelItem(order))
+            del(self.orders[self.orders.index(order)])
+            self.ui.statusbar.showMessage(_("Cancelled order"))
+
+    def orderDelete(self):
+        order = self.ui.orders_treeWidget_1.currentItem()
+        if not order:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose an order first"))
+            return
+        stocks = Database().runOnce("select stock from products where product_name=?", (order.productName,))[0][0]
+        if order.quantity>stocks:
+            QtGui.QMessageBox.warning(self.parent(), _("Warning"), _("Order quantity exceeds stocks. Stocks will be set to 0"))
+            Database().runOnce("update products set stock=? where product_name=?", (0, order.productName))
+            for product in self.products:
+                if product.name == order.productName:
+                    product.setText(2, "0")
+        else:
+            Database().runOnce("update products set stock=? where product_name=?", (stocks - order.quantity, order.productName))
+            for product in self.products:
+                if product.name == order.productName:
+                    product.quantity = stocks - order.quantity
+                    product.setText(2, str(product.quantity))
+        for client in self.clients:
+            if client.name == order.clientName:
+                logger.add(logger.logTypes.information, _("cafeteria item sold"), order.clientName, client.session.user, order.price())
+                Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, order.price()))
+                client.session.orders.append(order.price())
+        self.orderCancel(question = False)
+
+    def refreshLogs(self):
+        startDate = self.ui.logs_dateTimeEdit_1.dateTime().toTime_t()
+        endDate = self.ui.logs_dateTimeEdit_2.dateTime().toTime_t()
+        if startDate>endDate:
+            QtGui.QMessageBox.warning(self.parent(), _("Warning"), _("Starting time must be smaller than ending time. They will be set to equal"))
+            self.ui.logs_dateTimeEdit_1.setDateTime(self.ui.logs_dateTimeEdit_2.dateTime())
+            return
+        self.logs = []
+        logs = Database().run("select date,log_type,log_value,cashier,computer,member,income from logs where date between ? and ?", (startDate, endDate))
+        for log in logs:
+            time = QtCore.QDateTime.fromTime_t(log[0]).toString("dd.MM.yyyy hh.mm")
+            type = log[1]
+            if type == logger.logTypes.emergency: type = _("emergency")
+            elif type == logger.logTypes.warning: type = _("warning")
+            elif type == logger.logTypes.error: type = _("error")
+            elif type == logger.logTypes.information: type = _("information")
+            self.logs.append(Log(self.ui.logs_treeWidget, (time, type) + log[2:]))

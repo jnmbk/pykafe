@@ -26,6 +26,8 @@ class ClientSession:
         self.startTime = None
         self.endTime = None
         self.orders = []
+        self.receivedBytes = 0
+        self.transferredBytes = 0
 
     def calculatePrice(self, config):
         time = self.startTime.secsTo(QtCore.QDateTime.currentDateTime())
@@ -35,6 +37,11 @@ class ClientSession:
             #TODO: round the price using price_rounding
             price = float(config.price_onehourprice)/3600 * time
         return price
+    def calculateTotal(self, config):
+        total = self.calculatePrice(config)
+        for i in self.orders:
+            total += i
+        return total
 
     def toString(self):
         """returns current state as a string"""

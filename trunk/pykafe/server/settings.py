@@ -13,6 +13,7 @@
 from PyQt4 import QtGui, QtCore
 from pysqlite2 import dbapi2 as sqlite
 from database import Database
+from cashierreports import Ui_CashierReports
 import sha, socket
 
 import locale, gettext
@@ -215,7 +216,15 @@ class SettingsManager:
             except sqlite.IntegrityError:
                 QtGui.QMessageBox.critical(self.parent, _("Error"), _("Username must be unique"))
     def cashierReports(self):
-        pass
+        cashier = self.ui.cashiers_treeWidget.currentItem()
+        if not cashier:
+            QtGui.QMessageBox.critical(self.parent, _("Error"), _("You must select a cashier first"))
+            return
+        dialog = QtGui.QDialog(self.parent)
+        reportwindow = Ui_CashierReports()
+        reportwindow.setupUi(dialog, cashier.userName)
+        dialog.show()
+
     def cashierChanged(self, current, previous):
         currentCashier = current
         if not currentCashier:
@@ -223,3 +232,18 @@ class SettingsManager:
         self.ui.cashiers_username.setText(currentCashier.userName)
         self.ui.cashiers_password.clear()
         self.ui.cashiers_realName.setText(currentCashier.realName)
+    def checkPricingRoundingValue(self):
+        if self.ui.pricing_rounding.value() > self.ui.pricing_fixed.value():
+            QtGui.QMessageBox.warning(self.parent, _("Warning"), _("Price rounding must be smaller than or equal to fixed price. Correct value will be set."))
+            self.ui.pricing_rounding.setValue(self.ui.pricing_fixed.value())
+    def checkPricingOnehourValue(self):
+        if self.ui.pricing_fixed.value() > self.ui.pricing_onehour.value():
+            QtGui.QMessageBox.warning(self.parent, _("Warning"), _("One hour price must be bigger than or equal to fixed price.  Correct value will be set."))
+            self.ui.pricing_onehour.setValue(self.ui.pricing_fixed.value())
+    def checkPricingFixedValue(self):
+        if self.ui.pricing_rounding.value() > self.ui.pricing_fixed.value():
+            QtGui.QMessageBox.warning(self.parent, _("Warning"), _("Fixed price must be bigger than or equal to price rounding. Correct value will be set."))
+            self.ui.pricing_fixed.setValue(self.ui.pricing_rounding.value())
+        elif self.ui.pricing_fixed.value() > self.ui.pricing_onehour.value():
+            QtGui.QMessageBox.warning(self.parent, _("Warning"), _("Fixed price must be smaller than or equal to one hour price. Correct value will be set."))
+            self.ui.pricing_fixed.setValue(self.ui.pricing_onehour.value())

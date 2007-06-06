@@ -142,10 +142,10 @@
          <item>
           <widget class="QSpinBox" name="pricing_minutes" >
            <property name="maximum" >
-            <number>3600</number>
+            <number>60</number>
            </property>
            <property name="singleStep" >
-            <number>15</number>
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -793,6 +793,54 @@
     <hint type="sourcelabel" >
      <x>408</x>
      <y>232</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>233</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pricing_fixed</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>319</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>233</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pricing_onehour</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>292</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>233</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pricing_rounding</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>292</x>
+     <y>122</y>
     </hint>
     <hint type="destinationlabel" >
      <x>233</x>
