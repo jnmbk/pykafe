@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import sys, base64, socket
+import os, sys, base64, socket
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 import cafeteria
@@ -24,7 +24,7 @@ config = PykafeConfiguration()
 class SenderThread(QtCore.QThread):
     def __init__(self, data):
         QtCore.QThread.__init__(self)
-        self.data = data
+        self.data = str(data)
     def run(self):
         tcpSocket = QtNetwork.QTcpSocket()
         tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
@@ -56,6 +56,9 @@ class ListenerThread(QtCore.QThread):
             else:
                 text1, text2 = text.split('|',1)
                 self.emit(QtCore.SIGNAL("updateLabels"), str(text1), str(text2))
+        if data[:3] == "021":
+            wallpaper = os.popen("dcop kdesktop KBackgroundIface currentWallpaper 1").read().strip()
+            self.sendMessage("022" + wallpaper)
 
 class PykafeClientMain(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
@@ -98,14 +101,16 @@ class PykafeClientMain(QtNetwork.QTcpServer):
     def logout(self):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to logout?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.Yes:
+            wallpaper = os.popen("dcop kdesktop KBackgroundIface currentWallpaper 1").read().strip()
+            self.sendMessage("022" + wallpaper)
             self.sendMessage("008")
     def sendOrders(self):
         text = "019"
         for order in self.temporders:
-            text += order
+            text += order + "||"
             self.orders.append(order)
-        if len(text)>3:
-            self.sendMessage(text)
+        if len(text)>5:
+            self.sendMessage(text[:-2])
 
 class TimerThread(QtCore.QThread):
     def run(self):

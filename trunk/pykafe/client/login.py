@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import base64, os, sys, sha, time
+import base64, os, sys, sha
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 
@@ -19,10 +19,11 @@ locale.setlocale(locale.LC_ALL, "C")
 _ = gettext.translation("pyKafe_client", fallback=True).ugettext
 
 config = PykafeConfiguration()
+timeOut = 5000
 
 class SenderThread(QtCore.QThread):
-    def __init__(self, parent, data, retry = False):
-        QtCore.QThread.__init__(self, parent)
+    def __init__(self, data, retry = False):
+        QtCore.QThread.__init__(self)
         self.data = data
         self.retry = retry
     def run(self):
@@ -31,7 +32,7 @@ class SenderThread(QtCore.QThread):
         while not tcpSocket.waitForConnected(-1) and self.retry:
             self.emit(QtCore.SIGNAL("connectionError()"))
             print "trying to reconnect in 5 seconds"
-            time.sleep(5)
+            self.sleep(5)
             tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
         if tcpSocket.write(base64.encodestring(self.data)) == -1:
             print "couldn't send:", self.data
@@ -55,16 +56,28 @@ class ListenerThread(QtCore.QThread):
             if data[3] == "1":
                 self.login()
             elif data[3] == "0":
-                self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"))
+                self.emit(QtCore.SIGNAL("message"), _("Server didn't give acknowledge"), timeOut)
         elif data[:3] == "003":
             if data[3] == "1":
+                wallpaper = data.split('|')[1]
+                if wallpaper:
+                    os.system("dcop kdesktop KBackgroundIface setWallpaper %s 8" % wallpaper)
                 self.login()
             else:
-                self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"))
+                self.emit(QtCore.SIGNAL("message"), _("Wrong username or password"), timeOut)
         elif data[:3] == "005":
             self.login()
+        elif data[:3] == "012":
+            self.emit(QtCore.SIGNAL("message"), _("Previous customer didn't make payment"))
         elif data[:3] == "014":
-            self.emit(QtCore.SIGNAL("message"), _("Can't connect to server"))
+            self.emit(QtCore.SIGNAL("message"), _("Can't connect to server"), timeOut)
+            self.sleep(5)
+            thread = SenderThread("004")
+            thread.start()
+        elif data[:3] == "020":
+            thread=SenderThread("004")
+            thread.start()
+            self.emit(QtCore.SIGNAL("message"),"")
         self.tcpSocket.disconnectFromHost()
         self.exec_()
     def login(self):
@@ -80,7 +93,7 @@ class PykafeClient(QtNetwork.QTcpServer):
             print "Can't bind port %d" % config.network_localPort
             sys.exit()
         print "listening localhost on port:", config.network_localPort
-        thread = SenderThread(self.parent(), "004", retry = True)
+        thread = SenderThread("004", retry = True)
         QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
         self.threads = [thread]
@@ -92,17 +105,18 @@ class PykafeClient(QtNetwork.QTcpServer):
         self.threads.append(thread)
         print "login has %d threads" % len(self.threads)
     def login(self):
-        thread = SenderThread(self.parent(), "002" + unicode(self.ui.username.text()) + "|" + sha.new(unicode(self.ui.password.text())).hexdigest())
+        thread = SenderThread("002" + unicode(self.ui.username.text()) + "|" + sha.new(unicode(self.ui.password.text())).hexdigest())
         QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
         self.threads.append(thread)
     def request(self):
-        thread = SenderThread(self.parent(), "000")
+        thread = SenderThread("000")
         QtCore.QObject.connect(thread, QtCore.SIGNAL("connectionError()"), self.connectionError)
         thread.start()
+        self.ui.statusbar.showMessage(_("Sent opening request to server"), timeOut)
         self.threads.append(thread)
     def connectionError(self):
-        self.ui.statusbar.showMessage(_("Can't connect to local daemon, please contact cashier"))
+        self.ui.statusbar.showMessage(_("Can't connect to local daemon, please contact cashier"), timeOut)
 
 class Ui_LoginWindow(object):
     def setupUi(self, MainWindow):
