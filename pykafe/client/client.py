@@ -73,7 +73,7 @@ def getNetworkBytes():
     transferredBytes = 0
     interfaces = os.listdir("/sys/class/net")
     for interface in interfaces:
-        if file("/sys/class/net/%s/operstate" % interface).read() == "up\n":
+        if file("/sys/class/net/%s/operstate" % interface).read() in ("up\n", "unknown\n"):
             receivedBytes += int(file("/sys/class/net/%s/statistics/rx_bytes" % interface).read())
             transferredBytes += int(file("/sys/class/net/%s/statistics/tx_bytes" % interface).read())
     return receivedBytes, transferredBytes
@@ -101,11 +101,13 @@ class ListenerThread(QtCore.QThread):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received from server:", data
         if data[:3] == "001":
+            if data[3] == "1":
+                self.client.setState(ClientSession.loggedIn)
             sendDataToUi(data)
         elif data[:3] == "003":
             sendDataToUi(data)
             if data[3] == "1":
-                self.client.setState(ClientSession.loggedIn)
+                self.client.setState(ClientSession.loggedIn, user = data[4:data.find('|')])
         elif data[:3] == "005":
             self.client.setState(ClientSession.loggedIn)
             sendDataToUi(data)
@@ -125,15 +127,19 @@ class ListenerThread(QtCore.QThread):
             print iptablesFile
             os.system("iptables-restore < /etc/pyKafe/iptables.conf")
         elif data[:3] == "009":
+            received, transferred = getNetworkBytes()
+            sendDataToServer("023" + self.client.session.user + '|' + str(received - self.client.session.receivedBytes) +'|'+ str(transferred - self.client.session.transferredBytes))
             os.system("restartkde&")
         elif data[:3] == "010":
             os.system("init 0")
         elif data[:3] == "015":
-            if self.client.state == ClientSession.ready:
-                sendDataToServer("004")
+            self.client.setState(ClientSession.notReady)
+            sendDataToUi("020")
         elif data[:3] == "016":
             for c, value in map(lambda x,y:(x,y), ("price_fixedprice", "price_fixedpriceminutes", "price_onehourprice", "price_rounding"), data[3:].split("|")):
                 config.set(c, value)
+        elif data[:3] == "021":
+            sendDataToUi(data)
 
     def readUi(self):
         data = base64.decodestring(self.tcpSocket.readAll())
@@ -141,22 +147,31 @@ class ListenerThread(QtCore.QThread):
         if self.client.session.state == ClientSession.notConnected:
             sendDataToUi("014")
             return
+        if self.client.session.state == ClientSession.waitingMoney:
+            sendDataToUi("012")
+            return
         if data[:3] == "000":
             sendDataToServer("000")
             self.client.setState(ClientSession.requestedOpening)
         elif data[:3] == "002":
             sendDataToServer(data)
         elif data[:3] == "004":
-            sendDataToServer("004")
-            self.client.setState(ClientSession.ready)
+            if not self.client.session.state == ClientSession.waitingMoney:
+                sendDataToServer("004")
+                self.client.setState(ClientSession.ready)
         elif data[:3] == "008":
+            received, transferred = getNetworkBytes()
+            sendDataToServer("023" + self.client.session.user + '|' + str(received - self.client.session.receivedBytes) +'|'+ str(transferred - self.client.session.transferredBytes))            
             sendDataToServer(data)
             os.system("restartkde&")
+            self.client.setState(ClientSession.waitingMoney)
         elif data[:3] == "017":
+            if self.client.session.state != ClientSession.loggedIn:
+                return
             currentTime = QtCore.QDateTime.currentDateTime()
             usedTime = self.client.session.startTime.secsTo(currentTime)
             remainingTime = QtCore.QDateTime()
-            if self.client.session.endTime:
+            if self.client.session.endTime and currentTime.secsTo(self.client.session.endTime)>0:
                 remainingTime.setTime_t(currentTime.secsTo(self.client.session.endTime))
             else:
                 remainingTime.setTime_t(0)
@@ -178,6 +193,11 @@ class ListenerThread(QtCore.QThread):
             data = tcpSocket.readAll()
             self.tcpSocket.write(data)
             self.tcpSocket.waitForBytesWritten()
+        elif data[:3] == "019":
+            sendDataToServer(data)
+        elif data[:3] == "022":
+            if self.client.session.user != "guest":
+                sendDataToServer(data)
 
 class PykafeClient(QtNetwork.QTcpServer):
     def __init__(self):
@@ -190,6 +210,7 @@ class PykafeClient(QtNetwork.QTcpServer):
         QtCore.QObject.connect(thread, QtCore.SIGNAL("messageSent"), self.initialConnection)
         thread.start()
         self.threads = [thread]
+        self.login = False
         print "trying to connect to server"
 
     def incomingConnection(self, socketDescriptor):
@@ -201,6 +222,7 @@ class PykafeClient(QtNetwork.QTcpServer):
     def initialConnection(self):
         print "connected to server"
         self.session.setState(ClientSession.notReady)
+        sendDataToUi("020")
 
     def setState(self, state, user = "guest", endTime = ""):
         if state == ClientSession.loggedIn:
@@ -208,4 +230,6 @@ class PykafeClient(QtNetwork.QTcpServer):
             self.session.startTime = QtCore.QDateTime.currentDateTime()
             if endTime:
                 self.session.endTime = endTime
+            self.session.receivedBytes, self.session.transferredBytes = getNetworkBytes()
+            print getNetworkBytes()
         self.session.setState(state)

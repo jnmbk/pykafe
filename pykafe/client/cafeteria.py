@@ -11,6 +11,7 @@
 #
 
 from PyQt4 import QtCore, QtGui
+from currencyformat import currency
 
 import locale, gettext
 locale.setlocale(locale.LC_ALL, "C")
@@ -25,13 +26,13 @@ class Order(QtGui.QTreeWidgetItem):
     def __init__(self, parent, product, value, quantity):
         QtGui.QTreeWidgetItem.__init__(self, parent)
         self.setText(0, product)
-        self.setText(1, value)
-        self.setText(2, quantity)
+        self.setText(1, currency(value))
+        self.setText(2, str(quantity))
 
 def findProductPrice(products, name):
     for product in products:
         if product.name == name:
-            return float(product.value)
+            return float(product.quantity)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog, client):
@@ -130,10 +131,15 @@ class Ui_Dialog(object):
         for product in client.cafeteriaContents:
             self.products.append(Product(product))
             self.product.addItem(self.products[-1].name)
+        self.sentOrdersHolder = []
+        for order in client.orders:
+            name, quantity = order.split('|')
+            self.sentOrdersHolder.append(Order(self.sentOrders, name, findProductPrice(self.products, name), quantity)) 
         self.orders = []
+        self.adder = Adder(self)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("accepted()"),Dialog.accept)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("rejected()"),Dialog.reject)
-        QtCore.QObject.connect(self.addOrder,QtCore.SIGNAL("clicked()"),self.orderAdd())
+        QtCore.QObject.connect(self.addOrder,QtCore.SIGNAL("clicked()"),self.adder.orderAdd)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -150,7 +156,10 @@ class Ui_Dialog(object):
         self.sentOrders.headerItem().setText(2,_("Quantity"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _("Sent Orders"))
 
+class Adder:
+    def __init__(self, ui):
+        self.ui = ui
     def orderAdd(self):
-        cost = self.quantity.value() * findProductPrice(self.products, self.product.currentText())
-        self.orders.append(Order(self.ordersToSend, self.product.currentText(), cost, self.quantity.value()))
-        self.client.temporders.append[self.product.currentText() + '|' + str(self.quantity.value())]
+        cost = self.ui.quantity.value() * findProductPrice(self.ui.products, self.ui.product.currentText())
+        self.ui.orders.append(Order(self.ui.ordersToSend, self.ui.product.currentText(), cost, self.ui.quantity.value()))
+        self.ui.client.temporders.append(self.ui.product.currentText() + '|' + str(self.ui.quantity.value()))
