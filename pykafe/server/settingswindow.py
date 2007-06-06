@@ -86,8 +86,8 @@ class Ui_SettingsWindow(object):
         self.hboxlayout1.addWidget(self.label_5)
 
         self.pricing_minutes = QtGui.QSpinBox(self.tab_3)
-        self.pricing_minutes.setMaximum(3600)
-        self.pricing_minutes.setSingleStep(15)
+        self.pricing_minutes.setMaximum(60)
+        self.pricing_minutes.setSingleStep(5)
         self.pricing_minutes.setObjectName("pricing_minutes")
         self.hboxlayout1.addWidget(self.pricing_minutes)
 
@@ -335,6 +335,9 @@ class Ui_SettingsWindow(object):
         QtCore.QObject.connect(self.cashiers_deleteButton,QtCore.SIGNAL("clicked()"),self.manager.cashierDelete)
         QtCore.QObject.connect(self.cashiers_updateButton,QtCore.SIGNAL("clicked()"),self.manager.cashierUpdate)
         QtCore.QObject.connect(self.cashiers_reportsButton,QtCore.SIGNAL("clicked()"),self.manager.cashierReports)
+        QtCore.QObject.connect(self.pricing_fixed,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingFixedValue)
+        QtCore.QObject.connect(self.pricing_onehour,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingOnehourValue)
+        QtCore.QObject.connect(self.pricing_rounding,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingRoundingValue)
         QtCore.QMetaObject.connectSlotsByName(SettingsWindow)
         SettingsWindow.setTabOrder(self.tabWidget,self.checkBox_2)
         SettingsWindow.setTabOrder(self.checkBox_2,self.pricing_minutes)
