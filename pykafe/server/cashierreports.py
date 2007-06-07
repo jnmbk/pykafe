@@ -21,11 +21,14 @@ class Handler:
     def __init__(self, ui, cashier):
         self.ui = ui
         self.cashierName = cashier
+        self.ui.dateTimeEdit.setDateTime(QtCore.QDateTime.currentDateTime().addDays(-7))
+        self.ui.dateTimeEdit_2.setDateTime(QtCore.QDateTime.currentDateTime().addDays(1))
+        self.search()
     def search(self):
         startDate = self.ui.dateTimeEdit.dateTime().toTime_t()
         endDate = self.ui.dateTimeEdit_2.dateTime().toTime_t()
         income = Database().runOnce("select sum(income) from safe where cashier=? and date between ? and ?", (self.cashierName, startDate, endDate))[0][0]
-        self.ui.doubleSpinBox.setValue(income)
+        if income: self.ui.doubleSpinBox.setValue(float(income))
         added = Database().runOnce("select count() from logs where log_value=? and cashier=? and date between ? and ?", (_("Added member"), self.cashierName, startDate, endDate))[0][0]
         deleted = Database().runOnce("select count() from logs where log_value=? and cashier=? and date between ? and ?", (_("Deleted member"), self.cashierName, startDate, endDate))[0][0]
         self.ui.spinBox.setValue(added)
