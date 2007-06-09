@@ -29,6 +29,19 @@ locale.setlocale(locale.LC_MONETARY, "")
 _ = gettext.translation("pyKafe_server", fallback=True).ugettext
 
 
+def validIp(ip):
+    "returns true when you give it a valid ip"
+    try:
+        is_ip = True
+        num = ip.split('.')
+        for n in num:
+            if not 256 > int(n) > 0:
+                is_ip = False
+                break;
+        return is_ip
+    except ValueError:
+        return False
+
 class MessageSender(QtCore.QThread):
     def __init__(self, ip, port, message):
         QtCore.QThread.__init__(self)
@@ -708,6 +721,9 @@ class PykafeServer(QtNetwork.QTcpServer):
 
     def changeClient(self):
         client = self.ui.main_treeWidget.currentItem()
+        if not validIp(unicode(self.clientSettingsUi.clientIP.text())):
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Invalid ip address"))
+            return
         client.updateInformation(self.parent(), unicode(self.clientSettingsUi.clientID.text()), self.clientSettingsUi.clientIP.text())
 
     def addClient(self):
@@ -716,6 +732,9 @@ class PykafeServer(QtNetwork.QTcpServer):
     def clientAdder(self):
         name = unicode(self.clientSettingsUi.clientID.text())
         ip = unicode(self.clientSettingsUi.clientIP.text())
+        if not validIp(ip):
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Invalid ip address"))
+            return
         try:
             Database().runOnce("insert into computers(ip,name) values(?,?)", (ip, name))
             info = ClientInformation(ip, name)
