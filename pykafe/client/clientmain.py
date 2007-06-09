@@ -44,21 +44,18 @@ class ListenerThread(QtCore.QThread):
         self.tcpSocket.setSocketDescriptor(self.socketDescriptor)
         print "connection request from:", self.tcpSocket.peerAddress().toString()
         QtCore.QObject.connect(self.tcpSocket, QtCore.SIGNAL("readyRead()"), self.readRoot)
-        self.tcpSocket.waitForDisconnected()
         self.exec_()
     def readRoot(self):
         data = base64.decodestring(self.tcpSocket.readAll())
         print "received:", data
         if data[:3] == "017":
             text = data[3:]
-            if not text:
-                print "couldn't read"
-            else:
-                text1, text2 = text.split('|',1)
-                self.emit(QtCore.SIGNAL("updateLabels"), str(text1), str(text2))
+            text1, text2 = text.split('|',1)
+            self.emit(QtCore.SIGNAL("updateLabels"), str(text1), str(text2))
         if data[:3] == "021":
             wallpaper = os.popen("dcop kdesktop KBackgroundIface currentWallpaper 1").read().strip()
             self.sendMessage("022" + wallpaper)
+        self.tcpSocket.disconnectFromHost()
 
 class PykafeClientMain(QtNetwork.QTcpServer):
     def __init__(self, parent, ui):
