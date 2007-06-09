@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import os, sys, base64, socket
+import os, sys, base64
 from PyQt4 import QtCore, QtGui, QtNetwork
 from config import PykafeConfiguration
 import cafeteria
@@ -115,11 +115,11 @@ class PykafeClientMain(QtNetwork.QTcpServer):
 class TimerThread(QtCore.QThread):
     def run(self):
         while True:
-            #self.emit(QtCore.SIGNAL("updateLabels"), "sadasf","retr")
-            tcpSocket = socket.socket()
-            tcpSocket.connect(("",config.network_port))
-            tcpSocket.send(base64.encodestring("017"))
-            tcpSocket.close()
+            tcpSocket = QtNetwork.QTcpSocket()
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
+            tcpSocket.write(base64.encodestring("017"))
+            tcpSocket.waitForBytesWritten()
+            tcpSocket.disconnectFromHost()
             self.sleep(60)
 
 class Ui_MainWindow(object):
