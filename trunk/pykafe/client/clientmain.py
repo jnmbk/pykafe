@@ -52,9 +52,12 @@ class ListenerThread(QtCore.QThread):
             text = data[3:]
             text1, text2 = text.split('|',1)
             self.emit(QtCore.SIGNAL("updateLabels"), str(text1), str(text2))
+            #TODO: Show a baloon when we're close to the end time
         if data[:3] == "021":
             wallpaper = os.popen("dcop kdesktop KBackgroundIface currentWallpaper 1").read().strip()
             self.sendMessage("022" + wallpaper)
+        if data[:3] == "024":
+            self.emit(QtCore.SIGNAL("showMessage"), _("Warning"), _("You have %s seconds remaining!") % data[3:], QtGui.QSystemTrayIcon.Warning, 60000)
         self.tcpSocket.disconnectFromHost()
 
 class PykafeClientMain(QtNetwork.QTcpServer):
@@ -70,6 +73,7 @@ class PykafeClientMain(QtNetwork.QTcpServer):
         QtCore.QObject.connect(thread,QtCore.SIGNAL("close"),self.parent().close)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("message"),self.ui.statusbar.showMessage)
         QtCore.QObject.connect(thread,QtCore.SIGNAL("updateLabels"),self.ui.updateLabels)
+        QtCore.QObject.connect(thread,QtCore.SIGNAL("showMessage"),self.ui.trayIcon.showMessage)
         thread.start()
         self.threads.append(thread)
     def sendMessage(self, data):
