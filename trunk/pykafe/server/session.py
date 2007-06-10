@@ -36,7 +36,8 @@ class ClientSession:
         else:
             #TODO: round the price using price_rounding
             price = float(config.price_onehourprice)/3600 * time
-        return price
+        return int(price/config.price_rounding)*config.price_rounding
+
     def calculateTotal(self, config):
         total = self.calculatePrice(config)
         for i in self.orders:
