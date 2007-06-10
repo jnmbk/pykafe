@@ -20,6 +20,7 @@ from database import Database
 from settingswindow import Ui_SettingsWindow
 from clientsettingswindow import Ui_ClientSettingsWindow
 from currencyformat import currency
+from payment import Ui_PaymentDialog
 import logger
 import base64, sha, os
 
@@ -243,6 +244,14 @@ class Client(QtGui.QTreeWidgetItem):
         elif state == ClientSession.notReady:
             if self.session.state == ClientSession.waitingMoney:
                 total = self.session.calculateTotal(self.config)
+                self.emit(QtCore.SIGNAL("payment"), self)
+                #dialog = Ui_PaymentDialog()
+                #self.parent()
+                self.paymentDialog = QtGui.QDialog(self.parent())
+                QtCore.QObject.connect(self.paymentDialog, QtCore.SIGNAL("accepted()"), self.sendOptions)
+                settingsUi = Ui_SettingsWindow()
+                settingsUi.setupUi(self.settingsDialog, self.config)
+                self.settingsDialog.show()
                 print "will pay", total
                 payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
                 print payingType, credit
@@ -364,7 +373,9 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.parent().close()
         self.clients = []
         for clientInformation in self.config.clientList:
-            self.clients.append(Client(ui.main_treeWidget, clientInformation, self.config, self))
+            client = Client(ui.main_treeWidget, clientInformation, self.config, self)
+            QtCore.QObject.connect(client, QtCore.SIGNAL("payment"), self.payment)
+            self.clients.append(client)
             self.ui.orders_idComboBox.addItem(clientInformation.name, QtCore.QVariant(clientInformation.ip))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
         self.initMembers(first = True)
@@ -829,7 +840,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             if client.name == order.clientName:
                 logger.add(logger.logTypes.information, _("cafeteria item sold"), order.clientName, client.session.user, order.price())
                 Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, order.price()))
-                client.session.orders.append(order.price())
+                client.session.addOrder(order.productName, order.price())
         self.orderCancel(question = False)
 
     def refreshLogs(self):
@@ -849,3 +860,14 @@ class PykafeServer(QtNetwork.QTcpServer):
             elif type == logger.logTypes.error: type = _("error")
             elif type == logger.logTypes.information: type = _("information")
             self.logs.append(Log(self.ui.logs_treeWidget, (time, type) + log[2:]))
+
+    def payment(self, client):
+        paymentDialog = QtGui.QDialog(self.parent())
+        paymentUi = Ui_PaymentDialog()
+        paymentUi.setupUi(paymentDialog)
+        paymentUi.totalCost.setValue(client.session.calculateTotal())
+        time = client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())        
+        paymentUi.usedTime.setTime(QtCore.QTime().addSecs(time))
+        for order in client.session.orders:
+            QtGui.QTreeWidgetItem(paymentUi.cafeteriaWidget, order)
+        paymentDialog.show()

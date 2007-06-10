@@ -21,8 +21,11 @@ class ClientSession:
     notConnected, notReady, ready, loggedIn, requestedOpening, waitingMoney = range(6)
     def __init__(self):
         self.state = 0
-        self.user = None
         self.settings = None
+        self.initialize()
+
+    def initialize(self):
+        self.user = None
         self.startTime = None
         self.endTime = None
         self.orders = []
@@ -40,8 +43,11 @@ class ClientSession:
     def calculateTotal(self, config):
         total = self.calculatePrice(config)
         for i in self.orders:
-            total += i
+            total += i[1]
         return total
+    
+    def addOrder(self, productName, price):
+        self.orders.append([productName, price])    
 
     def toString(self):
         """returns current state as a string"""
