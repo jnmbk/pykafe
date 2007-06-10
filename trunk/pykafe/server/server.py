@@ -458,7 +458,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         elif state == ClientSession.ready:
             answer = QtGui.QInputDialog.getInteger(self.parent(), _("Enter time"), _("Enter time in minutes"),
                                                    int(self.config.price_fixedpriceminutes),
-                                                   int(self.config.price_fixedpriceminutes),
+                                                   2,
                                                    1440, 15)
             if answer[1] != False:
                 myTime = QtCore.QDateTime.currentDateTime().addSecs(answer[0]*60)
