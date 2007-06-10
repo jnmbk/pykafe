@@ -840,7 +840,7 @@ class PykafeServer(QtNetwork.QTcpServer):
             self.ui.logs_dateTimeEdit_1.setDateTime(self.ui.logs_dateTimeEdit_2.dateTime())
             return
         self.logs = []
-        logs = Database().run("select date,log_type,log_value,cashier,computer,member,income from logs where date between ? and ?", (startDate, endDate))
+        logs = Database().runOnce("select date,log_type,log_value,cashier,computer,member,income from logs where date between ? and ?", (startDate, endDate))
         for log in logs:
             time = QtCore.QDateTime.fromTime_t(log[0]).toString("dd.MM.yyyy hh.mm")
             type = log[1]
