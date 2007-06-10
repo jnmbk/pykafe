@@ -34,7 +34,6 @@ class ClientSession:
         if time/60 < int(config.price_fixedpriceminutes):
             price = float(config.price_fixedprice)
         else:
-            #TODO: round the price using price_rounding
             price = float(config.price_onehourprice)/3600 * time
         return int(price/config.price_rounding)*config.price_rounding
 
