@@ -244,7 +244,7 @@ class Client(QtGui.QTreeWidgetItem):
         elif state == ClientSession.notReady:
             if self.session.state == ClientSession.waitingMoney:
                 total = self.session.calculateTotal(self.config)
-                self.emit(QtCore.SIGNAL("payment"), self)
+                self.server.payment(self)
                 #dialog = Ui_PaymentDialog()
                 #self.parent()
                 self.paymentDialog = QtGui.QDialog(self.parent())
@@ -374,7 +374,6 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.clients = []
         for clientInformation in self.config.clientList:
             client = Client(ui.main_treeWidget, clientInformation, self.config, self)
-            QtCore.QObject.connect(client, QtCore.SIGNAL("payment"), self.payment)
             self.clients.append(client)
             self.ui.orders_idComboBox.addItem(clientInformation.name, QtCore.QVariant(clientInformation.ip))
         ui.main_treeWidget.sortItems(0, QtCore.Qt.AscendingOrder)
