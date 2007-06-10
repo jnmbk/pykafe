@@ -252,9 +252,10 @@ class Client(QtGui.QTreeWidgetItem):
                             member.debt -= total
                             Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
                 else:
-                    logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
-                    Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
+                    #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
+                    #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
                     #logger.add(logger.logTypes.information, _("money paid"), self.name, self.session.user, self.session.calculateTotal()
+                    pass
             if self.session.state == ClientSession.loggedIn:
                 total = self.session.calculateTotal(self.config)
                 payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
