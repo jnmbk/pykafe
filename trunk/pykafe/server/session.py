@@ -38,7 +38,7 @@ class ClientSession:
             price = float(config.price_fixedprice)
         else:
             price = float(config.price_onehourprice)/3600 * time
-        return int(price/config.price_rounding)*config.price_rounding
+        return int(price/float(config.price_rounding))*float(config.price_rounding)
 
     def calculateTotal(self, config):
         total = self.calculatePrice(config)
