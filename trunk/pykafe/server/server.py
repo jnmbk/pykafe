@@ -139,6 +139,8 @@ class ClientThread(QtCore.QThread):
                 usedTime = QtCore.QDateTime()
                 usedTime.setTime_t(self.client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime()))
                 self.emit(QtCore.SIGNAL("changetext"),4,usedTime.toUTC().time().toString("hh.mm"))
+                if self.client.session.endTime and QtCore.QDateTime.currentDateTime().__gt__(self.client.session.endTime):
+                    self.emit(QtCore.SIGNAL("timepassed"))
             self.sleep(int(self.config.ui_refreshdelay))
 
 class Log(QtGui.QTreeWidgetItem):
@@ -196,6 +198,7 @@ class Client(QtGui.QTreeWidgetItem):
         self.fillList(clientInformation)
         watcherThread = ClientThread(self, config)
         QtCore.QObject.connect(watcherThread, QtCore.SIGNAL("changetext"), self.setText)
+        QtCore.QObject.connect(watcherThread, QtCore.SIGNAL("timepassed"), self.timeWarning)
         watcherThread.start()
         self.threads = [watcherThread]
 
@@ -219,6 +222,8 @@ class Client(QtGui.QTreeWidgetItem):
     def changeColor(self, colorName):
         for i in range(self.columnCount()):
             self.setBackground(i, QtGui.QBrush(QtGui.QColor(colorName)))
+    def timeWarning(self):
+        self.setBackground(5, QtGui.QBrush(QtGui.QColor("red")))
 
     def sendMessage(self, message):
         thread = MessageSender(self.ip, int(self.config.network_port), message)
@@ -269,8 +274,9 @@ class Client(QtGui.QTreeWidgetItem):
                             member.debt -= total
                             Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
                 else:
-                    logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
-                    Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
+                    #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
+                    #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
+                    pass
             if self.config.filter_enable:
                 message = "007"
                 filterFile = open(self.config.filter_file)
