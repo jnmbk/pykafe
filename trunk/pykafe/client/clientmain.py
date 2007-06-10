@@ -113,7 +113,7 @@ class TimerThread(QtCore.QThread):
     def run(self):
         while True:
             tcpSocket = QtNetwork.QTcpSocket()
-            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_localPort)
+            tcpSocket.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), config.network_port)
             tcpSocket.write(base64.encodestring("017"))
             tcpSocket.waitForBytesWritten()
             tcpSocket.disconnectFromHost()
