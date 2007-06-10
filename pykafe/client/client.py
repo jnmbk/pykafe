@@ -183,6 +183,8 @@ class ListenerThread(QtCore.QThread):
                    usedTime.toUTC().time().toString("hh.mm") + "|"
             text += currency(self.client.session.calculatePrice(config))
             sendDataToUi(str(data+text))
+            if 120>remainingTime.toTime_t()>0:
+                sendDataToUi("024" + str(remainingTime.toTime_t()))
         elif data[:3] == "018":
             tcpSocket = QtNetwork.QTcpSocket()
             tcpSocket.connectToHost(QtNetwork.QHostAddress(config.network_serverIP), config.network_port)
