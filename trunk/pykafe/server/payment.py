@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'payment.ui'
 #
-# Created: Mon Jun 11 00:40:07 2007
-#      by: PyQt4 UI code generator 4.1.1
+# Copyright (C) 2007, pyKafe Development Team
 #
-# WARNING! All changes made in this file will be lost!
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# Please read the COPYING file.
+#
 
-import sys
 from PyQt4 import QtCore, QtGui
 
 class Ui_PaymentDialog(object):
@@ -81,7 +82,6 @@ class Ui_PaymentDialog(object):
 
         self.retranslateUi(PaymentDialog)
         QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("accepted()"),PaymentDialog.accept)
-        QtCore.QObject.connect(self.buttonBox,QtCore.SIGNAL("rejected()"),PaymentDialog.)
         QtCore.QMetaObject.connectSlotsByName(PaymentDialog)
 
     def retranslateUi(self, PaymentDialog):
