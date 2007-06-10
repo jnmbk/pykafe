@@ -337,7 +337,6 @@ class Ui_SettingsWindow(object):
         QtCore.QObject.connect(self.cashiers_reportsButton,QtCore.SIGNAL("clicked()"),self.manager.cashierReports)
         QtCore.QObject.connect(self.pricing_fixed,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingFixedValue)
         QtCore.QObject.connect(self.pricing_onehour,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingOnehourValue)
-        QtCore.QObject.connect(self.pricing_rounding,QtCore.SIGNAL("valueChanged(double)"),self.manager.checkPricingRoundingValue)
         QtCore.QMetaObject.connectSlotsByName(SettingsWindow)
         SettingsWindow.setTabOrder(self.tabWidget,self.checkBox_2)
         SettingsWindow.setTabOrder(self.checkBox_2,self.pricing_minutes)
