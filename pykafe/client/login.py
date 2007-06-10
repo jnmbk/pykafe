@@ -81,7 +81,7 @@ class ListenerThread(QtCore.QThread):
         self.tcpSocket.disconnectFromHost()
         self.exec_()
     def login(self):
-        os.system("pyKafeclient&")
+        os.system("pykafeclient&")
         self.emit(QtCore.SIGNAL("close"))
 
 class PykafeClient(QtNetwork.QTcpServer):
