@@ -894,3 +894,8 @@ class PykafeServer(QtNetwork.QTcpServer):
         else:
             Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, cost))
             logger.add(logger.logTypes.information, _("Money paid"), client.name, client.session.user, totalCost)
+        for order in self.orders:
+            if order.clientName == client.name:
+                Database().runOnce("delete from orders where product_name=? and quantity=? and computer_name=?", (order.productName, order.quantity, order.clientName))
+                self.ui.orders_treeWidget_1.takeTopLevelItem(self.ui.orders_treeWidget_1.indexOfTopLevelItem(order))
+                del(self.orders[self.orders.index(order)])
