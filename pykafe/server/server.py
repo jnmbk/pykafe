@@ -21,6 +21,7 @@ from settingswindow import Ui_SettingsWindow
 from clientsettingswindow import Ui_ClientSettingsWindow
 from currencyformat import currency
 from payment import Ui_PaymentDialog
+from memberreports import Ui_MemberReports
 import logger
 import base64, sha, os
 
@@ -623,7 +624,14 @@ class PykafeServer(QtNetwork.QTcpServer):
 
     def memberReports(self):
         "Shows statistics about selected member"
-        pass
+        member = self.ui.members_treeWidget.currentItem()
+        if not member:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("You must select a member first"))
+            return
+        dialog = QtGui.QDialog(self.parent())
+        reportwindow = Ui_MemberReports()
+        reportwindow.setupUi(dialog, member.userName)
+        dialog.show()
 
     def memberChanged(self, current, previous):
         member = current
