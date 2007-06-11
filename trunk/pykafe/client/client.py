@@ -171,7 +171,6 @@ class ListenerThread(QtCore.QThread):
             currentTime = QtCore.QDateTime.currentDateTime()
             usedTime = self.client.session.startTime.secsTo(currentTime)
             remainingTime = QtCore.QDateTime()
-            print self.client.session.startTime.toString("hh.mm"), currentTime.toString("hh.mm"), self.client.session.endTime.toString("hh.mm")
             if self.client.session.endTime:
                 remainingTime.setTime_t(currentTime.secsTo(self.client.session.endTime))
             else:
@@ -184,7 +183,7 @@ class ListenerThread(QtCore.QThread):
                    usedTime.toUTC().time().toString("hh.mm") + "|"
             text += currency(self.client.session.calculatePrice(config))
             sendDataToUi(str(data+text))
-            if 120>remainingTime.toTime_t()>0:
+            if 180>remainingTime.toTime_t()>0:
                 sendDataToUi("024" + str(remainingTime.toTime_t()))
         elif data[:3] == "018":
             tcpSocket = QtNetwork.QTcpSocket()
