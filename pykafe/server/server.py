@@ -307,7 +307,7 @@ class Product(QtGui.QTreeWidgetItem):
     def updateValues(self, productInformation):
         self.name, self.price, self.quantity = productInformation
         self.setText(0,self.name)
-        self.setText(1,str(self.price))
+        self.setText(1,currency(self.price))
         self.setText(2,str(self.quantity))
 
 class Member(QtGui.QTreeWidgetItem):
