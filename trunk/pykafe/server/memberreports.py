@@ -36,7 +36,7 @@ class Handler:
             date = QtCore.QDateTime.fromTime_t(result[0])
             income = str(result[2])
             if _("Money paid") in result[1]:
-                self.payments.append(QtGui.QTreeWidgetItem(self.ui.paymentTree, [date.toString("dd.MM.yyyy hh.mm"), _("Normal"), currency(income)]))
+                self.payments.append(QtGui.QTreeWidgetItem(self.ui.paymentTree, [date.toString("dd.MM.yyyy hh.mm"), _("Normal"), currency(float(income))]))
             if _("cafeteria item sold") in result[1]:
                 self.payments.append(QtGui.QTreeWidgetItem(self.ui.paymentTree, [date.toString("dd.MM.yyyy hh.mm"), _("Cafeteria"), currency(float(income))]))
             if _("received, sent:") in result[1]:
