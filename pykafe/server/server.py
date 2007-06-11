@@ -97,6 +97,10 @@ class ListenerThread(QtCore.QThread):
             if client.session.state == ClientSession.ready:
                 username, password = data[3:].split("|")
                 if Database().runOnce("select count() from members where username = ? and password = ?", (username, password))[0][0]:
+                    dates = Database().runOnce("select starting_date, finish_date from members where username = ?", (username,))[0]
+                    if not dates[0] < QtCore.QDateTime.currentDateTime().toString("yyyy-MM-dd") < dates[1]:
+                        client.sendMessage("0030")
+                        return
                     wallpaper = ""
                     try:
                         wallpaper = Database().runOnce("select setting_value from member_settings where username=? and setting_name=?", (username,"wallpaper"))[0][0]
@@ -458,7 +462,19 @@ class PykafeServer(QtNetwork.QTcpServer):
             client.sendMessage("015")
 
     def changeButton(self):
-        pass
+        client = self.ui.main_treeWidget.currentItem()
+        if not client:
+            QtGui.QMessageBox.information(self.parent(), _("Information"), _("Choose a client first"))
+            return
+        if client.session.state != ClientSession.loggedIn:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("Client must be logged in before moving"))
+            return
+        count = 0
+        for client in self.clients:
+            if client.session.state in (ClientSession.loggedIn, ClientSession.ready):
+                count += 1
+        if count < 2:
+            QtGui.QMessageBox.critical(self.parent(), _("Error"), _("There must be at least one more ready or logged in client"))
 
     def remoteButton(self):
         client = self.ui.main_treeWidget.currentItem()
