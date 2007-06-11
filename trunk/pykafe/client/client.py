@@ -171,7 +171,8 @@ class ListenerThread(QtCore.QThread):
             currentTime = QtCore.QDateTime.currentDateTime()
             usedTime = self.client.session.startTime.secsTo(currentTime)
             remainingTime = QtCore.QDateTime()
-            if self.client.session.endTime and currentTime.secsTo(self.client.session.endTime)>0:
+            print self.client.session.startTime.toString("hh.mm"), currentTime.toString("hh.mm"), self.client.session.endTime.toString("hh.mm")
+            if self.client.session.endTime:
                 remainingTime.setTime_t(currentTime.secsTo(self.client.session.endTime))
             else:
                 remainingTime.setTime_t(0)
@@ -226,12 +227,11 @@ class PykafeClient(QtNetwork.QTcpServer):
         self.session.setState(ClientSession.notReady)
         sendDataToUi("020")
 
-    def setState(self, state, user = "guest", endTime = ""):
+    def setState(self, state, user = "guest", endTime = None):
         if state == ClientSession.loggedIn:
             self.session.user = user
             self.session.startTime = QtCore.QDateTime.currentDateTime()
-            if endTime:
-                self.session.endTime = endTime
+            self.session.endTime = endTime
             self.session.receivedBytes, self.session.transferredBytes = getNetworkBytes()
             print getNetworkBytes()
         self.session.setState(state)
