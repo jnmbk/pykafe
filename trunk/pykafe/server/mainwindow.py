@@ -635,7 +635,7 @@ class Ui_MainWindow(object):
         self.orders_treeWidget_1.headerItem().setText(2,_("Cost"))
         self.orders_treeWidget_1.headerItem().setText(3,_("Quantity"))
         self.orders_cancelButton_1.setText(_("Cancel"))
-        self.orders_deleteButton_1.setText(_("Delete"))
+        self.orders_deleteButton_1.setText(_("Served"))
         self.orders_updateButton_1.setText(_("Update"))
         self.orders_addButton_1.setText(_("Add"))
         self.groupBox_3.setTitle(_("Cafeteria Stocks"))
