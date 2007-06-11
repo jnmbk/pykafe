@@ -22,65 +22,6 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="2" column="1" >
-    <widget class="QLabel" name="timeLabel" />
-   </item>
-   <item row="3" column="1" >
-    <widget class="QLabel" name="totalLabel" />
-   </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Total:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label_1" >
-     <property name="text" >
-      <string>Used Time:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2" >
-    <widget class="QTreeWidget" name="ordersTreeWidget" >
-     <column>
-      <property name="text" >
-       <string>Date</string>
-      </property>
-     </column>
-     <column>
-      <property name="text" >
-       <string>Payment</string>
-      </property>
-     </column>
-     <column>
-      <property name="text" >
-       <string>Cost</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="4" column="1" >
-    <widget class="QLabel" name="bytesLabel" />
-   </item>
-   <item row="4" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>Received/Sent data in KB:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2" >
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2" >
     <layout class="QGridLayout" >
      <property name="margin" >
@@ -90,10 +31,10 @@
       <number>6</number>
      </property>
      <item row="1" column="0" >
-      <widget class="QDateTimeEdit" name="dateTimeEdit_2" />
+      <widget class="QDateTimeEdit" name="end" />
      </item>
      <item rowspan="2" row="0" column="1" >
-      <widget class="QToolButton" name="toolButton" >
+      <widget class="QToolButton" name="findButton" >
        <property name="text" >
         <string>Find</string>
        </property>
@@ -112,9 +53,58 @@
       </widget>
      </item>
      <item row="0" column="0" >
-      <widget class="QDateTimeEdit" name="dateTimeEdit" />
+      <widget class="QDateTimeEdit" name="start" />
      </item>
     </layout>
+   </item>
+   <item row="4" column="0" colspan="2" >
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Received/Sent data in KB:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLabel" name="bytesLabel" />
+   </item>
+   <item row="1" column="0" colspan="2" >
+    <widget class="QTreeWidget" name="paymentTree" >
+     <column>
+      <property name="text" >
+       <string>Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Payment</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Cost</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Total:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="totalLabel" />
    </item>
   </layout>
  </widget>
@@ -153,10 +143,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>toolButton</sender>
+   <sender>findButton</sender>
    <signal>clicked()</signal>
    <receiver>MemberReports</receiver>
-   <slot>close()</slot>
+   <slot></slot>
    <hints>
     <hint type="sourcelabel" >
      <x>218</x>
