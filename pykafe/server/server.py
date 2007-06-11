@@ -243,54 +243,8 @@ class Client(QtGui.QTreeWidgetItem):
                 self.setText(5, self.session.endTime.time().toString("hh.mm"))
             self.changeColor("green")
         elif state == ClientSession.notReady:
-            if self.session.state == ClientSession.waitingMoney:
+            if self.session.state in (ClientSession.waitingMoney, ClientSession.loggedIn):
                 self.server.payment(self)
-                #total = self.session.calculateTotal(self.config)
-                #dialog = Ui_PaymentDialog()
-                #self.parent()
-                """
-                self.paymentDialog = QtGui.QDialog(self.parent())
-                QtCore.QObject.connect(self.paymentDialog, QtCore.SIGNAL("accepted()"), self.sendOptions)
-                settingsUi = Ui_SettingsWindow()
-                settingsUi.setupUi(self.settingsDialog, self.config)
-                self.settingsDialog.show()
-                print "will pay", total
-                payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
-                print payingType, credit
-                if payingType == _("Pre Paid"):
-                    print "user is pre_paid and has %s credit" % currency(credit)
-                    for member in self.server.members:
-                        print member.userName, self.session.user
-                        if member.userName == self.session.user:
-                            if member.debt < total:
-                                QtGui.QMessageBox.warning(self.server.parent(), _("Low credit"), _("%s's credit has finished! Has %s debt.") % (member.userName, currency(total - member.debt)))
-                                logger.add(logger.logTypes.warning, _("Member has low credit"), self.name, member.userName, member.debt - total)
-                            member.debt -= total
-                            Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
-                else:
-                    #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
-                    #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
-                    #logger.add(logger.logTypes.information, _("money paid"), self.name, self.session.user, self.session.calculateTotal()
-                """
-                pass
-            if self.session.state == ClientSession.loggedIn:
-                self.server.payment(self)
-                """total = self.session.calculateTotal(self.config)
-                payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
-                if payingType == _("Pre Paid"):
-                    print "user is pre_paid and has %s credit" % currency(credit)
-                    for member in self.server.members:
-                        if member.userName == self.session.user:
-                            if member.debt < total:
-                                QtGui.QMessageBox.warning(self.server.parent(), _("Low credit"), _("%s's credit has finished! Has %s debt.") % (member.userName, currency(total - member.debt)))
-                                logger.add(logger.logTypes.warning, _("Member has low credit"), self.name, member.userName, member.debt - total)
-                            member.debt -= total
-                            Database().runOnce("update members set debt=? where username=?", (member.debt, member.userName))
-                else:
-                    #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
-                    #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
-                    pass"""
-                pass
             if self.config.filter_enable:
                 message = "007"
                 filterFile = open(self.config.filter_file)
