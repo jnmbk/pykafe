@@ -97,6 +97,7 @@ class PykafeClientMain(QtNetwork.QTcpServer):
         dialog = cafeteria.Ui_Dialog()
         dialog.setupUi(self.cafeteriaWindow, self)
         self.cafeteriaWindow.setModal(True)
+        self.temporders=[]
         self.cafeteriaWindow.show()
     def logout(self):
         answer = QtGui.QMessageBox.question(self.parent(), _("Are you sure?"), _("Do you really want to logout?"), QtGui.QMessageBox.StandardButtons(QtGui.QMessageBox.Yes).__or__(QtGui.QMessageBox.No), QtGui.QMessageBox.No)
