@@ -93,4 +93,3 @@ class Ui_PaymentDialog(object):
         self.label_2.setText(QtGui.QApplication.translate("PaymentDialog", "Total Cost:", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("PaymentDialog", "Used Time:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("PaymentDialog", "guest", None, QtGui.QApplication.UnicodeUTF8))
-
