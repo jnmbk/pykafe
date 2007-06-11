@@ -347,7 +347,6 @@ class PykafeServer(QtNetwork.QTcpServer):
         self.threads = []
 
     def initMembers(self, first = False):
-        #TODO: Call this function after adding and deleting
         if first:
             self.members = []
             self.ui.members_treeWidget.clear()
