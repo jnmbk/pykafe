@@ -87,9 +87,8 @@ class Ui_PaymentDialog(object):
     def retranslateUi(self, PaymentDialog):
         PaymentDialog.setWindowTitle(QtGui.QApplication.translate("PaymentDialog", "Payment", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox.setTitle(QtGui.QApplication.translate("PaymentDialog", "Cafeteria Costs", None, QtGui.QApplication.UnicodeUTF8))
-        self.cafeteriaWidget.headerItem().setText(0,QtGui.QApplication.translate("PaymentDialog", "Date", None, QtGui.QApplication.UnicodeUTF8))
-        self.cafeteriaWidget.headerItem().setText(1,QtGui.QApplication.translate("PaymentDialog", "Product", None, QtGui.QApplication.UnicodeUTF8))
-        self.cafeteriaWidget.headerItem().setText(2,QtGui.QApplication.translate("PaymentDialog", "Price", None, QtGui.QApplication.UnicodeUTF8))
+        self.cafeteriaWidget.headerItem().setText(0,QtGui.QApplication.translate("PaymentDialog", "Product", None, QtGui.QApplication.UnicodeUTF8))
+        self.cafeteriaWidget.headerItem().setText(1,QtGui.QApplication.translate("PaymentDialog", "Price", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("PaymentDialog", "Total Cost:", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("PaymentDialog", "Used Time:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("PaymentDialog", "guest", None, QtGui.QApplication.UnicodeUTF8))

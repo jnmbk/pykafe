@@ -395,6 +395,7 @@ class PykafeServer(QtNetwork.QTcpServer):
         #TODO: Call this function after adding and deleting
         if first:
             self.members = []
+            self.ui.members_treeWidget.clear()
             memberList = Database().run("select * from members where is_cashier='0'")
             for memberInformation in memberList:
                 self.members.append(Member(self.ui.members_treeWidget, memberInformation[:7]))
@@ -869,10 +870,27 @@ class PykafeServer(QtNetwork.QTcpServer):
         paymentDialog = QtGui.QDialog(self.parent())
         paymentUi = Ui_PaymentDialog()
         paymentUi.setupUi(paymentDialog)
-        paymentUi.totalCost.setValue(client.session.calculateTotal(self.config))
+        totalCost = client.session.calculateTotal(self.config)
+        cost = client.session.calculatePrice(self.config)
+        paymentUi.totalCost.setValue(totalCost)
         paymentUi.label_3.setText("%s: %s" % (client.name, client.session.user))
         time = client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())
         paymentUi.usedTime.setTime(QtCore.QTime().addSecs(time))
         for order in client.session.orders:
-            QtGui.QTreeWidgetItem(paymentUi.cafeteriaWidget, order)
+            print order
+            QtGui.QTreeWidgetItem(paymentUi.cafeteriaWidget, [order[0], currency(order[1])])
         paymentDialog.show()
+        payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(client.session.user,))[0]
+        if payingType == _("Pre Paid"):
+            credit = Database().runOnce("select debt from members where username = ?", (client.session.user,))[0][0]
+            if totalCost > credit:
+                QtGui.QMessageBox.warning(self.parent(), _("Low credit"), _("%s's credit has finished! Has %s debt.") % (client.session.user, currency(totalCost - credit)))
+                logger.add(logger.logTypes.warning, _("Member has low credit"), client.name, client.session.user, totalCost - credit)
+            else:
+                logger.add(logger.logTypes.information, _("Money paid"), client.name, client.session.user, totalCost)
+                Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, cost))
+            self.initMembers()
+            Database().runOnce("update members set debt=? where username=?", (totalCost - credit, client.session.user))
+        else:
+            Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, cost))
+            logger.add(logger.logTypes.information, _("Money paid"), client.name, client.session.user, totalCost)
