@@ -243,10 +243,11 @@ class Client(QtGui.QTreeWidgetItem):
             self.changeColor("green")
         elif state == ClientSession.notReady:
             if self.session.state == ClientSession.waitingMoney:
-                total = self.session.calculateTotal(self.config)
                 self.server.payment(self)
+                #total = self.session.calculateTotal(self.config)
                 #dialog = Ui_PaymentDialog()
                 #self.parent()
+                """
                 self.paymentDialog = QtGui.QDialog(self.parent())
                 QtCore.QObject.connect(self.paymentDialog, QtCore.SIGNAL("accepted()"), self.sendOptions)
                 settingsUi = Ui_SettingsWindow()
@@ -269,9 +270,11 @@ class Client(QtGui.QTreeWidgetItem):
                     #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
                     #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
                     #logger.add(logger.logTypes.information, _("money paid"), self.name, self.session.user, self.session.calculateTotal()
-                    pass
+                """
+                pass
             if self.session.state == ClientSession.loggedIn:
-                total = self.session.calculateTotal(self.config)
+                self.server.payment(self)
+                """total = self.session.calculateTotal(self.config)
                 payingType, credit = Database().runOnce("select paying_type, debt from members where username=?",(self.session.user,))[0]
                 if payingType == _("Pre Paid"):
                     print "user is pre_paid and has %s credit" % currency(credit)
@@ -285,7 +288,8 @@ class Client(QtGui.QTreeWidgetItem):
                 else:
                     #logger.add(logger.logTypes.information, _("Money paid"), self.name, member.userName, total)
                     #Database().runOnce("insert into safe values(?,?,?)", (QtCore.QDateTime.currentDateTime().toTime_t(), self.config.last_cashier, total))
-                    pass
+                    pass"""
+                pass
             if self.config.filter_enable:
                 message = "007"
                 filterFile = open(self.config.filter_file)
@@ -302,6 +306,7 @@ class Client(QtGui.QTreeWidgetItem):
             self.sendMessage(message)
             self.setTexts((2,3,4,5), ("","","",""))
             self.changeColor("orange")
+            self.session.initialize()
         elif state == ClientSession.requestedOpening:
             self.changeColor("red")
         elif state == ClientSession.waitingMoney:
@@ -864,8 +869,9 @@ class PykafeServer(QtNetwork.QTcpServer):
         paymentDialog = QtGui.QDialog(self.parent())
         paymentUi = Ui_PaymentDialog()
         paymentUi.setupUi(paymentDialog)
-        paymentUi.totalCost.setValue(client.session.calculateTotal())
-        time = client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())        
+        paymentUi.totalCost.setValue(client.session.calculateTotal(self.config))
+        paymentUi.label_3.setText("%s: %s" % (client.name, client.session.user))
+        time = client.session.startTime.secsTo(QtCore.QDateTime.currentDateTime())
         paymentUi.usedTime.setTime(QtCore.QTime().addSecs(time))
         for order in client.session.orders:
             QtGui.QTreeWidgetItem(paymentUi.cafeteriaWidget, order)
