@@ -1,0 +1,591 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-03 14:39+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../pykafe/server/mainwindow.py:685
+msgid "About Qt"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:684 ../pykafe/server/server.py:528
+msgid "About pyKafe"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:638 ../pykafe/server/mainwindow.py:646
+#: ../pykafe/server/mainwindow.py:656 ../pykafe/server/settingswindow.py:375
+#: ../pykafe/server/settingswindow.py:384
+msgid "Add"
+msgstr ""
+
+#: ../pykafe/server/server.py:379 ../pykafe/server/server.py:380
+msgid "Added member"
+msgstr ""
+
+#: ../pykafe/server/server.py:491
+msgid "Added product"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:374
+msgid "Addres:"
+msgstr ""
+
+#: ../pykafe/server/settings.py:169 ../pykafe/server/settings.py:201
+msgid "All cashier information must be filled"
+msgstr ""
+
+#: ../pykafe/server/server.py:371 ../pykafe/server/server.py:402
+msgid "All member information must be filled"
+msgstr ""
+
+#: ../pykafe/server/server.py:319 ../pykafe/server/server.py:352
+#: ../pykafe/server/server.py:428 ../pykafe/server/server.py:521
+#: ../pykafe/server/settings.py:186
+msgid "Are you sure?"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:365
+msgid "Ask password when opening"
+msgstr ""
+
+#: ../pykafe/server/server.py:528
+msgid "Authors:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:373
+msgid "Browse"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:639
+msgid "Cafeteria Stocks"
+msgstr ""
+
+#: ../pykafe/server/server.py:276 ../pykafe/server/server.py:293
+#: ../pykafe/server/server.py:315 ../pykafe/server/server.py:336
+#: ../pykafe/server/server.py:350
+msgid "Can't connect to client"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:635
+msgid "Cancel"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:674
+msgid "Cashier"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:380
+msgid "Cashier List"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:388
+msgid "Cashiers"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:617
+msgid "Change"
+msgstr ""
+
+#: ../pykafe/server/server.py:272 ../pykafe/server/server.py:289
+#: ../pykafe/server/server.py:311 ../pykafe/server/server.py:333
+#: ../pykafe/server/server.py:346
+msgid "Choose a client first"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:651
+msgid "Clear"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:652
+msgid "Clears filter"
+msgstr ""
+
+#: ../pykafe/server/server.py:281 ../pykafe/server/server.py:296
+msgid "Client is already logged in"
+msgstr ""
+
+#: ../pykafe/server/server.py:317
+msgid "Client is already stopped"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:675 ../pykafe/server/mainwindow.py:686
+msgid "Computer"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:629
+msgid "Computer ID"
+msgstr ""
+
+#: ../pykafe/server/server.py:227
+msgid "Connection Error"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:683
+msgid "Contents"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:633 ../pykafe/server/mainwindow.py:641
+msgid "Cost"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:671
+msgid "Date"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:665
+msgid "Debt:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:636 ../pykafe/server/mainwindow.py:648
+#: ../pykafe/server/mainwindow.py:658 ../pykafe/server/settingswindow.py:376
+#: ../pykafe/server/settingswindow.py:386
+msgid "Delete"
+msgstr ""
+
+#: ../pykafe/server/server.py:434
+msgid "Deleted member"
+msgstr ""
+
+#: ../pykafe/server/server.py:525
+msgid "Deleted product"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:673
+msgid "Description"
+msgstr ""
+
+#: ../pykafe/server/settings.py:186
+msgid "Do you really want to delete this cashier?"
+msgstr ""
+
+#: ../pykafe/server/server.py:428
+msgid "Do you really want to delete this member?"
+msgstr ""
+
+#: ../pykafe/server/server.py:521
+msgid "Do you really want to delete this product?"
+msgstr ""
+
+#: ../pykafe/server/server.py:352
+msgid "Do you really want to shutdown this client?"
+msgstr ""
+
+#: ../pykafe/server/server.py:319
+msgid "Do you really want to stop this client?"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:378
+msgid "Enable Internet Filter"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:625
+msgid "End Time"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:669
+msgid "Ends"
+msgstr ""
+
+#: ../pykafe/server/server.py:298
+msgid "Enter time"
+msgstr ""
+
+#: ../pykafe/server/server.py:298
+msgid "Enter time in minutes"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:687
+msgid "Entertainment"
+msgstr ""
+
+#: ../pykafe/server/passwordwindow.py:88 ../pykafe/server/server.py:276
+#: ../pykafe/server/server.py:293 ../pykafe/server/server.py:315
+#: ../pykafe/server/server.py:336 ../pykafe/server/server.py:350
+#: ../pykafe/server/server.py:360 ../pykafe/server/server.py:371
+#: ../pykafe/server/server.py:382 ../pykafe/server/server.py:387
+#: ../pykafe/server/server.py:391 ../pykafe/server/server.py:402
+#: ../pykafe/server/server.py:411 ../pykafe/server/server.py:420
+#: ../pykafe/server/server.py:426 ../pykafe/server/server.py:483
+#: ../pykafe/server/server.py:486 ../pykafe/server/server.py:493
+#: ../pykafe/server/server.py:498 ../pykafe/server/server.py:504
+#: ../pykafe/server/server.py:507 ../pykafe/server/server.py:514
+#: ../pykafe/server/server.py:519 ../pykafe/server/settings.py:63
+#: ../pykafe/server/settings.py:71 ../pykafe/server/settings.py:79
+#: ../pykafe/server/settings.py:169 ../pykafe/server/settings.py:176
+#: ../pykafe/server/settings.py:180 ../pykafe/server/settings.py:184
+#: ../pykafe/server/settings.py:195 ../pykafe/server/settings.py:201
+#: ../pykafe/server/settings.py:209 ../pykafe/server/settings.py:216
+msgid "Error"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:688
+msgid "Exit"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:680
+msgid "File"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:372
+msgid "Filter File:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:377
+msgid "Filtered Addresses"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:653
+msgid "Find:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:368
+msgid "Fixed price for first"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:366
+msgid "General"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:679
+msgid "Help"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:620 ../pykafe/server/mainwindow.py:631
+msgid "ID"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:364
+msgid "If selected, cashier password will be asked on opening"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:677
+msgid "Income"
+msgstr ""
+
+#: ../pykafe/server/server.py:272 ../pykafe/server/server.py:281
+#: ../pykafe/server/server.py:289 ../pykafe/server/server.py:296
+#: ../pykafe/server/server.py:311 ../pykafe/server/server.py:317
+#: ../pykafe/server/server.py:333 ../pykafe/server/server.py:346
+msgid "Information"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:379
+msgid "Internet Filter"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:628 ../pykafe/server/mainwindow.py:632
+#: ../pykafe/server/mainwindow.py:640 ../pykafe/server/mainwindow.py:645
+msgid "Item"
+msgstr ""
+
+#: ../pykafe/server/session.py:50
+msgid "Logged In"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:678
+msgid "Logs"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:626
+msgid "Main"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:676
+msgid "Member"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:655
+msgid "Member Information"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:650
+msgid "Member List"
+msgstr ""
+
+#: ../pykafe/server/server.py:85
+msgid "Member logged in"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:670
+msgid "Members"
+msgstr ""
+
+#: ../pykafe/server/server.py:528
+msgid "Mentor:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:623
+msgid "Money"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:616
+msgid "Moves user to another computer"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:681
+msgid "New"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:663
+msgid "Normal"
+msgstr ""
+
+#: ../pykafe/server/session.py:46
+msgid "Not Connected"
+msgstr ""
+
+#: ../pykafe/server/session.py:56
+msgid "Not ready"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:614
+msgid "Opens remote desktop connection"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:612
+msgid "Opens settings for this computer"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:627 ../pykafe/server/mainwindow.py:649
+msgid "Orders"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:661 ../pykafe/server/passwordwindow.py:76
+#: ../pykafe/server/settingswindow.py:383
+msgid "Password:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:660
+msgid "Paying Type:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:662
+msgid "Pre Paid"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:644
+msgid "Price"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:370
+msgid "Price for one hour:"
+msgstr ""
+
+#: ../pykafe/server/server.py:486 ../pykafe/server/server.py:507
+msgid "Price must be bigger than 0"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:367
+msgid "Price rounding:"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:371
+msgid "Pricing"
+msgstr ""
+
+#: ../pykafe/server/server.py:493 ../pykafe/server/server.py:514
+msgid "Product name must be unique"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:363
+msgid "PyKafe Settings"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:630 ../pykafe/server/mainwindow.py:634
+#: ../pykafe/server/mainwindow.py:642 ../pykafe/server/mainwindow.py:643
+msgid "Quantity"
+msgstr ""
+
+#: ../pykafe/server/session.py:48
+msgid "Ready"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:666 ../pykafe/server/settingswindow.py:381
+msgid "Real Name:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:615
+msgid "Remote"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:659 ../pykafe/server/settingswindow.py:387
+msgid "Reports"
+msgstr ""
+
+#: ../pykafe/server/session.py:52
+msgid "Requested Opening"
+msgstr ""
+
+#: ../pykafe/server/settings.py:108
+msgid "Select Filter File"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:613
+msgid "Settings"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:689
+msgid "Settings..."
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:619
+msgid "Shutdown"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:618
+msgid "Shuts down selected computer"
+msgstr ""
+
+#: ../pykafe/server/server.py:88
+msgid "Someone entered wrong password or username"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:611
+msgid "Start"
+msgstr ""
+
+#: ../pykafe/server/server.py:360 ../pykafe/server/server.py:387
+msgid "Start date must be smaller than end date"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:668
+msgid "Starts"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:610
+msgid "Starts selected computer for usage"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:606
+msgid "Starts selected computer for usage (timed)"
+msgstr ""
+
+#: ../pykafe/server/server.py:175
+#, python-format
+msgid "State changed to %s"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:621
+msgid "Status"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:609
+msgid "Stop"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:667
+msgid "Subscribing period:"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:608
+msgid "Switches to login state"
+msgstr ""
+
+#: ../pykafe/server/settings.py:180
+msgid "There should be one cashier at least"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:607
+msgid "Timed"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:682
+msgid "Tools"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:672
+msgid "Type"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:654
+msgid "Type some letters to filter"
+msgstr ""
+
+#: ../pykafe/server/server.py:226 ../pykafe/server/server.py:227
+#, python-format
+msgid "Unable to start server: %s"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:637 ../pykafe/server/mainwindow.py:647
+#: ../pykafe/server/mainwindow.py:657 ../pykafe/server/settingswindow.py:385
+msgid "Update"
+msgstr ""
+
+#: ../pykafe/server/server.py:409 ../pykafe/server/server.py:418
+msgid "Updated member information"
+msgstr ""
+
+#: ../pykafe/server/server.py:512
+msgid "Updated product"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:624
+msgid "Usage Time"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:622
+msgid "User"
+msgstr ""
+
+#: ../pykafe/server/server.py:382 ../pykafe/server/server.py:411
+#: ../pykafe/server/server.py:420 ../pykafe/server/settings.py:176
+#: ../pykafe/server/settings.py:209 ../pykafe/server/settings.py:216
+msgid "Username must be unique"
+msgstr ""
+
+#: ../pykafe/server/mainwindow.py:664 ../pykafe/server/passwordwindow.py:75
+#: ../pykafe/server/settingswindow.py:382
+msgid "Username:"
+msgstr ""
+
+#: ../pykafe/server/session.py:54
+msgid "Waiting for Payment"
+msgstr ""
+
+#: ../pykafe/server/passwordwindow.py:88
+msgid "Wrong username or password"
+msgstr ""
+
+#: ../pykafe/server/settings.py:63
+msgid "You didn't enter a valid address"
+msgstr ""
+
+#: ../pykafe/server/server.py:483 ../pykafe/server/server.py:504
+msgid "You must enter a product name"
+msgstr ""
+
+#: ../pykafe/server/settings.py:184 ../pykafe/server/settings.py:195
+msgid "You must select a cashier first"
+msgstr ""
+
+#: ../pykafe/server/settings.py:71 ../pykafe/server/settings.py:79
+msgid "You must select a filter first"
+msgstr ""
+
+#: ../pykafe/server/server.py:391 ../pykafe/server/server.py:426
+msgid "You must select a member first"
+msgstr ""
+
+#: ../pykafe/server/server.py:498 ../pykafe/server/server.py:519
+msgid "You must select a product first"
+msgstr ""
+
+#: ../pykafe/server/server.py:224
+msgid "cashier login to server"
+msgstr ""
+
+#: ../pykafe/server/settingswindow.py:369
+msgid "minutes:"
+msgstr ""
