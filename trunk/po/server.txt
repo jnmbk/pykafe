@@ -1,7 +1,0 @@
-../pykafe/server/logger.py
-../pykafe/server/mainwindow.py
-../pykafe/server/passwordwindow.py
-../pykafe/server/server.py
-../pykafe/server/session.py
-../pykafe/server/settings.py
-../pykafe/server/settingswindow.py

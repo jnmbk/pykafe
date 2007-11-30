@@ -1,4 +1,0 @@
-../pykafe/client/client.py
-../pykafe/client/clientmain.py
-../pykafe/client/login.py
-../pykafe/client/session.py
