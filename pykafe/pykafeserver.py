@@ -8,8 +8,6 @@ import signal, sys
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-import mainwindow_server
-
 def loadTranslator():
     settings = QtCore.QSettings()
     if settings.contains("language"):
@@ -20,7 +18,6 @@ def loadTranslator():
     translator.load(":/pykafe_%s.qm" % locale)
     QtGui.qApp.installTranslator(translator)
 
-
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QtGui.QApplication(sys.argv)
@@ -29,6 +26,7 @@ def main():
 
     loadTranslator()
 
+    import mainwindow_server
     mainWindow = mainwindow_server.MainWindow()
     mainWindow.show()
 
