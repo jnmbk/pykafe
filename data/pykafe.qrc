@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/icons" >
+        <file>icons/button_cancel.png</file>
+        <file>icons/edit_add.png</file>
+        <file>icons/edit_remove.png</file>
+        <file>icons/exit.png</file>
+        <file>icons/fileopen.png</file>
+        <file>icons/find.png</file>
+        <file>icons/kalarm.png</file>
+        <file>icons/kcontrol.png</file>
+        <file>icons/kontact_contacts.png</file>
+        <file>icons/locationbar_erase.png</file>
+        <file>icons/player_play.png</file>
+        <file>icons/pyKafe.png</file>
+        <file>icons/reload.png</file>
+        <file>icons/remote.png</file>
+        <file>icons/stop.png</file>
+    </qresource>
+</RCC>

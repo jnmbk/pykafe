@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/mainwindow_server.ui'
 #
-# Created: Sat Jan 26 17:18:02 2008
+# Created: Sat Jan 26 18:34:32 2008
 #      by: PyQt4 UI code generator 4.3-snapshot-20071219
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,650,500).size()).expandedTo(MainWindow.minimumSizeHint()))
-        MainWindow.setWindowIcon(QtGui.QIcon("../../data/icons/pyKafe.png"))
+        MainWindow.setWindowIcon(QtGui.QIcon(":/icons/icons/pyKafe.png"))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -39,7 +39,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addItem(spacerItem,0,8,1,1)
 
         self.main_startTimeButton = QtGui.QToolButton(self.tab)
-        self.main_startTimeButton.setIcon(QtGui.QIcon("../../data/icons/kalarm.png"))
+        self.main_startTimeButton.setIcon(QtGui.QIcon(":/icons/icons/kalarm.png"))
         self.main_startTimeButton.setIconSize(QtCore.QSize(64,64))
         self.main_startTimeButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_startTimeButton.setAutoRaise(True)
@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_startTimeButton,0,2,1,1)
 
         self.main_stopButton = QtGui.QToolButton(self.tab)
-        self.main_stopButton.setIcon(QtGui.QIcon("../../data/icons/stop.png"))
+        self.main_stopButton.setIcon(QtGui.QIcon(":/icons/icons/stop.png"))
         self.main_stopButton.setIconSize(QtCore.QSize(64,64))
         self.main_stopButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_stopButton.setAutoRaise(True)
@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_stopButton,0,3,1,1)
 
         self.main_startButton = QtGui.QToolButton(self.tab)
-        self.main_startButton.setIcon(QtGui.QIcon("../../data/icons/player_play.png"))
+        self.main_startButton.setIcon(QtGui.QIcon(":/icons/icons/player_play.png"))
         self.main_startButton.setIconSize(QtCore.QSize(64,64))
         self.main_startButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_startButton.setAutoRaise(True)
@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addItem(spacerItem1,0,0,1,1)
 
         self.main_settingsButton = QtGui.QToolButton(self.tab)
-        self.main_settingsButton.setIcon(QtGui.QIcon("../../data/icons/kcontrol.png"))
+        self.main_settingsButton.setIcon(QtGui.QIcon(":/icons/icons/kcontrol.png"))
         self.main_settingsButton.setIconSize(QtCore.QSize(64,64))
         self.main_settingsButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_settingsButton.setAutoRaise(True)
@@ -74,7 +74,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_settingsButton,0,6,1,1)
 
         self.main_remoteButton = QtGui.QToolButton(self.tab)
-        self.main_remoteButton.setIcon(QtGui.QIcon("../../data/icons/remote.png"))
+        self.main_remoteButton.setIcon(QtGui.QIcon(":/icons/icons/remote.png"))
         self.main_remoteButton.setIconSize(QtCore.QSize(64,64))
         self.main_remoteButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_remoteButton.setAutoRaise(True)
@@ -82,7 +82,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_remoteButton,0,5,1,1)
 
         self.main_changeButton = QtGui.QToolButton(self.tab)
-        self.main_changeButton.setIcon(QtGui.QIcon("../../data/icons/kontact_contacts.png"))
+        self.main_changeButton.setIcon(QtGui.QIcon(":/icons/icons/kontact_contacts.png"))
         self.main_changeButton.setIconSize(QtCore.QSize(64,64))
         self.main_changeButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_changeButton.setAutoRaise(True)
@@ -90,7 +90,7 @@ class Ui_MainWindow(object):
         self.gridlayout1.addWidget(self.main_changeButton,0,4,1,1)
 
         self.main_shutDownButton = QtGui.QToolButton(self.tab)
-        self.main_shutDownButton.setIcon(QtGui.QIcon("../../data/icons/exit.png"))
+        self.main_shutDownButton.setIcon(QtGui.QIcon(":/icons/icons/exit.png"))
         self.main_shutDownButton.setIconSize(QtCore.QSize(64,64))
         self.main_shutDownButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.main_shutDownButton.setAutoRaise(True)
@@ -163,22 +163,22 @@ class Ui_MainWindow(object):
         self.gridlayout3.addWidget(self.orders_treeWidget_1,0,0,1,5)
 
         self.orders_cancelButton_1 = QtGui.QPushButton(self.groupBox_2)
-        self.orders_cancelButton_1.setIcon(QtGui.QIcon("../../data/icons/button_cancel.png"))
+        self.orders_cancelButton_1.setIcon(QtGui.QIcon(":/icons/icons/button_cancel.png"))
         self.orders_cancelButton_1.setObjectName("orders_cancelButton_1")
         self.gridlayout3.addWidget(self.orders_cancelButton_1,2,4,1,1)
 
         self.orders_deleteButton_1 = QtGui.QPushButton(self.groupBox_2)
-        self.orders_deleteButton_1.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
+        self.orders_deleteButton_1.setIcon(QtGui.QIcon(":/icons/icons/edit_remove.png"))
         self.orders_deleteButton_1.setObjectName("orders_deleteButton_1")
         self.gridlayout3.addWidget(self.orders_deleteButton_1,2,3,1,1)
 
         self.orders_updateButton_1 = QtGui.QPushButton(self.groupBox_2)
-        self.orders_updateButton_1.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
+        self.orders_updateButton_1.setIcon(QtGui.QIcon(":/icons/icons/reload.png"))
         self.orders_updateButton_1.setObjectName("orders_updateButton_1")
         self.gridlayout3.addWidget(self.orders_updateButton_1,2,2,1,1)
 
         self.orders_addButton_1 = QtGui.QPushButton(self.groupBox_2)
-        self.orders_addButton_1.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
+        self.orders_addButton_1.setIcon(QtGui.QIcon(":/icons/icons/edit_add.png"))
         self.orders_addButton_1.setObjectName("orders_addButton_1")
         self.gridlayout3.addWidget(self.orders_addButton_1,2,1,1,1)
 
@@ -235,17 +235,17 @@ class Ui_MainWindow(object):
         self.gridlayout5.addItem(spacerItem3,2,0,1,1)
 
         self.orders_addButton_2 = QtGui.QPushButton(self.groupBox_3)
-        self.orders_addButton_2.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
+        self.orders_addButton_2.setIcon(QtGui.QIcon(":/icons/icons/edit_add.png"))
         self.orders_addButton_2.setObjectName("orders_addButton_2")
         self.gridlayout5.addWidget(self.orders_addButton_2,2,1,1,1)
 
         self.orders_updateButton_2 = QtGui.QPushButton(self.groupBox_3)
-        self.orders_updateButton_2.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
+        self.orders_updateButton_2.setIcon(QtGui.QIcon(":/icons/icons/reload.png"))
         self.orders_updateButton_2.setObjectName("orders_updateButton_2")
         self.gridlayout5.addWidget(self.orders_updateButton_2,2,2,1,1)
 
         self.orders_deleteButton_2 = QtGui.QPushButton(self.groupBox_3)
-        self.orders_deleteButton_2.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
+        self.orders_deleteButton_2.setIcon(QtGui.QIcon(":/icons/icons/edit_remove.png"))
         self.orders_deleteButton_2.setObjectName("orders_deleteButton_2")
         self.gridlayout5.addWidget(self.orders_deleteButton_2,2,3,1,1)
         self.gridlayout2.addWidget(self.splitter,0,0,1,1)
@@ -267,8 +267,8 @@ class Ui_MainWindow(object):
         self.layoutWidget.setObjectName("layoutWidget")
 
         self.vboxlayout = QtGui.QVBoxLayout(self.layoutWidget)
-        self.vboxlayout.setMargin(0)
         self.vboxlayout.setSpacing(6)
+        self.vboxlayout.setMargin(0)
         self.vboxlayout.setObjectName("vboxlayout")
 
         self.members_treeWidget = QtGui.QTreeWidget(self.layoutWidget)
@@ -278,12 +278,12 @@ class Ui_MainWindow(object):
         self.vboxlayout.addWidget(self.members_treeWidget)
 
         self.hboxlayout = QtGui.QHBoxLayout()
-        self.hboxlayout.setMargin(0)
         self.hboxlayout.setSpacing(6)
+        self.hboxlayout.setMargin(0)
         self.hboxlayout.setObjectName("hboxlayout")
 
         self.members_clearButton = QtGui.QPushButton(self.layoutWidget)
-        self.members_clearButton.setIcon(QtGui.QIcon("../../data/icons/locationbar_erase.png"))
+        self.members_clearButton.setIcon(QtGui.QIcon(":/icons/icons/locationbar_erase.png"))
         self.members_clearButton.setFlat(True)
         self.members_clearButton.setObjectName("members_clearButton")
         self.hboxlayout.addWidget(self.members_clearButton)
@@ -309,30 +309,30 @@ class Ui_MainWindow(object):
         self.gridlayout8.addItem(spacerItem4,2,0,1,1)
 
         self.hboxlayout1 = QtGui.QHBoxLayout()
-        self.hboxlayout1.setMargin(0)
         self.hboxlayout1.setSpacing(6)
+        self.hboxlayout1.setMargin(0)
         self.hboxlayout1.setObjectName("hboxlayout1")
 
         spacerItem5 = QtGui.QSpacerItem(80,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.hboxlayout1.addItem(spacerItem5)
 
         self.members_addButton = QtGui.QPushButton(self.groupBox)
-        self.members_addButton.setIcon(QtGui.QIcon("../../data/icons/edit_add.png"))
+        self.members_addButton.setIcon(QtGui.QIcon(":/icons/icons/edit_add.png"))
         self.members_addButton.setObjectName("members_addButton")
         self.hboxlayout1.addWidget(self.members_addButton)
 
         self.members_updateButton = QtGui.QPushButton(self.groupBox)
-        self.members_updateButton.setIcon(QtGui.QIcon("../../data/icons/reload.png"))
+        self.members_updateButton.setIcon(QtGui.QIcon(":/icons/icons/reload.png"))
         self.members_updateButton.setObjectName("members_updateButton")
         self.hboxlayout1.addWidget(self.members_updateButton)
 
         self.members_deleteButton = QtGui.QPushButton(self.groupBox)
-        self.members_deleteButton.setIcon(QtGui.QIcon("../../data/icons/edit_remove.png"))
+        self.members_deleteButton.setIcon(QtGui.QIcon(":/icons/icons/edit_remove.png"))
         self.members_deleteButton.setObjectName("members_deleteButton")
         self.hboxlayout1.addWidget(self.members_deleteButton)
 
         self.members_reportsButton = QtGui.QPushButton(self.groupBox)
-        self.members_reportsButton.setIcon(QtGui.QIcon("../../data/icons/find.png"))
+        self.members_reportsButton.setIcon(QtGui.QIcon(":/icons/icons/fileopen.png"))
         self.members_reportsButton.setObjectName("members_reportsButton")
         self.hboxlayout1.addWidget(self.members_reportsButton)
         self.gridlayout8.addLayout(self.hboxlayout1,3,0,1,1)
@@ -386,8 +386,8 @@ class Ui_MainWindow(object):
 
         self.members_debt = QtGui.QDoubleSpinBox(self.groupBox)
         self.members_debt.setAlignment(QtCore.Qt.AlignRight)
-        self.members_debt.setMaximum(1000000000.0)
         self.members_debt.setMinimum(-1000000000.0)
+        self.members_debt.setMaximum(1000000000.0)
         self.members_debt.setObjectName("members_debt")
         self.gridlayout9.addWidget(self.members_debt,3,1,1,1)
         self.gridlayout8.addLayout(self.gridlayout9,0,0,1,1)
@@ -449,7 +449,7 @@ class Ui_MainWindow(object):
         self.gridlayout12.addWidget(self.logs_dateTimeEdit_1,0,0,1,1)
 
         self.logs_searchButton = QtGui.QPushButton(self.tab_3)
-        self.logs_searchButton.setIcon(QtGui.QIcon("../../data/icons/find.png"))
+        self.logs_searchButton.setIcon(QtGui.QIcon(":/icons/icons/find.png"))
         self.logs_searchButton.setIconSize(QtCore.QSize(64,64))
         self.logs_searchButton.setObjectName("logs_searchButton")
         self.gridlayout12.addWidget(self.logs_searchButton,0,1,2,1)
@@ -467,7 +467,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,650,29))
+        self.menubar.setGeometry(QtCore.QRect(0,0,650,27))
         self.menubar.setObjectName("menubar")
 
         self.menuHelp = QtGui.QMenu(self.menubar)
@@ -491,6 +491,7 @@ class Ui_MainWindow(object):
         self.actionContents.setObjectName("actionContents")
 
         self.actionAbout_pyKafe = QtGui.QAction(MainWindow)
+        self.actionAbout_pyKafe.setIcon(QtGui.QIcon(":/icons/icons/pyKafe.png"))
         self.actionAbout_pyKafe.setObjectName("actionAbout_pyKafe")
 
         self.actionAbout_Qt = QtGui.QAction(MainWindow)
@@ -503,9 +504,11 @@ class Ui_MainWindow(object):
         self.actionEntertainment.setObjectName("actionEntertainment")
 
         self.actionExit = QtGui.QAction(MainWindow)
+        self.actionExit.setIcon(QtGui.QIcon(":/icons/icons/exit.png"))
         self.actionExit.setObjectName("actionExit")
 
         self.actionSettings = QtGui.QAction(MainWindow)
+        self.actionSettings.setIcon(QtGui.QIcon(":/icons/icons/kcontrol.png"))
         self.actionSettings.setObjectName("actionSettings")
         self.menuHelp.addAction(self.actionContents)
         self.menuHelp.addSeparator()
@@ -679,3 +682,4 @@ class Ui_MainWindow(object):
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
 
+import pykafe_rc
