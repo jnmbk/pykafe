@@ -1,9 +1,7 @@
-before 0.1_alpha1:
-* complete all state changes
-
-before 0.1_beta1:
+* use ts for translations
+* use qrc subsystem for icons
+* use QSettings, leave database alone
+* use qt's sqlite backend
 * complete all inline TODO's
-
-before 0.1_rc1:
 * menus should be capable of doing anything
 * add shortcut keys to all functions and buttons
