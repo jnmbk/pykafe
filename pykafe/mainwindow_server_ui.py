@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/mainwindow_server.ui'
 #
-# Created: Sat Jan 26 18:34:32 2008
+# Created: Sat Jan 26 19:11:23 2008
 #      by: PyQt4 UI code generator 4.3-snapshot-20071219
 #
 # WARNING! All changes made in this file will be lost!
@@ -526,34 +526,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        QtCore.QObject.connect(self.main_startButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_stopButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
         QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_startTimeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_addButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_updateButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_deleteButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_cancelButton_1,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_addButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_updateButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_deleteButton_2,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.members_addButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.members_updateButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.members_deleteButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.members_reportsButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_changeButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_remoteButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_settingsButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.main_shutDownButton,QtCore.SIGNAL("clicked()"),MainWindow.close)
-        QtCore.QObject.connect(self.members_treeWidget,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)"),MainWindow.close)
         QtCore.QObject.connect(self.members_clearButton,QtCore.SIGNAL("clicked()"),self.members_filter.clear)
-        QtCore.QObject.connect(self.members_filter,QtCore.SIGNAL("textChanged(QString)"),MainWindow.close)
-        QtCore.QObject.connect(self.actionAbout_pyKafe,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.actionAbout_Qt,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_treeWidget_1,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)"),MainWindow.close)
-        QtCore.QObject.connect(self.orders_treeWidget_2,QtCore.SIGNAL("currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)"),MainWindow.close)
-        QtCore.QObject.connect(self.actionSettings,QtCore.SIGNAL("activated()"),MainWindow.close)
-        QtCore.QObject.connect(self.actionComputer,QtCore.SIGNAL("activated()"),MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget,self.main_startButton)
         MainWindow.setTabOrder(self.main_startButton,self.main_startTimeButton)
