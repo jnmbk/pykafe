@@ -13,14 +13,26 @@
    <string>PyKafe</string>
   </property>
   <property name="windowIcon" >
-   <iconset>../../data/icons/pyKafe.png</iconset>
+   <iconset resource="../data/pykafe.qrc" >:/icons/icons/pyKafe.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
-    <property name="margin" >
+    <property name="leftMargin" >
      <number>9</number>
     </property>
-    <property name="spacing" >
+    <property name="topMargin" >
+     <number>9</number>
+    </property>
+    <property name="rightMargin" >
+     <number>9</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>9</number>
+    </property>
+    <property name="horizontalSpacing" >
+     <number>6</number>
+    </property>
+    <property name="verticalSpacing" >
      <number>6</number>
     </property>
     <item row="0" column="0" >
@@ -36,10 +48,22 @@
         <string>Main</string>
        </attribute>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>9</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="0" column="8" >
@@ -64,7 +88,7 @@
            <string>Timed</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/kalarm.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/kalarm.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -89,7 +113,7 @@
            <string>Stop</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/stop.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/stop.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -114,7 +138,7 @@
            <string>Start</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/player_play.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/player_play.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -152,7 +176,7 @@
            <string>Settings</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/kcontrol.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/kcontrol.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -177,7 +201,7 @@
            <string>Remote</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/remote.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/remote.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -202,7 +226,7 @@
            <string>Change</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/kontact_contacts.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/kontact_contacts.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -227,7 +251,7 @@
            <string>Shutdown</string>
           </property>
           <property name="icon" >
-           <iconset>../../data/icons/exit.png</iconset>
+           <iconset resource="../data/pykafe.qrc" >:/icons/icons/exit.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -293,10 +317,22 @@
         <string>Orders</string>
        </attribute>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>9</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="0" column="0" >
@@ -309,18 +345,42 @@
             <string>Orders</string>
            </property>
            <layout class="QGridLayout" >
-            <property name="margin" >
+            <property name="leftMargin" >
              <number>9</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing" >
              <number>6</number>
             </property>
             <item row="1" column="0" colspan="5" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>0</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="0" column="1" >
@@ -395,7 +455,7 @@
                <string>Cancel</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/button_cancel.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/button_cancel.png</iconset>
               </property>
              </widget>
             </item>
@@ -405,7 +465,7 @@
                <string>Delete</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/edit_remove.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_remove.png</iconset>
               </property>
              </widget>
             </item>
@@ -415,7 +475,7 @@
                <string>Update</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/reload.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/reload.png</iconset>
               </property>
              </widget>
             </item>
@@ -425,7 +485,7 @@
                <string>Add</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/edit_add.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_add.png</iconset>
               </property>
              </widget>
             </item>
@@ -449,10 +509,22 @@
             <string>Cafeteria Stocks</string>
            </property>
            <layout class="QGridLayout" >
-            <property name="margin" >
+            <property name="leftMargin" >
              <number>9</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing" >
              <number>6</number>
             </property>
             <item row="0" column="0" colspan="4" >
@@ -482,10 +554,22 @@
             </item>
             <item row="1" column="0" colspan="4" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>0</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="1" column="0" >
@@ -547,7 +631,7 @@
                <string>Add</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/edit_add.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_add.png</iconset>
               </property>
              </widget>
             </item>
@@ -557,7 +641,7 @@
                <string>Update</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/reload.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/reload.png</iconset>
               </property>
              </widget>
             </item>
@@ -567,7 +651,7 @@
                <string>Delete</string>
               </property>
               <property name="icon" >
-               <iconset>../../data/icons/edit_remove.png</iconset>
+               <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_remove.png</iconset>
               </property>
              </widget>
             </item>
@@ -582,10 +666,22 @@
         <string>Members</string>
        </attribute>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>9</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="0" column="0" >
@@ -595,11 +691,20 @@
           </property>
           <widget class="QWidget" name="layoutWidget" >
            <layout class="QVBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
             <property name="spacing" >
              <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
             </property>
             <item>
              <widget class="QTreeWidget" name="members_treeWidget" >
@@ -618,11 +723,20 @@
             </item>
             <item>
              <layout class="QHBoxLayout" >
-              <property name="margin" >
-               <number>0</number>
-              </property>
               <property name="spacing" >
                <number>6</number>
+              </property>
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
               </property>
               <item>
                <widget class="QPushButton" name="members_clearButton" >
@@ -633,7 +747,7 @@
                  <string>Clears filter</string>
                 </property>
                 <property name="icon" >
-                 <iconset>../../data/icons/locationbar_erase.png</iconset>
+                 <iconset resource="../data/pykafe.qrc" >:/icons/icons/locationbar_erase.png</iconset>
                 </property>
                 <property name="flat" >
                  <bool>true</bool>
@@ -663,10 +777,22 @@
             <string>Member Information</string>
            </property>
            <layout class="QGridLayout" >
-            <property name="margin" >
+            <property name="leftMargin" >
              <number>9</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing" >
              <number>6</number>
             </property>
             <item row="2" column="0" >
@@ -684,11 +810,20 @@
             </item>
             <item row="3" column="0" >
              <layout class="QHBoxLayout" >
-              <property name="margin" >
-               <number>0</number>
-              </property>
               <property name="spacing" >
                <number>6</number>
+              </property>
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
               </property>
               <item>
                <spacer>
@@ -712,7 +847,7 @@
                  <string>Add</string>
                 </property>
                 <property name="icon" >
-                 <iconset>../../data/icons/edit_add.png</iconset>
+                 <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_add.png</iconset>
                 </property>
                </widget>
               </item>
@@ -722,7 +857,7 @@
                  <string>Update</string>
                 </property>
                 <property name="icon" >
-                 <iconset>../../data/icons/reload.png</iconset>
+                 <iconset resource="../data/pykafe.qrc" >:/icons/icons/reload.png</iconset>
                 </property>
                </widget>
               </item>
@@ -732,7 +867,7 @@
                  <string>Delete</string>
                 </property>
                 <property name="icon" >
-                 <iconset>../../data/icons/edit_remove.png</iconset>
+                 <iconset resource="../data/pykafe.qrc" >:/icons/icons/edit_remove.png</iconset>
                 </property>
                </widget>
               </item>
@@ -742,7 +877,7 @@
                  <string>Reports</string>
                 </property>
                 <property name="icon" >
-                 <iconset>../../data/icons/find.png</iconset>
+                 <iconset resource="../data/pykafe.qrc" >:/icons/icons/fileopen.png</iconset>
                 </property>
                </widget>
               </item>
@@ -750,10 +885,22 @@
             </item>
             <item row="0" column="0" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>0</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="4" column="0" >
@@ -838,11 +985,11 @@
                 <property name="alignment" >
                  <set>Qt::AlignRight</set>
                 </property>
-                <property name="maximum" >
-                 <double>1000000000.000000000000000</double>
-                </property>
                 <property name="minimum" >
                  <double>-1000000000.000000000000000</double>
+                </property>
+                <property name="maximum" >
+                 <double>1000000000.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -850,10 +997,22 @@
             </item>
             <item row="1" column="0" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>0</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="2" column="0" >
@@ -913,10 +1072,22 @@
         <string>Logs</string>
        </attribute>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>9</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="0" column="2" >
@@ -947,10 +1118,22 @@
         </item>
         <item row="0" column="1" >
          <layout class="QGridLayout" >
-          <property name="margin" >
+          <property name="leftMargin" >
            <number>0</number>
           </property>
-          <property name="spacing" >
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
            <number>6</number>
           </property>
           <item row="0" column="0" >
@@ -959,7 +1142,7 @@
           <item rowspan="2" row="0" column="1" >
            <widget class="QPushButton" name="logs_searchButton" >
             <property name="icon" >
-             <iconset>../../data/icons/find.png</iconset>
+             <iconset resource="../data/pykafe.qrc" >:/icons/icons/find.png</iconset>
             </property>
             <property name="iconSize" >
              <size>
@@ -1025,7 +1208,7 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>29</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -1069,6 +1252,9 @@
    </property>
   </action>
   <action name="actionAbout_pyKafe" >
+   <property name="icon" >
+    <iconset resource="../data/pykafe.qrc" >:/icons/icons/pyKafe.png</iconset>
+   </property>
    <property name="text" >
     <string>About pyKafe</string>
    </property>
@@ -1089,11 +1275,17 @@
    </property>
   </action>
   <action name="actionExit" >
+   <property name="icon" >
+    <iconset resource="../data/pykafe.qrc" >:/icons/icons/exit.png</iconset>
+   </property>
    <property name="text" >
     <string>Exit</string>
    </property>
   </action>
   <action name="actionSettings" >
+   <property name="icon" >
+    <iconset resource="../data/pykafe.qrc" >:/icons/icons/kcontrol.png</iconset>
+   </property>
    <property name="text" >
     <string>Settings...</string>
    </property>
@@ -1141,7 +1333,9 @@
   <tabstop>logs_dateTimeEdit_2</tabstop>
   <tabstop>logs_treeWidget</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../data/pykafe.qrc" />
+ </resources>
  <connections>
   <connection>
    <sender>main_startButton</sender>
