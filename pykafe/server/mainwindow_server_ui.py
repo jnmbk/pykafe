@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/mainwindow_server.ui'
 #
-# Created: Sat Jan 26 19:11:23 2008
+# Created: Sun Jan 27 12:42:01 2008
 #      by: PyQt4 UI code generator 4.3-snapshot-20071219
 #
 # WARNING! All changes made in this file will be lost!
@@ -467,7 +467,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,650,27))
+        self.menubar.setGeometry(QtCore.QRect(0,0,650,21))
         self.menubar.setObjectName("menubar")
 
         self.menuHelp = QtGui.QMenu(self.menubar)
@@ -526,7 +526,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("activated()"),MainWindow.close)
+        QtCore.QObject.connect(self.actionExit,QtCore.SIGNAL("triggered()"),MainWindow.close)
         QtCore.QObject.connect(self.members_clearButton,QtCore.SIGNAL("clicked()"),self.members_filter.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget,self.main_startButton)
