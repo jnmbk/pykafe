@@ -23,15 +23,13 @@ from defaultsettings import defaultsettings
 class TcpServer(QtNetwork.QTcpServer):
     def __init__(self, parent = None):
         QtNetwork.QTcpServer.__init__(self, parent)
-        self.mainWindow = parent
 
         settings = QtCore.QSettings()
 
-        if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any),
-        settings.value("server/port", defaultsettings["server/port"]).toInt()[0]):
-            QtGui.QMessageBox.critical(self.parent(),
-                    QtGui.QApplication.translate("TcpServer", "Connection Error"),
-                    QtGui.QApplication.translate("TcpServer", "Unable to start server: %1").arg(self.errorString()))
+        # We just assume everything is going fine, gui should do the check here like this:
+        # if tcpServer.isListening():
+        self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any),
+            settings.value("server/port", defaultsettings["server/port"]).toInt()[0])
 
     def incomingConnection(self, socketDescriptor):
         # this is called when someone tries to connect
