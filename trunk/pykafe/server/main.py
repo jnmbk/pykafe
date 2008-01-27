@@ -19,6 +19,9 @@ import signal, sys
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
+import passwordwindow
+import mainwindow_server
+
 def loadTranslator():
     settings = QtCore.QSettings()
     if settings.contains("language"):
@@ -37,8 +40,14 @@ def main():
 
     loadTranslator()
 
-    import mainwindow_server
     mainWindow = mainwindow_server.MainWindow()
+    passwordWindow = passwordwindow.PasswordWindow(mainWindow)
+
+    settings = QtCore.QSettings()
+    if settings.value("start/askpassword", QtCore.QVariant(True)).toBool():
+        passwordWindow.show()
+    else:
+        mainWindow.show()
 
     return app.exec_()
 

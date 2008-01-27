@@ -24,12 +24,13 @@ class MainWindow(QtGui.QMainWindow, mainwindow_server_ui.Ui_MainWindow):
 
         self.tcpServer = tcpserver.TcpServer(self)
 
-        self.show()
+        """
         if not self.tcpServer.isListening():
             QtGui.QMessageBox.critical(self,
                 QtGui.QApplication.translate("MainWindow", "Connection Error"),
                 QtGui.QApplication.translate("MainWindow",
                 "Unable to start server: %1").arg(self.tcpServer.errorString()))
+        """
 
     @QtCore.pyqtSignature("on_main_startButton_clicked()")
     def on_main_startButton_clicked(self):
