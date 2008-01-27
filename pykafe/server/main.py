@@ -39,7 +39,6 @@ def main():
 
     import mainwindow_server
     mainWindow = mainwindow_server.MainWindow()
-    mainWindow.show()
 
     return app.exec_()
 
